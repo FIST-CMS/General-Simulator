@@ -1,0 +1,15 @@
+
+#compile setting
+CC = nvcc
+FLAGS = -g -G 
+SRCS = $(wildcard *.cu)
+OBJECTS = $(patsubst %.cu, %.o, $(SRCS))
+EXCU = exe
+LIB	=  -lcurand
+exe: $(OBJECTS)
+	$(CC) $(FLAGS) -o $(EXCU)  $(OBJECTS) $(LIB) 
+
+clean:
+	rm *.o
+	rm $(EXCU)
+

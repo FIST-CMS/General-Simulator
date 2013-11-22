@@ -1,0 +1,19 @@
+##########################################################
+sys cores #assign the type of the system
+##########################################################
+variable l 32
+###########################################################
+set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
+set variantn 4
+set coresn 1
+set radius 6
+set concentration 0.2 0.44
+#set method regular
+set method regular
+###########################################################
+##########################################################
+dump ./ 1 eta concentration #cores
+run
+shell cp concentration.final.data data.con.for.diffuse
+shell cp eta.final.data data.eta.for.diffuse
+shell rm eta.final.data concentration.final.data

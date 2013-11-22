@@ -1,0 +1,62 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Mon Sep  9 11:54:31 2013
+;; Desktop file format version 206
+;; Emacs version 23.3.1
+
+;; Global section:
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring nil)
+(setq regexp-search-ring nil)
+(setq register-alist nil)
+(setq file-name-history '("~/5precipitateInfluence/"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 206
+  "/public/home/Eins/5precipitateInfluence/dynamics.h"
+  "dynamics.h"
+  'c++-mode
+  '(abbrev-mode linum-mode auto-complete-mode semantic-stickyfunc-mode semantic-highlight-func-mode senator-minor-mode semantic-idle-scheduler-mode semantic-idle-summary-mode semantic-idle-local-symbol-highlight-mode semantic-idle-completions-mode semantic-mru-bookmark-mode semantic-decoration-mode)
+  725
+  '(1241 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/public/home/Eins/5precipitateInfluence/gups.cu"
+  "gups.cu"
+  'c++-mode
+  '(abbrev-mode linum-mode auto-complete-mode semantic-stickyfunc-mode semantic-highlight-func-mode senator-minor-mode semantic-idle-scheduler-mode semantic-idle-summary-mode semantic-idle-local-symbol-highlight-mode semantic-idle-completions-mode semantic-mru-bookmark-mode semantic-decoration-mode)
+  2352
+  '(3546 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/public/home/Eins/5precipitateInfluence/gups.h"
+  "gups.h"
+  'c++-mode
+  '(abbrev-mode linum-mode auto-complete-mode semantic-stickyfunc-mode semantic-highlight-func-mode senator-minor-mode semantic-idle-scheduler-mode semantic-idle-summary-mode semantic-idle-local-symbol-highlight-mode semantic-idle-completions-mode semantic-mru-bookmark-mode semantic-decoration-mode)
+  645
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/public/home/Eins/5precipitateInfluence/dynamics.cu"
+  "dynamics.cu"
+  'c++-mode
+  '(abbrev-mode linum-mode auto-complete-mode semantic-stickyfunc-mode semantic-highlight-func-mode senator-minor-mode semantic-idle-scheduler-mode semantic-idle-summary-mode semantic-idle-local-symbol-highlight-mode semantic-idle-completions-mode semantic-mru-bookmark-mode semantic-decoration-mode)
+  3818
+  '(2844 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+

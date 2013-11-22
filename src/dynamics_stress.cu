@@ -1,0 +1,149 @@
+
+#define DEBUG 0
+
+////////////////////////////////////////
+#include"pub.h"
+#include"dynamics.h"
+////////////////////////////////////////
+#include<curand.h>
+#include<cufft.h>
+#include"random.h"
+#include"gtensorb.h"
+
+#include"dynamics_stress.h"
+
+using namespace GUPS_NS;
+using namespace DATA_NS;
+/*
+  main calculation:
+    the structure tensor B
+	derivative of order parameter and concentration
+ */
+
+int DynamicsStress::Initialize(){
+  //para setting should be finished before or within this function
+  string ss;
+  ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
+  ss=Vars["variantn"];              if (ss!="") { ss>>VariantN;} 
+  ss=Vars["modulus"]; 				if (ss!="") ss>>B.C00>>B.C01>>B.C33;else {B.C00=3.5;B.C01=1.5; B.C33=1.0;}
+  ss=Vars["xi"]; 					if (ss!="") ss>>Xi;else {Xi=4000.0f; }
+  // it is called to initialize the --run-- function
+  // allocate memory initial size and default values
+  SetCalPos(Data_HOST);
+  ///////////////////////////////////////////////////
+  Stress = &((*Datas)["stress"]); // the assign function will malloc space for Stress
+  Defect = &((*Datas)["defect"]); // may create here
+  Stress->Init(4,6,nx,ny,nz,Data_HOST_DEV);
+  Defect->Init(3,nx,ny,nz,Data_HOST);
+  ///////////////////////////////////////////////////
+
+  Eta = &((*Datas)["eta"]); // may create here
+  if ( Eta->Arr == NULL ){
+	Eta->Init(4,VariantN,nx,ny,nz,Data_HOST_DEV);
+	SetCalPos(Data_DEV);
+	(*Eta)=0.0f; 
+  }else { Eta->HostToDevice(); }
+
+
+  if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
+  //StrainTensor=strainTensor;  //need to assign somewhere-else
+  StrainTensor = &((*Datas)["straintensor"]);
+  if (StrainTensor->Arr == NULL){
+	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	return -1;
+  }
+  tensor.Init(3,BaseVariantN+VariantN,3,3,Data_HOST_DEV); 
+  SetCalPos(Data_HOST);
+  tensor=0.f;
+  tensor(0,0,0)=1.0f; tensor(1,0,1)=1.0f; tensor(2,0,2)=1.0f;
+  tensor(3,1,1)=1.0f; tensor(4,1,2)=1.0f; tensor(5,2,2)=1.0f;
+  for (int i=6*9; i< (6+VariantN)*9; i++)
+	tensor[i]=(*StrainTensor)[i-6*9];
+  
+  GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
+  B.InitB(BaseVariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,tensor); 
+  GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
+
+  int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;
+  GV<0>::LogAndError<<"cuda fft plan is to create\n";
+  if (cufftPlanMany(&plan_vn,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,VariantN)==CUFFT_SUCCESS)
+	GV<0>::LogAndError<<"cuda fft plan vn is created\n";
+  else GV<0>::LogAndError<<"cuda fft plan vn fails to create\n";
+
+  if (cufftPlanMany(&plan_bvn,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,BaseVariantN/*6*/)==CUFFT_SUCCESS)
+	GV<0>::LogAndError<<"cuda fft plan bvn is created\n";
+  else GV<0>::LogAndError<<"cuda fft plan bvn fails to create\n";
+
+  int vndim[6]={4,VariantN,nx,ny,nz};
+  int bvndim[6]={4,BaseVariantN,nx,ny,nz};
+
+  Eta_CT.Init(vndim,Data_HOST_DEV);
+  RTermEta_CT.Init(bvndim,Data_HOST_DEV);
+
+  return 0;
+
+}
+
+DynamicsStress::DynamicsStress(){}
+DynamicsStress::~DynamicsStress(){
+  if (plan_vn) cufftDestroy(plan_vn);
+  if (plan_bvn) cufftDestroy(plan_bvn);
+}
+
+__global__ void ElasticForceCalculate_Stress_Kernel(Complex *ReTerm,Complex*Eta_sq,Real* B,int VariantN,Real Xi){
+  //int BaseVariantN = gridDim.z;
+  int nx= gridDim.x, ny= gridDim.y, nz = blockDim.x;
+  int x = blockIdx.x, y = blockIdx.y, z = threadIdx.x, v = blockIdx.z;
+  int nn= nx*ny*nz;
+  int nvn=  VariantN* nn;
+  int pn= (x*ny +y)*nx+z;
+  Complex temp = 0;
+  for (int i=0;i<VariantN;i++){
+	temp+=Xi*B[ v*nvn + i*nn +pn ]* Eta_sq[ i*nn + pn ];
+	if (DEBUG) ReTerm[v*nn+pn]=temp;
+  }
+  ReTerm[ v*nn + pn ] = temp;
+}
+
+int DynamicsStress::ElasticForceCalculate(){
+  SetCalPos(Data_DEV);
+  //Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
+  Eta_CT=(*Eta); //Store it in the buffer area
+  cufftExecC2C(plan_vn,(cufftComplex*)Eta_CT.Arr_dev,(cufftComplex*)Eta_CT.Arr_dev,CUFFT_FORWARD);
+  divi_device(Eta_CT.Arr_dev,Eta_CT.Arr_dev ,real(nx*ny*nz) ,Eta_CT.N() ); // seperate transformed
+  dim3 bn(nx,ny,BaseVariantN/*6*/);
+  dim3 tn(nz);
+  ElasticForceCalculate_Stress_Kernel<<<bn,tn>>>
+	(RTermEta_CT.Arr_dev,Eta_CT.Arr_dev,B.Arr_dev,VariantN,Xi);
+  cufftExecC2C(plan_bvn,(cufftComplex*)RTermEta_CT.Arr_dev,(cufftComplex*)RTermEta_CT.Arr_dev,CUFFT_INVERSE);
+  *Stress = - RTermEta_CT;
+  return 0;
+}
+
+int DynamicsStress::Calculate(){
+  string ss;
+  
+  ElasticForceCalculate();
+
+  SetCalPos(Data_HOST);
+  (*Defect)=0.f;
+  for (int v=0; v<VariantN; v++)
+	for (int i=0; i<nx; i++)
+	  for (int j=0; j<ny; j++)
+		for (int k=0; k<nz; k++)
+		  if (abs((*Eta)(v,i,j,k))>0.9)
+			(*Defect)(i,j,k)=1.f;
+  
+  return 0;
+}
+ 
+
+int DynamicsStress::Fix(real progress){
+  string ss,mode;
+  return 0;
+}
+
+string DynamicsStress::Get(string ss){ // return the statistic info.
+  string var; ss>>var;
+  return "nan"; 
+}
