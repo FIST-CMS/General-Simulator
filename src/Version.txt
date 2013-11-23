@@ -1,7 +1,0 @@
-version 2.1.2
-cores is correct
-diffuse is correct
-mart is correct
-
-stress remains unknow maybe is right but I do not know
-
