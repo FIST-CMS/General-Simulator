@@ -1,6 +1,0 @@
-##########################################################
-sys xxx #assign the type of the system
-##########################################################
-variable totalstep 20
-info totalstep x
-run totalstep
