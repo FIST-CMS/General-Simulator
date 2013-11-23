@@ -1,8 +1,0 @@
-*.o
-*.~
-*.swp
-.dy*
-.em*
-.tm*
-Plot.nb
-init.m
