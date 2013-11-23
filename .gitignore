@@ -5,12 +5,15 @@
 .dy*
 .em*
 .tm*
+tags
 
 # data files
 data.*
+*.data
 
-# log files
+# specific file types
 *.log
+*.m
 
 # specific files
 Plot.nb
