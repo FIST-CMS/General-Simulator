@@ -16,12 +16,13 @@ DynamicsXxx::~DynamicsXxx(){}
 int DynamicsXxx::Initialize(){
   //para setting should be finished before or within this function
   string ss;
-  x=1.0f; Vars["x"]>>=x;	
+  Vars["x"]>>=x;	
+  Matrix = &((*Datas)["matrix"]);
   return 0;
 }
 
 int DynamicsXxx::Calculate(){
-  x=x+1.0f;
+  (*Matrix)=(*Matrix)*x;
   return 0;
 }
 
@@ -35,5 +36,6 @@ int DynamicsXxx::Fix(real progress){return 0;}
 string DynamicsXxx::Get(string ss){
   string ans;
   if (ss=="x") return ans<<x;
+  if (ss=="sumofmatrix") return ans<<(Matrix->TotalHost());
   return "nan";
 }

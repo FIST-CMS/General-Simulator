@@ -15,8 +15,11 @@ src/in.gups*
 # specific file types
 *.log
 *.m
+*.err
+log.*
 
 # specific files
 Plot.nb
 init.m
 in.gups
+gups

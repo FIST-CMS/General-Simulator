@@ -1,9 +1,7 @@
 #device 0 #assign gpu device ID for cal. default 0. also ./gups in.script deviceID
 sys mart  #assign the type of the system
-
 variable l 32
 variable steps 20000
-
 ###########################################################
 set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
 set modulus 3.5 1.5 1.0  #set the modulus constant

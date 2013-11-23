@@ -18,7 +18,7 @@ namespace GUPS_NS{
 	virtual string Get(string );
 	////////////////////////////////
 	float x;
-
+	Data<Real>*Matrix;
   };
 
 }
