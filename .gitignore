@@ -4,5 +4,6 @@
 .dy*
 .em*
 .tm*
+data.*
 Plot.nb
 init.m

@@ -1,0 +1,396 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+B	gups.h	/^	TensorB		B;$/;"	m	class:GUPS_NS::GUPS
+BaseLength	gups.h	/^	real 	BaseLength[3];$/;"	m	class:GUPS_NS::GUPS
+BpqElastic_Kernel	cudaKernels.h	/^__global__ void BpqElastic_Kernel(cucomplex_E *_ReciprocalElasticTerm,cucomplex_E*ppsi2n,float* bpq){$/;"	f
+Bulk_Kernel	cudaKernels.h	/^__global__ void Bulk_Kernel(float *flan,float*ppsi){$/;"	f
+CC	Makefile	/^CC = g++$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -g $/;"	m
+Concentration	gups.h	/^	Data<Real>	Concentration;$/;"	m	class:GUPS_NS::GUPS
+DefectCentre	gups.h	/^	Data<Real>	DefectCentre;$/;"	m	class:GUPS_NS::GUPS
+DefectN	gups.h	/^	int 		DefectN;$/;"	m	class:GUPS_NS::GUPS
+DefectR	gups.h	/^	int 		DefectR;$/;"	m	class:GUPS_NS::GUPS
+Dimension	gups.h	/^	int		Dimension[6];$/;"	m	class:GUPS_NS::GUPS
+DrivingForce_Kernel	cudaKernels.h	/^__global__ void DrivingForce_Kernel(float *lan,cucomplex_E*ppsi2n,float*ppsi,float* localStress,float a1,float a2,float a3){$/;"	f
+E	include/mathFloat_E.h	/^const float E=2.7182818284590;$/;"	v
+E	include/math_E.h	/^const double E=2.7182818284590;$/;"	v
+ENERGY_Eins_H	energy.h	3;"	d
+ERRORExist	input.h	/^	 bool 	ERRORExist;$/;"	m	class:GUPS_NS::INPUT
+Energy	energy.h	/^  class Energy: public Data<Real>{\/\/total energy for its main definition$/;"	c	namespace:GUPS_NS
+Eta	gups.h	/^	Data<Real>	Eta; \/\/there may be lots of eta but one Data is enough$/;"	m	class:GUPS_NS::GUPS
+Evolution_Kernel	cudaKernels.h	/^__global__ void Evolution_Kernel(float*ppsi,float*precippo,float*grad,float*lan,float*relast,float*extressenergy,float*_Noise,float dt,float betaa,float xi){$/;"	f
+FFTW3_H	include/fftw322/include/fftw3.h	48;"	d
+FFTW_ALLOW_LARGE_GENERIC	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_ALLOW_LARGE_GENERIC$/;"	v
+FFTW_ALLOW_LARGE_GENERIC	include/fftw322/include/fftw3.h	397;"	d
+FFTW_ALLOW_PRUNING	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_ALLOW_PRUNING$/;"	v
+FFTW_ALLOW_PRUNING	include/fftw322/include/fftw3.h	404;"	d
+FFTW_BACKWARD	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_BACKWARD$/;"	v
+FFTW_BACKWARD	include/fftw322/include/fftw3.h	375;"	d
+FFTW_BELIEVE_PCOST	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_BELIEVE_PCOST$/;"	v
+FFTW_BELIEVE_PCOST	include/fftw322/include/fftw3.h	392;"	d
+FFTW_CONCAT	include/fftw322/include/fftw3.h	65;"	d
+FFTW_CONSERVE_MEMORY	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_CONSERVE_MEMORY$/;"	v
+FFTW_CONSERVE_MEMORY	include/fftw322/include/fftw3.h	383;"	d
+FFTW_DEFINE_API	include/fftw322/include/fftw3.h	120;"	d
+FFTW_DEFINE_COMPLEX	include/fftw322/include/fftw3.h	368;"	d
+FFTW_DEFINE_COMPLEX	include/fftw322/include/fftw3.h	369;"	d
+FFTW_DEFINE_COMPLEX	include/fftw322/include/fftw3.h	60;"	d
+FFTW_DEFINE_COMPLEX	include/fftw322/include/fftw3.h	62;"	d
+FFTW_DESTROY_INPUT	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_DESTROY_INPUT$/;"	v
+FFTW_DESTROY_INPUT	include/fftw322/include/fftw3.h	381;"	d
+FFTW_DHT	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_DHT$/;"	v
+FFTW_DHT	include/fftw322/include/fftw3.h	/^     FFTW_R2HC=0, FFTW_HC2R=1, FFTW_DHT=2,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_ESTIMATE	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_ESTIMATE$/;"	v
+FFTW_ESTIMATE	include/fftw322/include/fftw3.h	387;"	d
+FFTW_ESTIMATE_PATIENT	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_ESTIMATE_PATIENT$/;"	v
+FFTW_ESTIMATE_PATIENT	include/fftw322/include/fftw3.h	391;"	d
+FFTW_EXHAUSTIVE	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_EXHAUSTIVE$/;"	v
+FFTW_EXHAUSTIVE	include/fftw322/include/fftw3.h	384;"	d
+FFTW_EXTERN	include/fftw322/include/fftw3.h	81;"	d
+FFTW_EXTERN	include/fftw322/include/fftw3.h	83;"	d
+FFTW_EXTERN	include/fftw322/include/fftw3.h	86;"	d
+FFTW_FORWARD	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_FORWARD$/;"	v
+FFTW_FORWARD	include/fftw322/include/fftw3.h	374;"	d
+FFTW_HC2R	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_HC2R$/;"	v
+FFTW_HC2R	include/fftw322/include/fftw3.h	/^     FFTW_R2HC=0, FFTW_HC2R=1, FFTW_DHT=2,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_MANGLE_DOUBLE	include/fftw322/include/fftw3.h	66;"	d
+FFTW_MANGLE_FLOAT	include/fftw322/include/fftw3.h	67;"	d
+FFTW_MANGLE_LONG_DOUBLE	include/fftw322/include/fftw3.h	68;"	d
+FFTW_MANGLE_QUAD	include/fftw322/include/fftw3.h	69;"	d
+FFTW_MEASURE	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_MEASURE$/;"	v
+FFTW_MEASURE	include/fftw322/include/fftw3.h	380;"	d
+FFTW_NO_BUFFERING	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_BUFFERING$/;"	v
+FFTW_NO_BUFFERING	include/fftw322/include/fftw3.h	395;"	d
+FFTW_NO_DFT_R2HC	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_DFT_R2HC$/;"	v
+FFTW_NO_DFT_R2HC	include/fftw322/include/fftw3.h	393;"	d
+FFTW_NO_FIXED_RADIX_LARGE_N	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_FIXED_RADIX_LARGE_N$/;"	v
+FFTW_NO_FIXED_RADIX_LARGE_N	include/fftw322/include/fftw3.h	403;"	d
+FFTW_NO_INDIRECT_OP	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_INDIRECT_OP$/;"	v
+FFTW_NO_INDIRECT_OP	include/fftw322/include/fftw3.h	396;"	d
+FFTW_NO_NONTHREADED	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_NONTHREADED$/;"	v
+FFTW_NO_NONTHREADED	include/fftw322/include/fftw3.h	394;"	d
+FFTW_NO_RANK_SPLITS	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_RANK_SPLITS$/;"	v
+FFTW_NO_RANK_SPLITS	include/fftw322/include/fftw3.h	398;"	d
+FFTW_NO_SIMD	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_SIMD$/;"	v
+FFTW_NO_SIMD	include/fftw322/include/fftw3.h	401;"	d
+FFTW_NO_SLOW	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_SLOW$/;"	v
+FFTW_NO_SLOW	include/fftw322/include/fftw3.h	402;"	d
+FFTW_NO_TIMELIMIT	include/fftw322/include/fftw3.h	377;"	d
+FFTW_NO_VRANK_SPLITS	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_VRANK_SPLITS$/;"	v
+FFTW_NO_VRANK_SPLITS	include/fftw322/include/fftw3.h	399;"	d
+FFTW_NO_VRECURSE	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_NO_VRECURSE$/;"	v
+FFTW_NO_VRECURSE	include/fftw322/include/fftw3.h	400;"	d
+FFTW_PATIENT	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_PATIENT$/;"	v
+FFTW_PATIENT	include/fftw322/include/fftw3.h	386;"	d
+FFTW_PRESERVE_INPUT	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_PRESERVE_INPUT$/;"	v
+FFTW_PRESERVE_INPUT	include/fftw322/include/fftw3.h	385;"	d
+FFTW_R2HC	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_R2HC$/;"	v
+FFTW_R2HC	include/fftw322/include/fftw3.h	/^     FFTW_R2HC=0, FFTW_HC2R=1, FFTW_DHT=2,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_REDFT00	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_REDFT00$/;"	v
+FFTW_REDFT00	include/fftw322/include/fftw3.h	/^     FFTW_REDFT00=3, FFTW_REDFT01=4, FFTW_REDFT10=5, FFTW_REDFT11=6,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_REDFT01	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_REDFT01$/;"	v
+FFTW_REDFT01	include/fftw322/include/fftw3.h	/^     FFTW_REDFT00=3, FFTW_REDFT01=4, FFTW_REDFT10=5, FFTW_REDFT11=6,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_REDFT10	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_REDFT10$/;"	v
+FFTW_REDFT10	include/fftw322/include/fftw3.h	/^     FFTW_REDFT00=3, FFTW_REDFT01=4, FFTW_REDFT10=5, FFTW_REDFT11=6,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_REDFT11	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_REDFT11$/;"	v
+FFTW_REDFT11	include/fftw322/include/fftw3.h	/^     FFTW_REDFT00=3, FFTW_REDFT01=4, FFTW_REDFT10=5, FFTW_REDFT11=6,$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_RODFT00	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_RODFT00$/;"	v
+FFTW_RODFT00	include/fftw322/include/fftw3.h	/^     FFTW_RODFT00=7, FFTW_RODFT01=8, FFTW_RODFT10=9, FFTW_RODFT11=10$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_RODFT01	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_RODFT01$/;"	v
+FFTW_RODFT01	include/fftw322/include/fftw3.h	/^     FFTW_RODFT00=7, FFTW_RODFT01=8, FFTW_RODFT10=9, FFTW_RODFT11=10$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_RODFT10	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_RODFT10$/;"	v
+FFTW_RODFT10	include/fftw322/include/fftw3.h	/^     FFTW_RODFT00=7, FFTW_RODFT01=8, FFTW_RODFT10=9, FFTW_RODFT11=10$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_RODFT11	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_RODFT11$/;"	v
+FFTW_RODFT11	include/fftw322/include/fftw3.h	/^     FFTW_RODFT00=7, FFTW_RODFT01=8, FFTW_RODFT10=9, FFTW_RODFT11=10$/;"	e	enum:fftw_r2r_kind_do_not_use_me
+FFTW_UNALIGNED	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_UNALIGNED$/;"	v
+FFTW_UNALIGNED	include/fftw322/include/fftw3.h	382;"	d
+FFTW_WISDOM_ONLY	include/fftw322/include/fftw3.f	/^      INTEGER FFTW_WISDOM_ONLY$/;"	v
+FFTW_WISDOM_ONLY	include/fftw322/include/fftw3.h	388;"	d
+GUPS	gups.h	/^  class GUPS{\/\/default 3D situation$/;"	c	namespace:GUPS_NS
+GUPS_Eins_H	gups.h	7;"	d
+GUPS_METHOD_RANDOM	gups.h	10;"	d
+GUPS_METHOD_UNIFORM	gups.h	11;"	d
+GUPS_NS	energy.h	/^namespace GUPS_NS{$/;"	n
+GUPS_NS	gups.h	/^namespace GUPS_NS{$/;"	n
+GUPS_NS	input.h	/^namespace GUPS_NS{$/;"	n
+GUPS_NS	random.h	/^namespace GUPS_NS{$/;"	n
+GUPS_NS	tensorb.h	/^namespace GUPS_NS{$/;"	n
+GaussCMInverse	include/mathFloat_E.h	/^int GaussCMInverse(float *AA,float *B,int n){$/;"	f
+Gen_dev	random.h	/^	curandGenerator_t Gen_dev,Gen_host;$/;"	m	class:GUPS_NS::Random
+Gen_host	random.h	/^	curandGenerator_t Gen_dev,Gen_host;$/;"	m	class:GUPS_NS::Random
+Grad_Kernel	cudaKernels.h	/^__global__ void Grad_Kernel(float *fgrad,float*grad,float*ppsi,float dx){$/;"	f
+Gups	input.h	/^	 GUPS	*Gups;$/;"	m	class:GUPS_NS::INPUT
+ID	gups.h	/^	int		ID; \/\/ ID is most usefull in debug$/;"	m	class:GUPS_NS::GUPS
+INPUT	input.h	/^  class INPUT{$/;"	c	namespace:GUPS_NS
+INPUT_Eins_H	input.h	3;"	d
+Im	include/mathFloat_E.h	/^	float Im;$/;"	m	class:complex_E
+Im	include/mathFloat_E.h	/^	float Im;$/;"	m	class:cucomplex_E
+Im	include/math_E.h	/^	double Im;$/;"	m	class:complex_E
+Infile	input.h	/^	 FILE	*Infile;$/;"	m	class:GUPS_NS::INPUT
+LOG_PREFIX_FALSE	input.h	6;"	d
+LOG_PREFIX_TRUE	input.h	5;"	d
+LineNumber	input.h	/^	 int 	LineNumber;$/;"	m	class:GUPS_NS::INPUT
+Logfile	input.h	/^	 FILE	*Logfile;$/;"	m	class:GUPS_NS::INPUT
+MaxBlocks	include/mathCuda_E.h	/^const int MaxBlocks=65536;$/;"	v
+MaxBlocksDim	include/mathFloatCuda_E.h	/^const int MaxBlocksDim=65535;$/;"	v
+Mean	random.h	/^	real	Mean,Variance;$/;"	m	class:GUPS_NS::Random
+Method	gups.h	/^	int 	Method;$/;"	m	class:GUPS_NS::GUPS
+NC	Makefile	/^NC = nvcc$/;"	m
+NFLAGS	Makefile	/^NFLAGS = -g -G $/;"	m
+NnL	cudaKernels.h	/^const int NxL=nz*ny*nx,NyL=ny*nz,NzL=nz,NnL=nz*ny*nx*np;\/\/NxLev means x have a base of NxLev$/;"	v
+NnpLev	cudaKernels.h	/^const int NnpLev=nz*ny*nx,NxLev=ny*nz,NyLev=nz,NzLev=1;$/;"	v
+NormalDistributionX	include/mathFloat_E.h	/^float NormalDistributionX(){ float U1,U2,R,Z,th; U1=randreal();U2=randreal(); R=sqrt(-2*log(U2)); th=2*3.1415926*U1; Z=R*cos(th); return Z; }$/;"	f
+NormalDistributionX	include/mathFloat_E.h	/^float NormalDistributionX(float mean,float sd){ return mean+sd*NormalDistributionX(); }$/;"	f
+NormalDistributionX	include/math_E.h	/^double NormalDistributionX(){ double U1,U2,R,Z,th; U1=randreal();U2=randreal(); R=sqrt(-2*log(U2)); th=2*3.1415926*U1; Z=R*cos(th); return Z; }$/;"	f
+NormalDistributionX	include/math_E.h	/^double NormalDistributionX(double mean,double sd){ return mean+sd*NormalDistributionX(); }$/;"	f
+NxL	cudaKernels.h	/^const int NxL=nz*ny*nx,NyL=ny*nz,NzL=nz,NnL=nz*ny*nx*np;\/\/NxLev means x have a base of NxLev$/;"	v
+NxLev	cudaKernels.h	/^const int NnpLev=nz*ny*nx,NxLev=ny*nz,NyLev=nz,NzLev=1;$/;"	v
+NyL	cudaKernels.h	/^const int NxL=nz*ny*nx,NyL=ny*nz,NzL=nz,NnL=nz*ny*nx*np;\/\/NxLev means x have a base of NxLev$/;"	v
+NyLev	cudaKernels.h	/^const int NnpLev=nz*ny*nx,NxLev=ny*nz,NyLev=nz,NzLev=1;$/;"	v
+NzL	cudaKernels.h	/^const int NxL=nz*ny*nx,NyL=ny*nz,NzL=nz,NnL=nz*ny*nx*np;\/\/NxLev means x have a base of NxLev$/;"	v
+NzLev	cudaKernels.h	/^const int NnpLev=nz*ny*nx,NxLev=ny*nz,NyLev=nz,NzLev=1;$/;"	v
+OBJECTS	Makefile	/^OBJECTS = main.o gups.o input.o tensorb.o random.o energy.o$/;"	m
+Pi	include/mathFloat_E.h	/^const float Pi=3.1415926;$/;"	v
+Pi	include/math_E.h	/^const double Pi=3.1415926;$/;"	v
+RANDOM_EINS_H	random.h	4;"	d
+Random	random.h	/^  class Random: public Data<Real>{$/;"	c	namespace:GUPS_NS
+RandomSeed	gups.h	/^	int 	RandomSeed;$/;"	m	class:GUPS_NS::GUPS
+Re	include/mathFloat_E.h	/^	float Re;$/;"	m	class:complex_E
+Re	include/mathFloat_E.h	/^	float Re;$/;"	m	class:cucomplex_E
+Re	include/math_E.h	/^	double Re;$/;"	m	class:complex_E
+Seed_dev	random.h	/^	real	Seed_dev,Seed_host;$/;"	m	class:GUPS_NS::Random
+Seed_host	random.h	/^	real	Seed_dev,Seed_host;$/;"	m	class:GUPS_NS::Random
+SetZeros	include/mathFloat_E.h	/^int SetZeros(float * _m,int n){$/;"	f
+StrainTensor	gups.h	/^	Data<Real>	StrainTensor;$/;"	m	class:GUPS_NS::GUPS
+TENSORB_EINS_H	tensorb.h	3;"	d
+TensorB	tensorb.h	/^  class TensorB: public Data<Real>{$/;"	c	namespace:GUPS_NS
+ThreadsInOneBlock	include/mathCuda_E.h	/^const int ThreadsInOneBlock=128;$/;"	v
+Variance	random.h	/^	real	Mean,Variance;$/;"	m	class:GUPS_NS::Random
+VariantN	gups.h	/^	int 	VariantN;$/;"	m	class:GUPS_NS::GUPS
+_g	tensorb.h	/^	Data<Real> _g;$/;"	m	class:GUPS_NS::TensorB
+_gSquare	tensorb.h	/^	Data<Real> _gSquare;$/;"	m	class:GUPS_NS::TensorB
+abs_E	include/mathFloat_E.h	10;"	d
+abs_E	include/math_E.h	10;"	d
+ac_fn_c_check_func	configure	/^ac_fn_c_check_func ()$/;"	f
+ac_fn_c_check_header_compile	configure	/^ac_fn_c_check_header_compile ()$/;"	f
+ac_fn_c_check_header_mongrel	configure	/^ac_fn_c_check_header_mongrel ()$/;"	f
+ac_fn_c_check_type	configure	/^ac_fn_c_check_type ()$/;"	f
+ac_fn_c_try_compile	configure	/^ac_fn_c_try_compile ()$/;"	f
+ac_fn_c_try_cpp	configure	/^ac_fn_c_try_cpp ()$/;"	f
+ac_fn_c_try_link	configure	/^ac_fn_c_try_link ()$/;"	f
+ac_fn_c_try_run	configure	/^ac_fn_c_try_run ()$/;"	f
+ac_fn_cxx_try_compile	configure	/^ac_fn_cxx_try_compile ()$/;"	f
+addByNumberCuda	include/mathFloatCuda_E.h	/^int addByNumberCuda(cucomplex_E*arrin,cucomplex_E num,cucomplex_E *arrout ,int n){$/;"	f
+addByNumberCuda	include/mathFloatCuda_E.h	/^int addByNumberCuda(float*arrin,float num,float *arrout ,int n){$/;"	f
+addByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void addByNumberCuda_Kernel(cucomplex_E*arrin,cucomplex_E num,cucomplex_E *arrout ,int n){$/;"	f
+addByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void addByNumberCuda_Kernel(float*arrin,float num,float *arrout ,int n){$/;"	f
+addCuda	include/mathCuda_E.h	/^int addCuda(double*arrin1,double *arrin2,double *arrout ,int n){$/;"	f
+addCuda	include/mathFloatCuda_E.h	/^int addCuda(cucomplex_E*arrin1,cucomplex_E *arrin2,cucomplex_E *arrout ,int n){$/;"	f
+addCuda	include/mathFloatCuda_E.h	/^int addCuda(float*arrin1,float *arrin2,float *arrout ,int n){$/;"	f
+addCuda_Kernel	include/mathCuda_E.h	/^__global__ void addCuda_Kernel(double*arrin1,double*arrin2 ,double *arrout ,int n){$/;"	f
+addCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void addCuda_Kernel(cucomplex_E *arrin1,cucomplex_E *arrin2 ,cucomplex_E *arrout ,int n){$/;"	f
+addCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void addCuda_Kernel(float*arrin1,float*arrin2 ,float *arrout ,int n){$/;"	f
+as_fn_append	config.status	/^  as_fn_append ()$/;"	f
+as_fn_append	configure	/^  as_fn_append ()$/;"	f
+as_fn_arith	config.status	/^  as_fn_arith ()$/;"	f
+as_fn_arith	configure	/^  as_fn_arith ()$/;"	f
+as_fn_error	config.status	/^as_fn_error ()$/;"	f
+as_fn_error	configure	/^as_fn_error ()$/;"	f
+as_fn_exit	config.status	/^as_fn_exit ()$/;"	f
+as_fn_exit	configure	/^as_fn_exit ()$/;"	f
+as_fn_failure	configure	/^as_fn_failure () { as_fn_return 1; }$/;"	f
+as_fn_mkdir_p	config.status	/^as_fn_mkdir_p ()$/;"	f
+as_fn_mkdir_p	configure	/^as_fn_mkdir_p ()$/;"	f
+as_fn_ret_failure	configure	/^as_fn_ret_failure () { return 1; }$/;"	f
+as_fn_ret_success	configure	/^as_fn_ret_success () { return 0; }$/;"	f
+as_fn_set_status	config.status	/^as_fn_set_status ()$/;"	f
+as_fn_set_status	configure	/^as_fn_set_status ()$/;"	f
+as_fn_success	configure	/^as_fn_success () { as_fn_return 0; }$/;"	f
+as_fn_unset	config.status	/^as_fn_unset ()$/;"	f
+as_fn_unset	configure	/^as_fn_unset ()$/;"	f
+c00	tensorb.h	/^	real vvv,c00,c01,c33;$/;"	m	class:GUPS_NS::TensorB
+c01	tensorb.h	/^	real vvv,c00,c01,c33;$/;"	m	class:GUPS_NS::TensorB
+c33	tensorb.h	/^	real vvv,c00,c01,c33;$/;"	m	class:GUPS_NS::TensorB
+cijkl	tensorb.h	/^	Data<Real> cijkl;\/\/(4,3,3,3,3,Data_HOST);$/;"	m	class:GUPS_NS::TensorB
+complex_E	include/mathFloat_E.h	/^	complex_E(){ Re=0; Im=0; }$/;"	f	class:complex_E
+complex_E	include/mathFloat_E.h	/^	complex_E(float c[2]){ Re=c[0]; Im=c[1]; }$/;"	f	class:complex_E
+complex_E	include/mathFloat_E.h	/^	complex_E(float real,float image){ this->Re=real; this->Im=image; }$/;"	f	class:complex_E
+complex_E	include/mathFloat_E.h	/^class complex_E{$/;"	c
+complex_E	include/math_E.h	/^	complex_E(){ Re=0; Im=0; }$/;"	f	class:complex_E
+complex_E	include/math_E.h	/^	complex_E(double c[2]){ Re=c[0]; Im=c[1]; }$/;"	f	class:complex_E
+complex_E	include/math_E.h	/^	complex_E(double real,double image){ this->Re=real; this->Im=image; }$/;"	f	class:complex_E
+complex_E	include/math_E.h	/^class complex_E{$/;"	c
+cuadd	include/mathFloat_E.h	/^__device__ cucomplex_E cuadd(cucomplex_E c,float d){ return cucomplex_E(d+c.Re,c.Im); }$/;"	f
+cuadd	include/mathFloat_E.h	/^__device__ cucomplex_E cuadd(cucomplex_E c1,cucomplex_E c2){return cucomplex_E(c1.Re+c2.Re,c1.Im+c2.Im); }$/;"	f
+cuadd	include/mathFloat_E.h	/^__device__ cucomplex_E cuadd(float d,cucomplex_E c){ return cucomplex_E(d+c.Re,c.Im); }$/;"	f
+cucomplex_E	include/mathFloat_E.h	/^	__device__ cucomplex_E(){ Re=0; Im=0; }$/;"	f	class:cucomplex_E
+cucomplex_E	include/mathFloat_E.h	/^	__device__ cucomplex_E(complex_E c){ Re=c.Re; Im=c.Im; }$/;"	f	class:cucomplex_E
+cucomplex_E	include/mathFloat_E.h	/^	__device__ cucomplex_E(float c[2]){ Re=c[0]; Im=c[1]; }$/;"	f	class:cucomplex_E
+cucomplex_E	include/mathFloat_E.h	/^	__device__ cucomplex_E(float real,float image){ this->Re=real; this->Im=image; }$/;"	f	class:cucomplex_E
+cucomplex_E	include/mathFloat_E.h	/^class cucomplex_E{$/;"	c
+cudaSetDeviceTorque	include/cuda_E.h	/^int cudaSetDeviceTorque(){$/;"	f
+cudaSetDeviceTorque	include/cuda_E.h	/^int cudaSetDeviceTorque(int id){$/;"	f
+cudivi	include/mathFloat_E.h	/^__device__ cucomplex_E cudivi(cucomplex_E c,float d){ return cucomplex_E(c.Re\/d,c.Im\/d);}$/;"	f
+cudivi	include/mathFloat_E.h	/^__device__ cucomplex_E cudivi(cucomplex_E c1,cucomplex_E c2){ float mo=pow2_E(c2.Re)+pow2_E(c2.Im);return cucomplex_E((c1.Re*c2.Re+c1.Im*c2.Im)\/mo,(c1.Im*c2.Re-c1.Re*c2.Im)\/mo);}$/;"	f
+cudivi	include/mathFloat_E.h	/^__device__ cucomplex_E cudivi(float d,cucomplex_E c){ float mo=pow2_E(c.Re)+pow2_E(c.Im); return cucomplex_E(c.Re*d\/mo,c.Im*d\/mo);}$/;"	f
+cufloat	include/mathFloat_E.h	/^	__device__ float cufloat(){return Re;}$/;"	f	class:cucomplex_E
+cuminus	include/mathFloat_E.h	/^__device__ cucomplex_E cuminus(cucomplex_E c,float d){ return cucomplex_E(c.Re-d,c.Im); }$/;"	f
+cuminus	include/mathFloat_E.h	/^__device__ cucomplex_E cuminus(cucomplex_E c1,cucomplex_E c2){ return cucomplex_E(c1.Re-c2.Re,c1.Im-c2.Im); }$/;"	f
+cuminus	include/mathFloat_E.h	/^__device__ cucomplex_E cuminus(float d,cucomplex_E c){ return cucomplex_E(d-c.Re,-c.Im); }$/;"	f
+cumulti	include/mathFloat_E.h	/^__device__ cucomplex_E cumulti(cucomplex_E c,float d){ return cucomplex_E(c.Re*d,c.Im*d);}$/;"	f
+cumulti	include/mathFloat_E.h	/^__device__ cucomplex_E cumulti(cucomplex_E c1,cucomplex_E c2){ return cucomplex_E(c1.Re*c2.Re-c1.Im*c2.Im,c1.Re*c2.Im+c1.Im*c2.Re);}$/;"	f
+cumulti	include/mathFloat_E.h	/^__device__ cucomplex_E cumulti(float d,cucomplex_E c){ return cucomplex_E(c.Re*d,c.Im*d);}$/;"	f
+cumulti	include/mathFloat_E.h	/^__device__ cucomplex_E cumulti(float d,float c){ return cucomplex_E(c*d,0.0f);}$/;"	f
+cuset	include/mathFloat_E.h	/^	__device__ int cuset(cucomplex_E &left,cucomplex_E right){$/;"	f
+cuset	include/mathFloat_E.h	/^	__device__ int cuset(cucomplex_E &left,float right){$/;"	f
+cuunequal	include/mathFloat_E.h	/^__device__ int cuunequal(cucomplex_E c1,cucomplex_E c2){if (c1.Re!=c2.Re||c1.Im!=c2.Im)return 1;else return 0;}$/;"	f
+cuunequal	include/mathFloat_E.h	/^__device__ int cuunequal(cucomplex_E c1,float c2){if (c1.Re!=c2||c1.Im!=0)return 1;else return 0;}$/;"	f
+cuunequal	include/mathFloat_E.h	/^__device__ int cuunequal(float c2,cucomplex_E c1){if (c1.Re!=c2||c1.Im!=0)return 1;else return 0;}$/;"	f
+detaTemperature	controlpara.h	/^float detaTemperature=20;$/;"	v
+device	controlpara.h	/^const int nx=64,ny=64,nz=64,np=4,nend=410000,device=0;$/;"	v
+div2P_E	include/mathFloat_E.h	19;"	d
+div2P_E	include/math_E.h	19;"	d
+diviCuda	include/mathFloatCuda_E.h	/^int diviCuda(cucomplex_E *arrin1,cucomplex_E *arrin2,cucomplex_E *arrout ,int n){$/;"	f
+diviCuda	include/mathFloatCuda_E.h	/^int diviCuda(float*arrin1,float *arrin2,float *arrout ,int n){$/;"	f
+diviCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void diviCuda_Kernel(cucomplex_E *arrin1,cucomplex_E *arrin2 ,cucomplex_E *arrout ,int n){$/;"	f
+diviCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void diviCuda_Kernel(float*arrin1,float*arrin2 ,float *arrout ,int n){$/;"	f
+dt	controlpara.h	/^const float dx=0.1,dt=0.01; $/;"	v
+dx	controlpara.h	/^const float dx=0.1,dt=0.01; $/;"	v
+fftw_iodim64_do_not_use_me	include/fftw322/include/fftw3.h	/^struct fftw_iodim64_do_not_use_me {$/;"	s
+fftw_iodim_do_not_use_me	include/fftw322/include/fftw3.h	/^struct fftw_iodim_do_not_use_me {$/;"	s
+fftw_r2r_kind_do_not_use_me	include/fftw322/include/fftw3.h	/^enum fftw_r2r_kind_do_not_use_me {$/;"	g
+fftw_read_char_func_do_not_use_me	include/fftw322/include/fftw3.h	/^typedef int (*fftw_read_char_func_do_not_use_me)(void *);$/;"	t
+fftw_write_char_func_do_not_use_me	include/fftw322/include/fftw3.h	/^typedef void (*fftw_write_char_func_do_not_use_me)(char c, void *);$/;"	t
+fin	input.h	/^	 ifstream fin;$/;"	m	class:GUPS_NS::INPUT
+flog	input.h	/^	 ofstream flog;$/;"	m	class:GUPS_NS::INPUT
+gpu_device	controlpara.h	/^const int gpu_device=0;$/;"	v
+iomega	tensorb.h	/^	Data<Real> iomega;\/\/(2,3,3,Data_HOST);$/;"	m	class:GUPS_NS::TensorB
+is	include/fftw322/include/fftw3.h	/^     int is;			\/* input stride *\/$/;"	m	struct:fftw_iodim_do_not_use_me
+is	include/fftw322/include/fftw3.h	/^     ptrdiff_t is;			\/* input stride *\/$/;"	m	struct:fftw_iodim64_do_not_use_me
+lowerTrunc	include/mathFloat_E.h	22;"	d
+lowerTrunc	include/math_E.h	22;"	d
+maxThreadsDim	include/mathFloatCuda_E.h	/^const int maxThreadsDim=1024;$/;"	v
+max_E	include/mathFloat_E.h	8;"	d
+max_E	include/math_E.h	8;"	d
+min_E	include/mathFloat_E.h	9;"	d
+min_E	include/math_E.h	9;"	d
+minusCuda	include/mathCuda_E.h	/^int minusCuda(double*arrin1,double *arrin2,double *arrout ,int n){$/;"	f
+minusCuda	include/mathFloatCuda_E.h	/^int minusCuda(float*arrin1,float *arrin2,float *arrout ,int n){$/;"	f
+minusCuda_Kernel	include/mathCuda_E.h	/^__global__ void minusCuda_Kernel(double*arrin1,double*arrin2 ,double *arrout ,int n){$/;"	f
+minusCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void minusCuda_Kernel(float*arrin1,float*arrin2 ,float *arrout ,int n){$/;"	f
+mod2P_E	include/mathFloat_E.h	18;"	d
+mod2P_E	include/math_E.h	18;"	d
+multiByNumberCuda	include/mathCuda_E.h	/^int multiByNumberCuda(complex_E*arrin,complex_E num,complex_E *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathCuda_E.h	/^int multiByNumberCuda(complex_E*arrin,double num,complex_E *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathCuda_E.h	/^int multiByNumberCuda(complex_E*arrin,double num,double *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathCuda_E.h	/^int multiByNumberCuda(double*arrin,double num,double *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathFloatCuda_E.h	/^int multiByNumberCuda(cucomplex_E*arrin,cucomplex_E num,cucomplex_E *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathFloatCuda_E.h	/^int multiByNumberCuda(cucomplex_E*arrin,float num,cucomplex_E *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathFloatCuda_E.h	/^int multiByNumberCuda(cucomplex_E*arrin,float num,float *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathFloatCuda_E.h	/^int multiByNumberCuda(float*arrin,float num,cucomplex_E *arrout ,int n){$/;"	f
+multiByNumberCuda	include/mathFloatCuda_E.h	/^int multiByNumberCuda(float*arrin,float num,float *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(complex_E*arrin,complex_E num,complex_E *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(complex_E*arrin,double num,complex_E *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(complex_E*arrin,double num,double *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(double*arrin,double num,double *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(cucomplex_E*arrin,cucomplex_E num,cucomplex_E *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(cucomplex_E*arrin,float num,cucomplex_E *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(cucomplex_E*arrin,float num,float *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(float*arrin,float num,cucomplex_E *arrout ,int n){$/;"	f
+multiByNumberCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiByNumberCuda_Kernel(float*arrin,float num,float *arrout ,int n){$/;"	f
+multiCuda	include/mathCuda_E.h	/^int multiCuda(double*arrin1,double *arrin2,complex_E *arrout ,int n){$/;"	f
+multiCuda	include/mathCuda_E.h	/^int multiCuda(double*arrin1,double *arrin2,double *arrout ,int n){$/;"	f
+multiCuda	include/mathFloatCuda_E.h	/^int multiCuda(cucomplex_E *arrin1,cucomplex_E *arrin2,cucomplex_E *arrout ,int n){$/;"	f
+multiCuda	include/mathFloatCuda_E.h	/^int multiCuda(cucomplex_E *arrin1,float *arrin2,float *arrout ,int n){$/;"	f
+multiCuda	include/mathFloatCuda_E.h	/^int multiCuda(float *arrin1,float *arrin2, cucomplex_E *arrout ,int n){$/;"	f
+multiCuda	include/mathFloatCuda_E.h	/^int multiCuda(float*arrin1,float *arrin2,float *arrout ,int n){$/;"	f
+multiCuda_Kernel	include/mathCuda_E.h	/^__global__ void multiCuda_Kernel(double*arrin1,double*arrin2 ,complex_E *arrout ,int n){$/;"	f
+multiCuda_Kernel	include/mathCuda_E.h	/^__global__ void multiCuda_Kernel(double*arrin1,double*arrin2 ,double *arrout ,int n){$/;"	f
+multiCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiCuda_Kernel(cucomplex_E *arrin1,float*arrin2 ,float *arrout ,int n){$/;"	f
+multiCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiCuda_Kernel(cucomplex_E*arrin1,cucomplex_E *arrin2,cucomplex_E *arrout ,int n){$/;"	f
+multiCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiCuda_Kernel(float*arrin1,float*arrin2 ,cucomplex_E *arrout ,int n){$/;"	f
+multiCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void multiCuda_Kernel(float*arrin1,float*arrin2 ,float *arrout ,int n){$/;"	f
+n	cudaKernels.h	/^const int n=nz*ny*nx*np;\/\/NxLev means x have a base of NxLev$/;"	v
+n	include/fftw322/include/fftw3.h	/^     int n;                     \/* dimension size *\/$/;"	m	struct:fftw_iodim_do_not_use_me
+n	include/fftw322/include/fftw3.h	/^     ptrdiff_t n;                     \/* dimension size *\/$/;"	m	struct:fftw_iodim64_do_not_use_me
+nend	controlpara.h	/^const int nx=64,ny=64,nz=64,np=4,nend=410000,device=0;$/;"	v
+ni	cudaKernels.h	/^__device__ int ni(int tid,int i){ return tid%NnL+i*NnL;}\/\/ i is the index of dimension (i,x,y,z)...$/;"	f
+np	controlpara.h	/^const int nx=64,ny=64,nz=64,np=4,nend=410000,device=0;$/;"	v
+nx	controlpara.h	/^const int nx=64,ny=64,nz=64,np=4,nend=410000,device=0;$/;"	v
+ny	controlpara.h	/^const int nx=64,ny=64,nz=64,np=4,nend=410000,device=0;$/;"	v
+nz	controlpara.h	/^const int nx=64,ny=64,nz=64,np=4,nend=410000,device=0;$/;"	v
+omega	tensorb.h	/^	Data<Real> omega;\/\/(2,3,3,Data_HOST);$/;"	m	class:GUPS_NS::TensorB
+operator !=	include/mathFloat_E.h	/^int operator!=(complex_E c1,complex_E c2){if (c1.Re!=c2.Re||c1.Im!=c2.Im)return 1;else return 0;}$/;"	f
+operator !=	include/mathFloat_E.h	/^int operator!=(complex_E c1,float c2){if (c1.Re!=c2||c1.Im!=0)return 1;else return 0;}$/;"	f
+operator !=	include/mathFloat_E.h	/^int operator!=(float c2,complex_E c1){if (c1.Re!=c2||c1.Im!=0)return 1;else return 0;}$/;"	f
+operator !=	include/math_E.h	/^int operator!=(complex_E c1,complex_E c2){if (c1.Re!=c2.Re||c1.Im!=c2.Im)return 1;else return 0;}$/;"	f
+operator !=	include/math_E.h	/^int operator!=(complex_E c1,double c2){if (c1.Re!=c2||c1.Im!=0)return 1;else return 0;}$/;"	f
+operator !=	include/math_E.h	/^int operator!=(double c2,complex_E c1){if (c1.Re!=c2||c1.Im!=0)return 1;else return 0;}$/;"	f
+operator *	include/mathFloat_E.h	/^complex_E operator*(complex_E c,float d){ return complex_E(c.Re*d,c.Im*d);}$/;"	f
+operator *	include/mathFloat_E.h	/^complex_E operator*(complex_E c1,complex_E c2){ return complex_E(c1.Re*c2.Re-c1.Im*c2.Im,c1.Re*c2.Im+c1.Im*c2.Re);}$/;"	f
+operator *	include/mathFloat_E.h	/^complex_E operator*(float d,complex_E c){ return complex_E(c.Re*d,c.Im*d);}$/;"	f
+operator *	include/math_E.h	/^complex_E operator*(complex_E c,double d){ return complex_E(c.Re*d,c.Im*d);}$/;"	f
+operator *	include/math_E.h	/^complex_E operator*(complex_E c1,complex_E c2){ return complex_E(c1.Re*c2.Re-c1.Im*c2.Im,c1.Re*c2.Im+c1.Im*c2.Re);}$/;"	f
+operator *	include/math_E.h	/^complex_E operator*(double d,complex_E c){ return complex_E(c.Re*d,c.Im*d);}$/;"	f
+operator +	include/mathFloat_E.h	/^complex_E operator+(complex_E c,float d){ return complex_E(d+c.Re,c.Im); }$/;"	f
+operator +	include/mathFloat_E.h	/^complex_E operator+(complex_E c1,complex_E c2){return complex_E(c1.Re+c2.Re,c1.Im+c2.Im); }$/;"	f
+operator +	include/mathFloat_E.h	/^complex_E operator+(float d,complex_E c){ return complex_E(d+c.Re,c.Im); }$/;"	f
+operator +	include/math_E.h	/^complex_E operator+(complex_E c,double d){ return complex_E(d+c.Re,c.Im); }$/;"	f
+operator +	include/math_E.h	/^complex_E operator+(complex_E c1,complex_E c2){return complex_E(c1.Re+c2.Re,c1.Im+c2.Im); }$/;"	f
+operator +	include/math_E.h	/^complex_E operator+(double d,complex_E c){ return complex_E(d+c.Re,c.Im); }$/;"	f
+operator -	include/mathFloat_E.h	/^complex_E operator-(complex_E c,float d){ return complex_E(c.Re-d,c.Im); }$/;"	f
+operator -	include/mathFloat_E.h	/^complex_E operator-(complex_E c1,complex_E c2){ return complex_E(c1.Re-c2.Re,c1.Im-c2.Im); }$/;"	f
+operator -	include/mathFloat_E.h	/^complex_E operator-(float d,complex_E c){ return complex_E(d-c.Re,-c.Im); }$/;"	f
+operator -	include/math_E.h	/^complex_E operator-(complex_E c,double d){ return complex_E(c.Re-d,c.Im); }$/;"	f
+operator -	include/math_E.h	/^complex_E operator-(complex_E c1,complex_E c2){ return complex_E(c1.Re-c2.Re,c1.Im-c2.Im); }$/;"	f
+operator -	include/math_E.h	/^complex_E operator-(double d,complex_E c){ return complex_E(d-c.Re,-c.Im); }$/;"	f
+operator /	include/mathFloat_E.h	/^complex_E operator\/(complex_E c,float d){ return complex_E(c.Re\/d,c.Im\/d);}$/;"	f
+operator /	include/mathFloat_E.h	/^complex_E operator\/(complex_E c1,complex_E c2){ float mo=pow2_E(c2.Re)+pow2_E(c2.Im);return complex_E((c1.Re*c2.Re+c1.Im*c2.Im)\/mo,(c1.Im*c2.Re-c1.Re*c2.Im)\/mo);}$/;"	f
+operator /	include/mathFloat_E.h	/^complex_E operator\/(float d,complex_E c){ float mo=pow2_E(c.Re)+pow2_E(c.Im); return complex_E(c.Re*d\/mo,c.Im*d\/mo);}$/;"	f
+operator <<	include/mathFloat_E.h	/^	friend ostream& operator<<(ostream &os,complex_E &c){$/;"	f	class:complex_E
+operator <<	include/math_E.h	/^	friend ostream& operator<<(ostream &os,complex_E &c){$/;"	f	class:complex_E
+operator =	include/mathFloat_E.h	/^	complex_E& operator =(float left_d){$/;"	f	class:complex_E
+operator =	include/math_E.h	/^	complex_E& operator =(double left_d){$/;"	f	class:complex_E
+operator double	include/math_E.h	/^	operator double(){return Re;}$/;"	f	class:complex_E
+operator float	include/mathFloat_E.h	/^	operator float(){return Re;}$/;"	f	class:complex_E
+os	include/fftw322/include/fftw3.h	/^     int os;			\/* output stride *\/$/;"	m	struct:fftw_iodim_do_not_use_me
+os	include/fftw322/include/fftw3.h	/^     ptrdiff_t os;			\/* output stride *\/$/;"	m	struct:fftw_iodim64_do_not_use_me
+pow2_E	include/mathFloat_E.h	12;"	d
+pow2_E	include/math_E.h	12;"	d
+pow3_E	include/mathFloat_E.h	13;"	d
+pow3_E	include/math_E.h	13;"	d
+pow4_E	include/mathFloat_E.h	14;"	d
+pow4_E	include/math_E.h	14;"	d
+pow5_E	include/mathFloat_E.h	15;"	d
+pow5_E	include/math_E.h	15;"	d
+pow6_E	include/mathFloat_E.h	16;"	d
+pow6_E	include/math_E.h	16;"	d
+prototypes	configure	/^   function prototypes and stuff, but not '\\xHH' hex character constants.$/;"	f
+randreal	include/mathFloat_E.h	/^float randreal(){ return rand()*1.0\/RAND_MAX; }$/;"	f
+randreal	include/mathFloat_E.h	/^float randreal(float max){ return randreal()*max; }$/;"	f
+randreal	include/mathFloat_E.h	/^float randreal(float min,float max){ return min+randreal()*(max-min); }$/;"	f
+randreal	include/math_E.h	/^double randreal(){ return rand()*1.0\/RAND_MAX; }$/;"	f
+randreal	include/math_E.h	/^double randreal(double max){ return randreal()*max; }$/;"	f
+randreal	include/math_E.h	/^double randreal(double min,double max){ return min+randreal()*(max-min); }$/;"	f
+showArrayC	include/mathFloatCuda_E.h	/^int showArrayC(float* arrin,int n,bool ShowAll){$/;"	f
+showArrayCuda	include/mathFloatCuda_E.h	/^int showArrayCuda(float* arrin_dev,int n,bool ShowAll){$/;"	f
+sigma	tensorb.h	/^	Data<Real> sigma;$/;"	m	class:GUPS_NS::TensorB
+squareCuda_Kernel	include/mathCuda_E.h	/^__global__ void squareCuda_Kernel(double* arrin,double*arrout,int n){$/;"	f
+squareCuda_Kernel	include/mathFloatCuda_E.h	/^__global__ void squareCuda_Kernel(float* arrin,float*arrout,int n){$/;"	f
+startTemperature	controlpara.h	/^float startTemperature=500;$/;"	v
+stepsKeep	controlpara.h	/^const int stepsKeep=20000;$/;"	v
+tst	input.h	/^	 stringstream	tst;$/;"	m	class:GUPS_NS::INPUT
+unitVector	tensorb.h	/^	Data<Real> unitVector;$/;"	m	class:GUPS_NS::TensorB
+uperTrunc	include/mathFloat_E.h	21;"	d
+uperTrunc	include/math_E.h	21;"	d
+vvv	tensorb.h	/^	real vvv,c00,c01,c33;$/;"	m	class:GUPS_NS::TensorB
+xn	cudaKernels.h	/^__device__ int xn(int tid){ return (tid+NyL)%NxL+(tid\/NxL)*NxL; }$/;"	f
+xp	cudaKernels.h	/^__device__ int xp(int tid){ return (tid-NyL+NxL)%NxL+(tid\/NxL)*NxL; }$/;"	f
+yn	cudaKernels.h	/^__device__ int yn(int tid){ return (tid+NzL)%NyL+(tid\/NyL)*NyL; }$/;"	f
+yp	cudaKernels.h	/^__device__ int yp(int tid){ return (tid-NzL+NyL)%NyL+(tid\/NyL)*NyL; }$/;"	f
+zn	cudaKernels.h	/^__device__ int zn(int tid){ return (tid+1)%NzL+(tid\/NzL)*NzL; }$/;"	f
+zp	cudaKernels.h	/^__device__ int zp(int tid){ return (tid-1+NzL)%NzL+(tid\/NzL)*NzL; }$/;"	f

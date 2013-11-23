@@ -1,0 +1,77 @@
+
+#ifndef DATA_MAP_H
+#define DATA_MAP_H
+
+namespace DATA_NS{
+  template<class idtype, class type> class Map{ // solo copy
+  public:
+	static const int maxN = 100;
+	int 		Total;
+	type 		*Vars[ maxN ];
+	idtype		ID[ maxN ];
+	bool		IsLinked[ maxN ];
+	Map(){
+	  Total = 0;
+	  for ( int i=0; i<maxN; i++ )
+		Vars[i]=NULL;
+	}
+	~Map(){
+	  for (int i=0;i<Total; i++)
+		if ( (!IsLinked[i]) && Vars[i]!=NULL ){
+		  delete Vars[i];
+		  Vars[i] = NULL;
+		}
+	}
+
+	type *operator()(idtype id){ // will not create new compared to [] and the return type is different
+	  for (int i=0;i<Total;i++)
+		if ( ID[i] == id )
+		  return Vars[i];
+	  return NULL;
+	};
+
+	type &operator[](idtype id){//will create new compared to () and the return type is different
+	  for ( int i=0; i<Total; i++)
+		if ( ID[i] == id )
+		  return *Vars[ i ];
+	  Vars[ Total ] = new type;
+	  ID[ Total ] = id;
+	  IsLinked[ Total ] = false;
+	  Total++; 
+	  return *Vars[ Total-1 ];
+	} //note that the return type is distinguished by the operator
+
+	Map<idtype, type> &operator=(Map< idtype, type > &vmap){
+	  Total = vmap.Total;
+	  for ( int i=0; i<Total; i++ ){
+		if ( Vars[i] == NULL )
+		  Vars[i] = new type;
+		*Vars[i] = *vmap.Vars[ i ];
+		ID[ i ] = vmap.ID[ i ];
+	    IsLinked[ i ] = vmap.IsLinked[ i ];
+	  }
+	  return *this;
+	}
+
+	int Link(idtype target, idtype link){
+	  int targetID=-1, linkID=-1;
+	  for (int i=0; i< Total; i++)
+		if (target == ID[i] ) targetID=i;
+		else if ( link == ID[i] ) linkID=i;
+	  if ( targetID < 0 ){
+		return -1;
+	  }
+	  if ( (linkID >= 0) && (!IsLinked[ linkID ]) )
+		delete Vars[ linkID ];
+	  else{
+		linkID = Total;
+		Total++;
+		ID[linkID] = link;
+	  }
+	  IsLinked[ linkID ] = true;
+	  Vars[ linkID ] = Vars[ targetID ];
+	  return 0;
+	}
+  };
+};
+#endif
