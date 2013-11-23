@@ -24,9 +24,15 @@ int DynamicsStress::Initialize(){
   //para setting should be finished before or within this function
   string ss;
   ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
-  ss=Vars["variantn"];              if (ss!="") { ss>>VariantN;} 
   ss=Vars["modulus"]; 				if (ss!="") ss>>B.C00>>B.C01>>B.C33;else {B.C00=3.5;B.C01=1.5; B.C33=1.0;}
   ss=Vars["xi"]; 					if (ss!="") ss>>Xi;else {Xi=4000.0f; }
+  StrainTensor = &((*Datas)["varianttensor"]);
+  if (StrainTensor->Arr == NULL){
+	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	return -1;
+  }
+  VariantN = StrainTensor->Dimension[1];
+
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
   SetCalPos(Data_HOST);
@@ -47,11 +53,6 @@ int DynamicsStress::Initialize(){
 
   if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
   //StrainTensor=strainTensor;  //need to assign somewhere-else
-  StrainTensor = &((*Datas)["straintensor"]);
-  if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
-	return -1;
-  }
   tensor.Init(3,BaseVariantN+VariantN,3,3,Data_HOST_DEV); 
   SetCalPos(Data_HOST);
   tensor=0.f;
@@ -136,6 +137,8 @@ int DynamicsStress::Calculate(){
   
   return 0;
 }
+
+int DynamicsStress::RunFunc(string funcName){ return 0; }
  
 
 int DynamicsStress::Fix(real progress){

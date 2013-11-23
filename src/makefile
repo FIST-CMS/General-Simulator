@@ -39,5 +39,5 @@ clean:
 	rm *.o
 	rm $(EXCU)
 install:
-	cp $(EXCU) ~/bin/
+	cp $(EXCU) /public/home/Eins/bin/
 

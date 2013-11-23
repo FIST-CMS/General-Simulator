@@ -9,50 +9,37 @@
 using namespace DATA_NS;
 
 namespace GUPS_NS{
-  //GUPS: Gpu based Universal Phase Field Simulator
-  class GUPS{//default 3D situation
+  class GUPS{//
   public:
 	Map< string, Data<Real> > 	Datas;
 	Map< string, string > 		Vars;
-	/*
-	  eta defect straintensor will be used in mart
-	  sys mart
-	    Vars:
-		  gridsize nx ny nz dx dy dz
-		  variantn n
-		Datas:
-		  eta
-		  defect
-	 */
 
-	static const int	DynaMax=100;
-	int 		DynaID; // the current Dyna[i] in calculation
-	Dynamics 	*Dyna[DynaMax]; //base pointer to access derived dynammics
-	bool 		IsDynaInit[DynaMax];
+	static const int	DynaMax=1000;
+	int 				DynaID; // the current Dyna[i] in calculation
+	Dynamics 			*Dyna[DynaMax]; //base pointer to access derived dynammics
+	bool 				IsDynaInit[DynaMax];
 
   public:
 	GUPS();
 	~GUPS();
-	int SetSys(string ss); //set the system type which should be a pre command for other commands except for device
+	int SetSys(string ss); //set the system type which should be a pre-command for other commands except the device
 	////////////////////////////////////////////
-	int Set(string); // cal dyna->Set
+	int Set(string); 
 	int Link(string);
-	int Read(string); // cal dyna->Read
+	int Read(string); 
+	int ReadHere(string name, string &arrays); // read Data in the script directly
 	////////////////////////////////////////////
-	int CreateVariant(int n1, real *tensor);
-
 	//real StartTemperature, EndTemperature;
-	int Fix(int step, int totalsteps); // set mode with set fix ...
-
 	int CurrentStep;
 	int	TotalSteps;
 	int Run();
 	int Run(string ss);
+	int RunFunc(string funcName);
 
-	int ThermoSteps;
-	string ThermoMode;
-	int SetThermo(string ss);
-	int ThermoOut();
+	int InfoSteps;
+	string InfoMode;
+	int SetInfo(string ss);
+	int InfoOut();
 
 	string DumpFolder;
 	int DumpSteps;

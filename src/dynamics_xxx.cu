@@ -9,33 +9,31 @@
 
 using namespace GUPS_NS;
 using namespace DATA_NS;
-/*
-  main calculation:
- */
-
-int DynamicsXxx::InitDynamics(){
-  //para setting should be finished before or within this function
-  string ss;
-  Vars["x"]>>=x;	
-  return 0;
-
-}
 
 DynamicsXxx::DynamicsXxx(){}
 DynamicsXxx::~DynamicsXxx(){}
 
-int DynamicsXxx::CalculateAll(){
-  return 0;
-}
-int DynamicsXxx::Iterate(){
-  return 0;
-} 
-
-int DynamicsXxx::Fix(real progress){
+int DynamicsXxx::Initialize(){
+  //para setting should be finished before or within this function
+  string ss;
+  x=1.0f; Vars["x"]>>=x;	
   return 0;
 }
 
-Real DynamicsXxx::Get(string ss){ // return the statistic info.
-  string var; ss>>var;
-  return -999999999999999999999999999999999999999999999999999.9;
+int DynamicsXxx::Calculate(){
+  x=x+1.0f;
+  return 0;
+}
+
+int DynamicsXxx::RunFunc(string funcName){
+  if (funcName=="calculate") Calculate();
+  return 0;
+}
+
+int DynamicsXxx::Fix(real progress){return 0;}
+
+string DynamicsXxx::Get(string ss){
+  string ans;
+  if (ss=="x") return ans<<x;
+  return "nan";
 }

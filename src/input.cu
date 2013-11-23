@@ -55,21 +55,21 @@ int INPUT::Phrasing(){
     ss=this->standardize(ss);
     if (ss=="") continue;
     string command; ss>>command;
-	if      (command== "variable" 		)   err=Vars.Set(ss); //variable(ss);
+	if      (command== "variable" 		)   err=Vars.Set(ss); 
 	else if (command== "shell"   		)   err=system(ss.c_str());
 	else if (command== "quit"			)   break;
 	//////////////////////////////////////////////////////////////
 	else if (command== "link"			)   { err= Gups.Link(ss); }
 	else if (command== "set"			)   { Vars.SubVar(ss,1); err=Gups.Set(ss);}
 	else if (command== "read"			)   { Vars.SubVar(ss,1); err=Gups.Read(ss);}
+	else if (command== "readhere"		)   { err=readhere(ss);}
 	else if (command== "dump" 			)   { Vars.SubVar(ss,1); err=Gups.SetDump(ss); } 
 	//////////////////////////////////////////////////////////////
 	else{
 	  Vars.SubVar(ss,0);
 	  if 	  (command== "device"		) 	err=device(ss); 
 	  else if (command== "sys"			)  	err=Gups.SetSys(ss);
-	  else if (command== "variant"		) 	err=variant(ss);
-	  else if (command== "thermo"     	)   err=Gups.SetThermo(ss); 
+	  else if (command== "info"     	)   err=Gups.SetInfo(ss); 
 	  else if (command== "run"			)   err=Gups.Run(ss);//run(ss);
 	  else{
 		GV<0>::LogAndError<<"Command "<<command<<" is not supported in GUPS!"; 
@@ -81,41 +81,29 @@ int INPUT::Phrasing(){
   return 0;
 }
 
-int INPUT::variant(string sr){
-  int n;
-  sr>>n;
-  if (n<=0){
-	GV<0>::LogAndError>>"Variant number is less than one!\n";
-    return -1;
-  }
-
-  real *arr=new real[n*3*3];
-  string 	ss;
+int INPUT::readhere(string sr){
+  int ndim=1,nele=1,tem;
+  string arrays,varname,ss,sele;
   int 	index=0;
+  sr>>varname;
   while (fgets_str(fin,ss)){
 	 ss=this->standardize(ss);
 	 Vars.SubVar(ss,0);
 	 while (ss!=""){
-	   ss>>arr[index];
+	   if (index==0) {
+		 ss>>ndim; arrays<<ndim<<" "; }
+	   else if (index<=ndim) {
+		 ss>>tem; arrays<<tem<<" "; 
+		 nele*=tem; 
+	   }else{
+		 ss>>sele; arrays<<sele<<" ";
+	   }
 	   index++;
 	 }
-	 if ( index >= 3*3*n) break;//finish condition
+	 if ( index > ndim + nele) break;//finish condition // the final index = ndim+nele+1...cause the ndim is counted as 1
   }
   //create the variant number and its corresponding tensor
-  Gups.CreateVariant(n, arr);
-  delete []arr;
-
-  //log the straintensor
-  GV<0>::LogAndError<<"straintensor created\n";
-  for (int v = 0; v < n; v++){
-    for (int i=0;i<3;i++){
-	 for (int j=0;j<3;j++){
-	   GV<0>::LogAndError<<(Gups.Datas["straintensor"])(v,i,j)<<" ";
-	 }
-	 GV<0>::LogAndError<<"\n";
-    }
-	GV<0>::LogAndError<<"\n";
-  }
+  Gups.ReadHere(varname, arrays);
   return 0;
 }
 

@@ -21,19 +21,21 @@ GUPS::~GUPS(){
 	if (Dyna[i]!=NULL) delete Dyna[i];
 }
 
-int GUPS::CreateVariant(int n, real *tensor){
-  Vars["variantn"]<<n;
-  Datas["straintensor"].Init(3,n,3,3,Data_HOST_DEV);
-  set_host(Datas["straintensor"].Arr,tensor,n*3*3);
-  Datas["straintensor"].HostToDevice();
+int GUPS::ReadHere(string name, string &arrays){
+  int n; arrays>>n;
+  int *dim = new int[n+1]; dim[0]=n;
+  for (int i=1; i<=n; i++) arrays>>dim[i];
+  Datas[name].Init(dim,Data_HOST);
+  for (int i=0; i<Datas[name].N(); i++)
+	arrays>>Datas[name].Arr[i];
   return 0;
 }
 
-int GUPS::SetThermo(string ss){ss>>ThermoSteps; ThermoMode  = ss; return 0;}
+int GUPS::SetInfo(string ss){ss>>InfoSteps; InfoMode  = ss; return 0;}
 
-int GUPS::ThermoOut(){
-  string sm,ss; sm=ThermoMode;
-  GV<0>::LogAndError<<"Steps "<<CurrentStep<<": \t";
+int GUPS::InfoOut(){
+  string sm,ss; sm=InfoMode;
+  GV<0>::LogAndError<<"Step  "<<CurrentStep<<" \t";
   while (sm !=""){
 	sm>>ss;
 	GV<0>::LogAndError<<Dyna[DynaID]->Get(ss)<<" \t";
@@ -89,16 +91,17 @@ int GUPS::SetSys(string ss){
   if (Dyna[DynaID]!=NULL) // if the DynaID dyna has been created then delete it.
 	delete Dyna[id];
 
+  bool hassys=false;
   ///////////////////////////////////
-  //GUPS_SYS_DEFINE
-  if (sys == "cores"	) {Dyna[DynaID] = new DynamicsCores;}
-  if (sys == "diffuse"	) {Dyna[DynaID] = new DynamicsDiffuse;}
-  if (sys == "mart"	) {Dyna[DynaID] = new DynamicsMart;}
-  if (sys == "stress"	) {Dyna[DynaID] = new DynamicsStress;}
-  if (sys == "xxx"	) {Dyna[DynaID] = new DynamicsXxx;}
-  //GUPS_SYS_DEFINE
+  //GUPS_SYS_DEFINE_START
+  if (sys == "cores"	) { Dyna[DynaID] = new DynamicsCores; hassys=true; }
+  if (sys == "diffuse"	) { Dyna[DynaID] = new DynamicsDiffuse; hassys=true; }
+  if (sys == "mart"	) { Dyna[DynaID] = new DynamicsMart; hassys=true; }
+  if (sys == "stress"	) { Dyna[DynaID] = new DynamicsStress; hassys=true; }
+  if (sys == "xxx"	) { Dyna[DynaID] = new DynamicsXxx; hassys=true; }
+  //GUPS_SYS_DEFINE_END
   ///////////////////////////////////
-  else {
+  if (!hassys) {
 	GV<0>::LogAndError>>"System ">>ss>>"is not recognized\n";
 	return -1;
   }
@@ -136,31 +139,48 @@ int GUPS::Read(string ss){
 
 int GUPS::Run(string ss){
   int totalsteps=1;
-  ss>>totalsteps; TotalSteps=totalsteps;
-  if (totalsteps <= 0 ) return -1;
-  //what dyna to use???? is defined in sys
-  Dyna[DynaID]->Datas = &Datas; // the data is passed by reference ( big )
+  ss>>totalsteps; TotalSteps=totalsteps; if (totalsteps <= 0 ) return -1;
+  //what dyna to use???? defined in sys
+  // the data is passed by reference ( big )
   // paras is passed by value ( small )
+  Dyna[DynaID]->Datas = &Datas; 
   Dyna[DynaID]->Vars= Vars; 
   if ( !IsDynaInit[DynaID] ){
-	Dyna[DynaID]->InitDynamics();
+	Dyna[DynaID]->Initialize();
 	IsDynaInit[ DynaID ] = true;
   }
-  int  thermoInterval;
-  if ( ThermoSteps==0) thermoInterval=totalsteps+1;else thermoInterval = totalsteps/ThermoSteps;
-  if ( thermoInterval==0 ) thermoInterval=1;
+  //////////////////////////////////////////////////////////////
+  int  infoInterval;
+  if ( InfoSteps==0) infoInterval=totalsteps+1;else infoInterval = totalsteps/InfoSteps;
+  if ( infoInterval==0 ) infoInterval=1;
   int  dumpInterval;
   if ( DumpSteps== 0 ) dumpInterval= totalsteps+1; else dumpInterval  = totalsteps/DumpSteps;
   if ( dumpInterval == 0 ) dumpInterval =1;
+  //////////////////////////////////////////////////////////////
+  string mode=InfoMode,tempss;
+  GV<0>::LogAndError<<"Info style: \t"; while (mode!=""){ mode>>tempss; GV<0>::LogAndError<<tempss<<"\t"; };
+  GV<0>::LogAndError<<"\n";
   for (int i=1;i<=totalsteps;i++) {
-	CurrentStep = i; // this will be used in dump and thermo to identity the progress
-	//if (DEBUG) Datas["eta"].DeviceToHost();
+	CurrentStep = i; // this will be used in dump and info to identity the progress
 	Dyna[DynaID]->Fix(real(i)/totalsteps);
-	Dyna[DynaID]->CalculateAll();
-	Dyna[DynaID]->Iterate();
+	Dyna[DynaID]->Calculate();
 
-	if (i % thermoInterval==0|| i==totalsteps) ThermoOut();
+	if (i % infoInterval==0|| i==totalsteps) InfoOut();
 	if (i % dumpInterval  ==0|| i==totalsteps) DumpOut();
   }
+  //////////////////////////////////////////////////////////////
+  return 0;
+}
+
+int GUPS::RunFunc(string funcName){
+  Dyna[DynaID]->Datas = &Datas; 
+  Dyna[DynaID]->Vars= Vars; 
+  if ( !IsDynaInit[DynaID] ){
+	GV<0>::LogAndError<<"runfunc command run before dynamics being initialized, run initialize function first\n";
+	Dyna[DynaID]->Initialize();
+	IsDynaInit[ DynaID ] = true;
+	GV<0>::LogAndError<<"Initialize function called\n";
+  }
+  Dyna[DynaID]->RunFunc(funcName);
   return 0;
 }

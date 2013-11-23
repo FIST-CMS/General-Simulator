@@ -7,5 +7,5 @@
 
 using namespace GUPS_NS;
 using namespace DATA_NS;
-//Dynamics::Dynamics(){}
-//Dynamics::~Dynamics(){}
+Dynamics::Dynamics(){}
+Dynamics::~Dynamics(){}

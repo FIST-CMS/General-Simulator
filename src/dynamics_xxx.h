@@ -8,17 +8,15 @@ namespace GUPS_NS{
 
   class DynamicsXxx: public Dynamics {//total energy for its main definition
   public:
-	// virtual functions need to be overriden
-	int InitDynamics();
-	int CalculateAll();
-	int Iterate();
-	int Fix(real progress);
-	Real Get(string );//return the statistic info
-	///////////////////////
-	//virtual int Set(string);
 	DynamicsXxx();
 	~DynamicsXxx();
-	// eta and con free chemical free energy
+	////////////////////////////////
+	virtual int Initialize();
+	virtual int Calculate();
+	virtual int RunFunc(string funcName);
+	virtual int Fix(real progress);
+	virtual string Get(string );
+	////////////////////////////////
 	float x;
 
   };

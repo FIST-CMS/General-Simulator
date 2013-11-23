@@ -166,8 +166,9 @@ namespace DATA_NS{
 	//overload << >> overload both fstream and stream
 	template<class ostype,class etype> friend ostype &operator<<(ostype &os,Data<etype>&data);
 	template<class istype,class etype> friend istype &operator>>(istype &is,Data<etype>&data);
-	//int 	Dump(FILE* file);
-	int 	DumpFile(string file);
+	//Read(Dump) in(out) directly with file
+	int  ReadFile(string filename);
+	int 	DumpFile(string filename);
   };
   template <class type> int Data<type>::VeryInit(){
 	TotalNumber++; SerialCode= TotalNumber;
@@ -181,8 +182,6 @@ namespace DATA_NS{
 	CountArr_dev=	NULL;
 	return 0;
   }
-
-
 
   template<class type> int Data<type>::Init(int *dimArr,int dataposition){//Assign data dype, dimension, and memory
 	if ( Arr != NULL ) { delete []Arr; Arr=NULL;}
@@ -342,7 +341,7 @@ namespace DATA_NS{
   template<class type> bool operator ==(Data<type> &data,int *dim){ return IsSameDimension(data.Dimension,dim); }
   template<class type> bool operator ==(int *dim,Data<type>&data){ return IsSameDimension(data.Dimension,dim); }
 
-  // Write Data to a File pointer
+  // Write Data to a File  (read from a file)
   template<class type> int Data<type>::DumpFile(string filename){
     ofstream os(filename.c_str());
     for (int i=0; i<= Dimension[0]; i++)
@@ -351,6 +350,18 @@ namespace DATA_NS{
     for ( int i = 0; i < N() ; i++)
 	 os<<Arr[i]<<endl;
     os.close();
+    return 0;
+  }
+  template<class type> int Data<type>::ReadFile(string filename){
+    ifstream ifs;
+    ifs.open(filename.c_str());
+    if (ifs){
+	 ifs>>(*this);
+	 ifs.close();
+    }else{
+	 cerr<<"File "<<filename<<" not found!\n";
+	 return -1;
+    }
     return 0;
   }
 

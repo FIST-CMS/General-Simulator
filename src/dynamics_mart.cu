@@ -17,7 +17,6 @@ int DynamicsMart::Initialize(){
   //para setting should be finished before or within this function
   string ss;
   ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
-  ss=Vars["variantn"];              if (ss!="") ss>>VariantN;
   ss=Vars["coefficient"];           if (ss!="") ss>>LPC[1]>>LPC[2]>>LPC[3];
   weightExternal= 0.f;
   weightDislocation= 0.01f; Vars["weightdislocation"]>>=weightDislocation;
@@ -28,6 +27,12 @@ int DynamicsMart::Initialize(){
   weightElastic=  100000.0f;  Vars["weightelastic"]>>=weightElastic;
   TransitionTemperature=450.0f; Vars["transitiontemperature"]>>=TransitionTemperature;
   LPC[2]=32.05f; LPC[3]=37.5f; ss=Vars["modulus"]; 	if (ss!="") ss>>B.C00>>B.C01>>B.C33;
+  StrainTensor = &((*Datas)["varianttensor"]);
+  if (StrainTensor->Arr == NULL){
+	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	return -1;
+  }
+  VariantN = StrainTensor->Dimension[1];
 
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
@@ -55,11 +60,6 @@ int DynamicsMart::Initialize(){
 
   if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
   //StrainTensor=strainTensor;  //need to assign somewhere-else
-  StrainTensor = &((*Datas)["straintensor"]);
-  if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
-	return -1;
-  }
   GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
   B.InitB(VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,*StrainTensor); 
   GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
@@ -308,6 +308,8 @@ int DynamicsMart::Calculate(){
   return 0;
 }
 
+int DynamicsMart::RunFunc(string funcName){ return 0; }
+
 int DynamicsMart::Fix(real progress){
   string ss,mode;
   ss = Vars["fix"];
@@ -332,3 +334,5 @@ string DynamicsMart::Get(string ss){ // return the statistic info.
   if (var == "temperature") return ans<<Temperature; 
   else return "nan";
 }
+
+//int DynamicsMart::Finalize(){ return 0; }

@@ -20,7 +20,3 @@ int cudaSetDeviceTorque(int id){
 	cudaSetDevice(id);
 	return id;
 }
-
-
-
-

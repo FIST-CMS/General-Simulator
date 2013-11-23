@@ -16,25 +16,14 @@ namespace GUPS_NS{
   public:
 	INPUT(string infile);
 	~INPUT();
-
-	int Phrasing();//process the infile and do the task assigned
-
-
-	//Log Warning and Wrong case dealing
-
-	int 	variable(string ss);
+	//////////////////////////////////////////////
+	int 	Phrasing();//process the infile and do the task assigned
+	//////////////////////////////////////////////
 	string 	standardize(string ss);
 	bool	fgets_str(ifstream &ifs, string &ss);
-	//commands
-	int device(string ss);
-	//int sys(string 		ss);
-	int variant(string	ss);
-
-
+	//////////////////////////////////////////////
+	int 	device(string ss);
+	int  	readhere(string ss);
   };
-
-
-
 }
-
 #endif

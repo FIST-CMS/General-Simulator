@@ -21,7 +21,8 @@ set concentration 0.1 0.44 # the init con of the mother phase is 0.2
 read eta data.eta.for.diffuse
 read concentration data.con.for.diffuse
 ###########################################################
-variant 4  #the conresponding variants information
+readhere varianttensor
+3 4 3 3
 {
  -0.01126,-0.00709,-0.00709,-0.00709, -0.01126,-0.00709, -0.00709, -0.00709, -0.01126 
  -0.01126, 0.00709, 0.00709, 0.00709, -0.01126,-0.00709, 0.00709, -0.00709, -0.01126 
@@ -30,7 +31,7 @@ variant 4  #the conresponding variants information
 }
 ######################################
 ######################################
-thermo steps/1 # (/ 4 2)
+info steps/1 # (/ 4 2)
 shell rm -rf dump_pre
 dump dump_pre 1 eta concentration
 #####################################

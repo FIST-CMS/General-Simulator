@@ -26,7 +26,6 @@ int DynamicsDiffuse::Initialize(){
   string ss;
   ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
   ss=Vars["deltatime"];             if (ss!="") ss>>DeltaTime;else DeltaTime=0.1;
-  ss=Vars["variantn"];              if (ss!="") ss>>VariantN; 
   ss=Vars["coefficient"];           if (ss!="") ss>>A[1]>>A[2]>>A[3]>>A[4]>>A[5]>>A[6]>>A[7]; else {A[1]=54.0;A[2]=-17.0;A[3]=7.0;A[4]=2.5;A[5]=0.2;A[6]=0.2;A[7]=0.2;}
   ss=Vars["modulus"]; 				if (ss!="") ss>>B.C00>>B.C01>>B.C33;else {B.C00=3.5;B.C01=1.5; B.C33=1.0;}
   ss=Vars["arfi"]; if (ss!="") ss>>Arfi; else Arfi=300.0f;
@@ -36,6 +35,12 @@ int DynamicsDiffuse::Initialize(){
   ss=Vars["xi"];   if (ss!="") ss>>Xi; else Xi=400.f;
   ss=Vars["concentration"]; if (ss!="") ss>>Concentration1>>Concentration2; else { Concentration1=0.1; Concentration2=0.44; }
   ss=Vars["weightnoise"]; if (ss!="") { ss>>weightEtaNoise; weightConNoise = weightEtaNoise; } else{ weightEtaNoise= 0.001; weightConNoise= 0.001;}
+  StrainTensor = &((*Datas)["varianttensor"]);
+  if (StrainTensor->Arr == NULL){
+	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	return -1;
+  }
+  VariantN=StrainTensor->Dimension[1]; 
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
   Init(3,nx,ny,nz,Data_NONE);
@@ -55,11 +60,6 @@ int DynamicsDiffuse::Initialize(){
 
   if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
   //StrainTensor=strainTensor;  //need to assign somewhere-else
-  StrainTensor = &((*Datas)["straintensor"]);
-  if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
-	return -1;
-  }
   GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
   B.InitB(VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,*StrainTensor); 
   GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
@@ -292,6 +292,8 @@ int DynamicsDiffuse::Calculate(){
 
   return 0;
 }
+
+int DynamicsDiffuse::RunFunc(string funcName){ return 0;}
 
 
 int DynamicsDiffuse::Fix(real progress){

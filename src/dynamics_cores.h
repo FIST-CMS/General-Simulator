@@ -11,7 +11,7 @@ namespace GUPS_NS{
 	// virtual functions need to be overriden
 	virtual int Initialize();
 	virtual int Calculate();
-	virtual int Finalize();
+	virtual int RunFunc(string funcName);
 	virtual int Fix(real progress);
 	virtual string Get(string );//return the statistic info
 	///////////////////////

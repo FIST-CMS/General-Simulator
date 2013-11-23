@@ -177,10 +177,9 @@ int DynamicsCores::Calculate(){
   return 0;
 }
 
+int DynamicsCores::RunFunc(string funcName){return 0;}
 
-int DynamicsCores::Fix(real progress){
-  return 0;
-}
+int DynamicsCores::Fix(real progress){return 0;}
 
 string DynamicsCores::Get(string ss){ // return the statistic info.
   string var; ss>>var;

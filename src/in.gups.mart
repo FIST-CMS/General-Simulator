@@ -12,18 +12,18 @@ set deltatime 0.01
 set fix temperature 460 300 #assign the temperature route  
 set weightdislocation 1
 ##########################################################
-read dislocationstress data.stress.for.mart
+#read dislocationstress data.stress.for.mart
 read defect data.defect.for.mart
 ###########################################################
-
-variant 4  #the conresponding variants information
+readhere varianttensor
+3 4 3 3
 { { {0.00, 0.0063, 	0.0063 }, {0.0063, 0.0, 0.0063  }, { 0.0063, 0.0063, 0.0 }},
   { {0.00, 0.0063, 	-0.0063}, { 0.0063, 0.0, -0.0063}, {-0.0063, -0.0063, 0.0}},
   { {0.00, -0.0063, 0.0063 }, {-0.0063, 0.0, -0.0063}, { 0.0063, -0.0063, 0.0}},
   { {0.00, -0.0063, -0.0063}, { -0.0063, 0.0, 0.0063}, { -0.0063, 0.0063, 0.0}}};
 ######################################
 ######################################
-thermo steps/20 temperature # (/ 4 2)
+info steps/20 temperature # (/ 4 2)
 shell rm -rf dump_mart
 dump dump_mart 20 eta
 #####################################
