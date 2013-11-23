@@ -1,9 +1,18 @@
+# files by some soft
 *.o
 *.~
 *.swp
 .dy*
 .em*
 .tm*
+
+# data files
 data.*
+
+# log files
+*.log
+
+# specific files
 Plot.nb
 init.m
+
