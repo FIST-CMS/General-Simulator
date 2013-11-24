@@ -28,9 +28,9 @@ namespace GUPS_NS{
 	Real		A[10];
 	//Real		*A_dev;
 	Real		Concentration1, Concentration2;
-	Real 			weightElastic;
-	Real			weightConNoise;
-	Real			weightEtaNoise;
+	Real 		weightElastic;
+	Real		weightConNoise;
+	Real		weightEtaNoise;
 
 	Data<Real>  *Concentration;
 	Data<Real>  *Eta;
@@ -44,10 +44,10 @@ namespace GUPS_NS{
 
 
 	//cufft plan
-	cufftHandle	plan_vn;
-	cufftHandle plan_n;
+	cufftHandle		plan_vn;
+	cufftHandle 	plan_n;
 	//Elastic
-	TensorB			B;
+	GTensorB		B;
 	Data<Real> 		ElasticEnergy;
 	Data<Real> 		ElasticForce;
 	int 			ElasticEnergyCalculate();

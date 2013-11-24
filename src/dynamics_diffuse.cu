@@ -7,7 +7,7 @@
 #include<curand.h>
 #include<cufft.h>
 #include"random.h"
-#include"tensorb.h"
+#include"gtensorb.h"
 
 
 #include"dynamics_diffuse.h"
@@ -15,11 +15,6 @@
 
 using namespace GUPS_NS;
 using namespace DATA_NS;
-/*
-  main calculation:
-    the structure tensor B
-	derivative of order parameter and concentration
- */
 
 int DynamicsDiffuse::Initialize(){
   //para setting should be finished before or within this function
@@ -27,7 +22,6 @@ int DynamicsDiffuse::Initialize(){
   ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
   ss=Vars["deltatime"];             if (ss!="") ss>>DeltaTime;else DeltaTime=0.1;
   ss=Vars["coefficient"];           if (ss!="") ss>>A[1]>>A[2]>>A[3]>>A[4]>>A[5]>>A[6]>>A[7]; else {A[1]=54.0;A[2]=-17.0;A[3]=7.0;A[4]=2.5;A[5]=0.2;A[6]=0.2;A[7]=0.2;}
-  ss=Vars["modulus"]; 				if (ss!="") ss>>B.C00>>B.C01>>B.C33;else {B.C00=3.5;B.C01=1.5; B.C33=1.0;}
   ss=Vars["arfi"]; if (ss!="") ss>>Arfi; else Arfi=300.0f;
   ss=Vars["beta"]; if (ss!="") ss>>Beta; else Beta=300.0f;
   ss=Vars["meta"]; if (ss!="") ss>>Meta; else Meta=0.4f;
@@ -35,6 +29,7 @@ int DynamicsDiffuse::Initialize(){
   ss=Vars["xi"];   if (ss!="") ss>>Xi; else Xi=400.f;
   ss=Vars["concentration"]; if (ss!="") ss>>Concentration1>>Concentration2; else { Concentration1=0.1; Concentration2=0.44; }
   ss=Vars["weightnoise"]; if (ss!="") { ss>>weightEtaNoise; weightConNoise = weightEtaNoise; } else{ weightEtaNoise= 0.001; weightConNoise= 0.001;}
+  ////////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
 	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
@@ -43,6 +38,7 @@ int DynamicsDiffuse::Initialize(){
   VariantN=StrainTensor->Dimension[1]; 
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
+  ////////////////////////////////////////////////////////////
   Init(3,nx,ny,nz,Data_NONE);
   SetCalPos(Data_HOST_DEV);
   Concentration = &((*Datas)["concentration"]);
@@ -57,12 +53,25 @@ int DynamicsDiffuse::Initialize(){
 	SetCalPos(Data_DEV);
 	(*Eta)=0.0f; 
   }else{ Eta->HostToDevice(); }
-
-  if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
-  //StrainTensor=strainTensor;  //need to assign somewhere-else
+  ////////////////////////////////////////////////////////////
+  real C00=3.5,C01=1.5,C33=1.0;
+  ss=Vars["modulus"];if (ss!="") ss>>C00>>C01>>C33;
+  Data<Real> cijkl; SetCalPos(Data_HOST);
+  cijkl.Init(4,3,3,3,3); cijkl=0.f;
+  cijkl(0,0,0,0) =C00; cijkl(1,1,1,1) =C00; cijkl(2,2,2,2) =C00;
+  cijkl(0,0,1,1) =C01; cijkl(1,1,2,2) =C01; cijkl(2,2,0,0) =C01;
+  cijkl(0,1,0,1) =C33; cijkl(1,2,1,2) =C33; cijkl(2,0,2,0) =C33;
+  cijkl(1,1,0,0) =C01; cijkl(2,2,1,1) =C01; cijkl(0,0,2,2) =C01;
+  cijkl(1,0,1,0) =C33; cijkl(0,1,1,0) =C33; cijkl(1,0,0,1) =C33;
+  cijkl(2,1,2,1) =C33; cijkl(2,1,1,2) =C33; cijkl(1,2,2,1) =C33;
+  cijkl(0,2,0,2) =C33; cijkl(0,2,2,0) =C33; cijkl(2,0,0,2) =C33;			// 
+  Data<Real> vstrain(3,2*VariantN,3,3,Data_HOST_DEV);
+  for (int i=0; i<2*VariantN*3*3; i++)
+	vstrain.Arr[i]=StrainTensor->Arr[i%(VariantN*3*3)];
   GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
-  B.InitB(VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,*StrainTensor); 
+  B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
   GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
+  ////////////////////////////////////////////////////////////
   int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;
   GV<0>::LogAndError<<"cuda fft plan is to create\n";
   if (cufftPlanMany(&plan_vn,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,VariantN)==CUFFT_SUCCESS)

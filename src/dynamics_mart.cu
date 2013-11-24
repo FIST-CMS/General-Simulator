@@ -4,7 +4,8 @@
 #include<curand.h>
 #include<cufft.h>
 #include"random.h"
-#include"tensorb.h"
+//#include"tensorb.h"
+#include"gtensorb.h"
 
 #include"dynamics.h"
 #include"dynamics_mart.h"
@@ -14,10 +15,12 @@ using namespace GUPS_NS;
 using namespace DATA_NS;
 
 int DynamicsMart::Initialize(){
+  /////////////////////////////////////////////////////////
   //para setting should be finished before or within this function
   string ss;
   ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
-  ss=Vars["coefficient"];           if (ss!="") ss>>LPC[1]>>LPC[2]>>LPC[3];
+
+
   weightExternal= 0.f;
   weightDislocation= 0.01f; Vars["weightdislocation"]>>=weightDislocation;
   weightNoise = 0.01f; Vars["weightnoise"]>>=weightNoise;
@@ -26,14 +29,17 @@ int DynamicsMart::Initialize(){
   weightChemical= 1.0f; Vars["weightchemical"]>>=weightChemical;
   weightElastic=  100000.0f;  Vars["weightelastic"]>>=weightElastic;
   TransitionTemperature=450.0f; Vars["transitiontemperature"]>>=TransitionTemperature;
-  LPC[2]=32.05f; LPC[3]=37.5f; ss=Vars["modulus"]; 	if (ss!="") ss>>B.C00>>B.C01>>B.C33;
+  /////////////////////////////////////////////////////////
+  LPC[2]=32.05f; LPC[3]=37.5f;
+  ss=Vars["coefficient"]; if (ss!="") ss>>LPC[1]>>LPC[2]>>LPC[3];
+  /////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
 	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
 	return -1;
   }
   VariantN = StrainTensor->Dimension[1];
-
+  /////////////////////////////////////////////////////////
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
   Init(3,nx,ny,nz,Data_NONE);
@@ -45,6 +51,7 @@ int DynamicsMart::Initialize(){
 	SetCalPos(Data_DEV);
 	(*Eta)=0.0f; 
   }else{ Eta->HostToDevice();}
+  /////////////////////////////////////////////////////////
   int dim[5]={3,nx,ny,nz};
   int dimN[6]={4,VariantN,nx,ny,nz};
 
@@ -56,18 +63,34 @@ int DynamicsMart::Initialize(){
 
   ChemicalEnergy.Init(dim,Data_HOST_DEV);
   ChemicalForce.Init(dimN,Data_HOST_DEV);
-
-
-  if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
-  //StrainTensor=strainTensor;  //need to assign somewhere-else
+  /////////////////////////////////////////////////////////////////
+  real C00=3.5f, C01=1.5f, C33=1.0f;//defaut values
+  Data<Real> cijkl(4,3,3,3,3,Data_HOST_DEV); SetCalPos(Data_HOST);
+  cijkl(0,0,0,0) =C00; cijkl(1,1,1,1) =C00; cijkl(2,2,2,2) =C00;
+  cijkl(0,0,1,1) =C01; cijkl(1,1,2,2) =C01; cijkl(2,2,0,0) =C01;
+  cijkl(0,1,0,1) =C33; cijkl(1,2,1,2) =C33; cijkl(2,0,2,0) =C33;
+  cijkl(1,1,0,0) =C01; cijkl(2,2,1,1) =C01; cijkl(0,0,2,2) =C01;
+  cijkl(1,0,1,0) =C33; cijkl(0,1,1,0) =C33; cijkl(1,0,0,1) =C33;
+  cijkl(2,1,2,1) =C33; cijkl(2,1,1,2) =C33; cijkl(1,2,2,1) =C33;
+  cijkl(0,2,0,2) =C33; cijkl(0,2,2,0) =C33; cijkl(2,0,0,2) =C33;			// 
+  Data<Real> *modulus; modulus=&((*Datas)["modulus"]);
+  if ( modulus->Arr != NULL )
+	cijkl = (*modulus);
+  ///////////////////////////
+  Data<Real> vstrain(3,2*VariantN,3,3,Data_HOST_DEV);
+  for (int i=0; i<2*VariantN*3*3; i++)
+	vstrain.Arr[i]=StrainTensor->Arr[i%(VariantN*3*3)];
+  ///////////////////////////
   GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
-  B.InitB(VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,*StrainTensor); 
+  B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
   GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
+  /////////////////////////////////////////////////////////////////
   ElasticEnergy.Init(dim,Data_HOST_DEV);
   ElasticForce.Init(dimN,Data_HOST_DEV);
   Eta_RT.Init(dimN,Data_HOST_DEV);
   Eta_CT.Init(dimN,Data_HOST_DEV);
   ReciprocalTerm.Init(dimN,Data_HOST_DEV);
+  /////////////////////////////////////////////////////////////////
   int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;
   GV<0>::LogAndError<<"cuda fft plan is to creat\n";
   if (cufftPlanMany(&planAll_Cuda,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,VariantN)==CUFFT_SUCCESS)
@@ -81,6 +104,7 @@ int DynamicsMart::Initialize(){
 	(*Defect)=0.0f;
   }else { Defect->HostToDevice();}
   
+  /////////////////////////////////////////////////////////////////
   // the 6 component form should be rewriten to 3*3 form
   DislocationStressOForm= &((*Datas)["dislocationstress"]);
   int dim33[6]={5,3,3,nx,ny,nz}; 

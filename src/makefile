@@ -12,9 +12,9 @@ dynamics_cores.o: dynamics_cores.cu pub.h ./log_error.h ./../include/datamain.th
 	$(CC) $(FLAGS) -c $< -o $@
 dynamics.o: dynamics.cu pub.h ./log_error.h ./../include/datamain.th ../include/datamain.th ../include/datanumbers.th ../include/datamath.th ../include/datamap.th ../include/datatemp.th dynamics.h
 	$(CC) $(FLAGS) -c $< -o $@
-dynamics_diffuse.o: dynamics_diffuse.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h random.h tensorb.h dynamics_diffuse.h
+dynamics_diffuse.o: dynamics_diffuse.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h random.h gtensorb.h dynamics_diffuse.h
 	$(CC) $(FLAGS) -c $< -o $@
-dynamics_mart.o: dynamics_mart.cu pub.h ./log_error.h ./../include/datamain.th ../include/datamain.th ../include/datanumbers.th ../include/datamath.th ../include/datamap.th ../include/datatemp.th random.h tensorb.h dynamics.h dynamics_mart.h
+dynamics_mart.o: dynamics_mart.cu pub.h ./log_error.h ./../include/datamain.th ../include/datamain.th ../include/datanumbers.th ../include/datamath.th ../include/datamap.th ../include/datatemp.th random.h gtensorb.h dynamics.h dynamics_mart.h
 	$(CC) $(FLAGS) -c $< -o $@
 dynamics_stress.o: dynamics_stress.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h random.h gtensorb.h dynamics_stress.h
 	$(CC) $(FLAGS) -c $< -o $@

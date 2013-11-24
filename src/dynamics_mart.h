@@ -50,7 +50,7 @@ namespace GUPS_NS{
 	int ChemicalEnergyCalculate();
 	int ChemicalForceCalculate();
 	
-	TensorB		B;
+	GTensorB	B;
 	Data<Real> 	ElasticEnergy;
 	Data<Real> 	ElasticForce;
 	Real 		weightElastic;
