@@ -23,36 +23,57 @@ using namespace DATA_NS;
 int DynamicsStress::Initialize(){
   //para setting should be finished before or within this function
   string ss;
-  ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
-  ss=Vars["modulus"]; 				if (ss!="") ss>>B.C00>>B.C01>>B.C33;else {B.C00=3.5;B.C01=1.5; B.C33=1.0;}
-  ss=Vars["xi"]; 					if (ss!="") ss>>Xi;else {Xi=4000.0f; }
+
+  (((((Vars["gridsize"]>>=nx)>>=ny)>>=nz)>>=dx)>>=dy)>>=dz;
+  Xi=4000.0f;  Vars["xi"]>>=Xi;
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
 	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
 	return -1;
   }
   VariantN = StrainTensor->Dimension[1];
-
-  // it is called to initialize the --run-- function
-  // allocate memory initial size and default values
-  SetCalPos(Data_HOST);
   ///////////////////////////////////////////////////
   Stress = &((*Datas)["stress"]); // the assign function will malloc space for Stress
   Defect = &((*Datas)["defect"]); // may create here
   Stress->Init(4,6,nx,ny,nz,Data_HOST_DEV);
   Defect->Init(3,nx,ny,nz,Data_HOST);
   ///////////////////////////////////////////////////
-
   Eta = &((*Datas)["eta"]); // may create here
   if ( Eta->Arr == NULL ){
 	Eta->Init(4,VariantN,nx,ny,nz,Data_HOST_DEV);
 	SetCalPos(Data_DEV);
 	(*Eta)=0.0f; 
   }else { Eta->HostToDevice(); }
+  ////////////////////////////////////////////////////
+  Data<Real> cijkl;
+  SetCalPos(Data_HOST);
+  cijkl.Init(4,3,3,3,3); cijkl=0.f;
+  cijkl(1-1,1-1,1-1,1-1) =5.39  ;//c11
+  cijkl(2-1,2-1,2-1,2-1) =5.39  ;//c11
+  cijkl(3-1,3-1,3-1,3-1) =5.22  ;//c11
+  cijkl(1-1,1-1,2-1,2-1) =3.39  ;//c12
+  cijkl(2-1,2-1,3-1,3-1) =3.56  ;//c12
+  cijkl(3-1,3-1,1-1,1-1) =3.56  ;//c12
+  cijkl(1-1,2-1,1-1,2-1) =0.6   ;//c44
+  cijkl(2-1,3-1,2-1,3-1) =0.77  ;//c44
+  cijkl(3-1,1-1,3-1,1-1) =0.77  ;//c44
 
-
-  if (B.C00<0){ B.C00=3.5f; B.C01=1.5f; B.C33=1.0f;}//defaut values
-  //StrainTensor=strainTensor;  //need to assign somewhere-else
+  cijkl(2-1,2-1,1-1,1-1) =3.39  ;//c12
+  cijkl(3-1,3-1,2-1,2-1) =3.56  ;//c12
+  cijkl(1-1,1-1,3-1,3-1) =3.56  ;//c12
+  cijkl(2-1,1-1,2-1,1-1) =0.60  ;//c44
+  cijkl(1-1,2-1,2-1,1-1) =0.60  ;//c44
+  cijkl(2-1,1-1,1-1,2-1) =0.60  ;//c44
+  cijkl(3-1,2-1,3-1,2-1) =0.77  ;//c44
+  cijkl(3-1,2-1,2-1,3-1) =0.77  ;//c44
+  cijkl(2-1,3-1,3-1,2-1) =0.77  ;//c44
+  cijkl(1-1,3-1,1-1,3-1) =0.77  ;//c44
+  cijkl(1-1,3-1,3-1,1-1) =0.77  ;//c44
+  cijkl(3-1,1-1,1-1,3-1) =0.77  ;//c44
+  Data<Real> *modulus; modulus=&((*Datas)["modulus"]);
+  if ( modulus->Arr != NULL )
+	cijkl = (*modulus);
+  ////////////////////////////////////////////////////
   tensor.Init(3,BaseVariantN+VariantN,3,3,Data_HOST_DEV); 
   SetCalPos(Data_HOST);
   tensor=0.f;
@@ -62,7 +83,7 @@ int DynamicsStress::Initialize(){
 	tensor[i]=(*StrainTensor)[i-6*9];
   
   GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
-  B.InitB(BaseVariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,tensor); 
+  B.InitB(BaseVariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,tensor,cijkl); 
   GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
 
   int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;

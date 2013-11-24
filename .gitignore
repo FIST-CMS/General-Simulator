@@ -5,20 +5,20 @@
 .dy*
 .em*
 .tm*
-tags
+*.log
+*.m
+*.err
+log.*
+*.bak
+*.backup
 
 # files of this project
 data.*
 *.data
 src/in.gups*
-
-# specific file types
-*.log
-*.m
-*.err
-log.*
-
-# specific files
+include/emake
+include/makefile
+tags
 Plot.nb
 init.m
 in.gups
