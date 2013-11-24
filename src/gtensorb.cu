@@ -43,33 +43,13 @@ int  GTensorB::UnitVector(real dx,real dy, real dz){
   return 0;
 }
 
-__host__ __device__ int gtensorb_Inverse3x3(real *m1, real *m2){ // mat2 = Inverse(mat2)  matrix shape 3x3
-  real det_m1;
-  det_m1=
-	-m1[2]*m1[4]*m1[6] + m1[1]*m1[5]*m1[6] + m1[2]*m1[3]*m1[7] - 
-	m1[0]*m1[5]*m1[7] - m1[1]*m1[3]*m1[8] + m1[0]*m1[4]*m1[8];
-  if (det_m1>=0.00000001f||det_m1<=-0.00000001f){
-	m2[0]=( -m1[5]*m1[7] + m1[4]*m1[8])/det_m1; 
-	m2[1]=( m1[2]*m1[7] - m1[1]*m1[8])/det_m1;
-	m2[2]=( -m1[2]*m1[4] + m1[1]*m1[5])/det_m1;
-	m2[3]=( m1[5]*m1[6] - m1[3]*m1[8])/det_m1;
-	m2[4]=( -m1[2]*m1[6] + m1[0]*m1[8])/det_m1; 
-	m2[5]=( m1[2]*m1[3] - m1[0]*m1[5])/det_m1;
-	m2[6]=( -m1[4]*m1[6] + m1[3]*m1[7])/det_m1; 
-	m2[7]=( m1[1]*m1[6] - m1[0]*m1[7])/det_m1;
-	m2[8]=( -m1[1]*m1[3] + m1[0]*m1[4])/det_m1;
-  }else{
-	for (int i=0; i<9; i++)
-	  m2[i]=0.f;
-  }
-  return 0;
-}
 __global__ void gtensorb_kernel_calculate
 (
  Real *B,
  Real*modulus,Real*sigma,Real*tensor,
  Real*unitVector,
- int VariantN1,int VariantN2
+ int VariantN1,int VariantN2,
+ Real*iomega,Real*omega
  );
 
 int GTensorB::InitB (int variantN1,int variantN2,
@@ -103,13 +83,16 @@ int GTensorB::InitB (int variantN1,int variantN2,
   modulus.HostToDevice();
   //-------------------------------------------------------------------
   ////////////////////////////////////////////////////////////////////
+  Data<Real> iomega(5,lx,ly,lz,3,3,Data_DEV); // in order to free in time
+  Data<Real> omega(5,lx,ly,lz,3,3,Data_DEV);
   dim3 bn(lx,ly,1), tn(lz,1,1);
   gtensorb_kernel_calculate<<<bn,tn>>>
 	(
 	 Arr_dev,
 	 modulus.Arr_dev,sigma.Arr_dev,tensor.Arr_dev,
 	 unitVector.Arr_dev,
-	 variantN1,variantN2
+	 variantN1,variantN2,
+	 iomega.Arr_dev,omega.Arr_dev
 	 );
 
   DeviceToHost();
@@ -122,30 +105,52 @@ __global__ void gtensorb_kernel_calculate
  Real *B,
  Real *modulus,Real *sigma,Real *tensor,
  Real *unitVector,
- int variantN1,int variantN2
+ int variantN1,int variantN2,
+ Real*iomega,Real*omega
  ){
   int nx= gridDim.x,  ny= gridDim.y,  nz=blockDim.x;
   int ix= blockIdx.x, iy= blockIdx.y, iz=threadIdx.x;
-  Real  omega[3][3];
-  Real  iomega[3][3];
-
   /////////////////
   for (int i=0;i<3;i++)
 	for (int j=0;j<3;j++){
-	  iomega[i][j]=0.0;
+	  iomega[(((ix*ny+iy)*nz+iz)*3+i)*3+j]=0.0f;
+	  iomega[(((ix*ny+iy)*nz+iz)*3+i)*3+j]=0.0f;
 	  for (int k=0;k<3;k++){
 		for (int l=0;l<3;l++){
-		  iomega[i][j] = iomega[i][j]
-			+( modulus[((i*3+k)*3+l)*3+j]
+		  iomega[(((ix*ny+iy)*nz+iz)*3+i)*3+j] += 
+			( modulus[((i*3+k)*3+l)*3+j]
 			   * unitVector[((ix*ny+iy)*nz+iz)*3+k]
 			   * unitVector[((ix*ny+iy)*nz+iz)*3+l]
 			   );
 		}
 	  }
 	}
-  ///////////////
-  gtensorb_Inverse3x3((float*)iomega,(float*)omega);
-  /////////////////////
+  //////////////////////////////////////////////////////////////////////
+  //gtensorb_Inverse3x3((float*)iomega,(float*)omega);
+  Real det_m1; Real *m1,*m2; m1=iomega; m2=omega;
+  det_m1=
+	-m1[((ix*ny+iy)*nz+iz)*9+2]*m1[((ix*ny+iy)*nz+iz)*9+4]*m1[((ix*ny+iy)*nz+iz)*9+6]
+	+ m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+5]*m1[((ix*ny+iy)*nz+iz)*9+6]
+	+ m1[((ix*ny+iy)*nz+iz)*9+2]*m1[((ix*ny+iy)*nz+iz)*9+3]*m1[((ix*ny+iy)*nz+iz)*9+7]
+	- m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+5]*m1[((ix*ny+iy)*nz+iz)*9+7]
+	- m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+3]*m1[((ix*ny+iy)*nz+iz)*9+8]
+	+ m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+4]*m1[((ix*ny+iy)*nz+iz)*9+8];
+  if (det_m1>=0.00000001f||det_m1<=-0.00000001f){
+	m2[((ix*ny+iy)*nz+iz)*9+0]=( -m1[((ix*ny+iy)*nz+iz)*9+5]*m1[((ix*ny+iy)*nz+iz)*9+7] + m1[((ix*ny+iy)*nz+iz)*9+4]*m1[((ix*ny+iy)*nz+iz)*9+8])/det_m1; 
+	m2[((ix*ny+iy)*nz+iz)*9+1]=( m1[((ix*ny+iy)*nz+iz)*9+2]*m1[((ix*ny+iy)*nz+iz)*9+7] - m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+8])/det_m1;
+	m2[((ix*ny+iy)*nz+iz)*9+2]=( -m1[((ix*ny+iy)*nz+iz)*9+2]*m1[((ix*ny+iy)*nz+iz)*9+4] + m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+5])/det_m1;
+	m2[((ix*ny+iy)*nz+iz)*9+3]=( m1[((ix*ny+iy)*nz+iz)*9+5]*m1[((ix*ny+iy)*nz+iz)*9+6] - m1[((ix*ny+iy)*nz+iz)*9+3]*m1[((ix*ny+iy)*nz+iz)*9+8])/det_m1;
+	m2[((ix*ny+iy)*nz+iz)*9+4]=( -m1[((ix*ny+iy)*nz+iz)*9+2]*m1[((ix*ny+iy)*nz+iz)*9+6] + m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+8])/det_m1; 
+	m2[((ix*ny+iy)*nz+iz)*9+5]=( m1[((ix*ny+iy)*nz+iz)*9+2]*m1[((ix*ny+iy)*nz+iz)*9+3] - m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+5])/det_m1;
+	m2[((ix*ny+iy)*nz+iz)*9+6]=( -m1[((ix*ny+iy)*nz+iz)*9+4]*m1[((ix*ny+iy)*nz+iz)*9+6] + m1[((ix*ny+iy)*nz+iz)*9+3]*m1[((ix*ny+iy)*nz+iz)*9+7])/det_m1; 
+	m2[((ix*ny+iy)*nz+iz)*9+7]=( m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+6] - m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+7])/det_m1;
+	m2[((ix*ny+iy)*nz+iz)*9+8]=( -m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+3] + m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+4])/det_m1;
+  }else{
+	for (int i=0; i<9; i++)
+	  m2[((ix*ny+iy)*nz+iz)*9+i]=0.f;
+  }
+
+  //////////////////////////////////////////////////////////////////////
   Real term=0;
   for (int sa=0; sa<variantN1; sa++){
 	for (int sap=0; sap<variantN2; sap++){
@@ -157,7 +162,7 @@ __global__ void gtensorb_kernel_calculate
 			  term=
 				-unitVector[((ix*ny+iy)*nz+iz)*3+i]
 				*sigma[(sa*3+i)*3+j]
-				*omega[j][k]
+				*omega[(((ix*ny+iy)*nz+iz)*3+j)*3+k]
 				*sigma[((sap+variantN1)*3+k)*3+l]
 				*unitVector[((ix*ny+iy)*nz+iz)*3+l];
 			  B[((((sa*variantN2+sap)*nx+ix)*ny+iy)*nz+iz)]+=
