@@ -11,8 +11,8 @@
 ##############################################
 ##############################################
 sfix=".cu"
-flags="-g -G"
 flags="-O2"
+flags="-g -G"
 excu="gups"
 libs="-lcurand -lcufft"
 prefix="$HOME/bin"

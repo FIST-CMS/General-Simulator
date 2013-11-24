@@ -1,7 +1,7 @@
 
 #compile setting
 CC = nvcc
-FLAGS = -O2 
+FLAGS = -g -G 
 SRCS = $(wildcard *.cu)
 OBJECTS = $(patsubst %.cu, %.o, $(SRCS))
 EXCU = gups

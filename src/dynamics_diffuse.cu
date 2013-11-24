@@ -104,6 +104,7 @@ int DynamicsDiffuse::Initialize(){
   Noise_vn.InitRandom(4,VariantN,nx,ny,nz, 0, 0.001, 0,0);
   Noise_n.InitRandom(3,nx,ny,nz, 0, 0.001, 0,0);
 
+
   return 0;
 
 }

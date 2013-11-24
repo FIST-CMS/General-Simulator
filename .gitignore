@@ -15,7 +15,7 @@ log.*
 # files of this project
 data.*
 *.data
-src/in.gups*
+src/in.*
 include/emake
 include/makefile
 tags
