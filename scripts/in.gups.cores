@@ -1,7 +1,7 @@
 ##########################################################
 sys cores #assign the type of the system
 ##########################################################
-variable l 32
+variable l 64
 ###########################################################
 set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
 set variantn 4

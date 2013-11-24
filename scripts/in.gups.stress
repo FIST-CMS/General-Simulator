@@ -1,10 +1,9 @@
 ##########################################################
 sys stress #assign the type of the system
 ##########################################################
-variable l 32
+variable l 64
 ###########################################################
 set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
-set modulus 5.35 3.40 0.69 #set the modulus constant
 set xi 4000.0
 ###########################################################
 read eta data.eta.for.stress  #read the shape (order parameter)
