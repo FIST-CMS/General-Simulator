@@ -65,7 +65,6 @@ int GTensorB::InitB (int variantN1,int variantN2,
   _gSquare.DeviceToHost(); // ..
   unitVector.DeviceToHost(); // ..
   ////////////////////////////////////////////
-  //stress  sigma(sa,j,i)
   Data<Real> sigma;
   sigma.Init(3,variantN1+variantN2,3,3,Data_HOST_DEV);
   sigma=0.f;
@@ -84,7 +83,7 @@ int GTensorB::InitB (int variantN1,int variantN2,
   //-------------------------------------------------------------------
   ////////////////////////////////////////////////////////////////////
   Data<Real> iomega(5,lx,ly,lz,3,3,Data_DEV); // in order to free in time
-  Data<Real> omega(5,lx,ly,lz,3,3,Data_DEV);
+  Data<Real> omega(5,lx,ly,lz,3,3,Data_DEV); //as temp variables
   dim3 bn(lx,ly,1), tn(lz,1,1);
   gtensorb_kernel_calculate<<<bn,tn>>>
 	(
@@ -96,6 +95,7 @@ int GTensorB::InitB (int variantN1,int variantN2,
 	 );
 
   DeviceToHost();
+  //DumpFile("data.structure.factor");
   return 0;
   
 }
@@ -146,8 +146,7 @@ __global__ void gtensorb_kernel_calculate
 	m2[((ix*ny+iy)*nz+iz)*9+7]=( m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+6] - m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+7])/det_m1;
 	m2[((ix*ny+iy)*nz+iz)*9+8]=( -m1[((ix*ny+iy)*nz+iz)*9+1]*m1[((ix*ny+iy)*nz+iz)*9+3] + m1[((ix*ny+iy)*nz+iz)*9+0]*m1[((ix*ny+iy)*nz+iz)*9+4])/det_m1;
   }else{
-	for (int i=0; i<9; i++)
-	  m2[((ix*ny+iy)*nz+iz)*9+i]=0.f;
+	for (int i=0; i<9; i++) m2[((ix*ny+iy)*nz+iz)*9+i]=0.f;
   }
 
   //////////////////////////////////////////////////////////////////////

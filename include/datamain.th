@@ -103,7 +103,7 @@ namespace DATA_NS{
   class Data{
   public:
 	int		    ID;
-	string 		Name;
+	//string 		Name;
 	static int	TotalNumber;
 	int		    SerialCode;
 	int 		Position;

@@ -1,5 +1,5 @@
 
-#define DEBUG 0
+#define DEBUG 1
 ////////////////////////////////////////
 #include"pub.h"
 #include"dynamics.h"
@@ -57,7 +57,7 @@ int DynamicsDiffuse::Initialize(){
   real C00=3.5,C01=1.5,C33=1.0;
   ss=Vars["modulus"];if (ss!="") ss>>C00>>C01>>C33;
   Data<Real> cijkl; SetCalPos(Data_HOST);
-  cijkl.Init(4,3,3,3,3); cijkl=0.f;
+  cijkl.Init(4,3,3,3,3,Data_HOST_DEV); cijkl=0.f;
   cijkl(0,0,0,0) =C00; cijkl(1,1,1,1) =C00; cijkl(2,2,2,2) =C00;
   cijkl(0,0,1,1) =C01; cijkl(1,1,2,2) =C01; cijkl(2,2,0,0) =C01;
   cijkl(0,1,0,1) =C33; cijkl(1,2,1,2) =C33; cijkl(2,0,2,0) =C33;
@@ -65,9 +65,11 @@ int DynamicsDiffuse::Initialize(){
   cijkl(1,0,1,0) =C33; cijkl(0,1,1,0) =C33; cijkl(1,0,0,1) =C33;
   cijkl(2,1,2,1) =C33; cijkl(2,1,1,2) =C33; cijkl(1,2,2,1) =C33;
   cijkl(0,2,0,2) =C33; cijkl(0,2,2,0) =C33; cijkl(2,0,0,2) =C33;			// 
+  cijkl.HostToDevice();
   Data<Real> vstrain(3,2*VariantN,3,3,Data_HOST_DEV);
-  for (int i=0; i<2*VariantN*3*3; i++)
+  for (int i=0; i<vstrain.N(); i++)
 	vstrain.Arr[i]=StrainTensor->Arr[i%(VariantN*3*3)];
+  vstrain.HostToDevice();
   GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
   B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
   GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
@@ -171,44 +173,30 @@ int DynamicsDiffuse::LocalEtaFreeEnergyCalculate(){
   return 0;
 }
 
-__global__ void ElasticEnergyForceCalculate_Diffuse_Kernel(Complex *ReTerm,Complex*Eta_sq,Real* B){
+__global__ void ElasticEnergyForceCalculate_Diffuse_Kernel(Complex *RTerm,Complex*Eta_sq,Real* B){
   int VariantN=gridDim.z;
   int nx= gridDim.x, ny= gridDim.y, nz = blockDim.x;
   int x = blockIdx.x, y = blockIdx.y, z = threadIdx.x, v = blockIdx.z;
-  int nn= nx*ny*nz;
-  int nvn=  VariantN* nn;
-  int pn= (x*ny +y)*nx+z; //(x,y,z)
-  Complex temp = 0;
+  RTerm[((v*nx+x)*ny+y)*nz+z]=0.f;
   for (int i=0;i<VariantN;i++){
-	temp+=B[ v*nvn + i*nn +pn ]* Eta_sq[ i*nn + pn ];
-#ifdef DEBUG
-	if (DEBUG) ReTerm[v*nn+pn]=temp;
-#endif
+	RTerm[((v*nx+x)*ny+y)*nz+z]+=B[(((v*VariantN+i)*nx+x)*ny+y)*nz+z]* Eta_sq[((v*nx+x)*ny+y)*nz+z];
   }
-  ReTerm[ v*nn + pn ] = temp;
 }
 
 int DynamicsDiffuse::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
-  cudaThreadSynchronize();
+  ///////////////////////////////////////////////////////////////
   cufftExecC2C(plan_vn,(cufftComplex*)Eta_CT.Arr_dev,(cufftComplex*)Eta_CT.Arr_dev,CUFFT_FORWARD);
-  cudaThreadSynchronize();
   Eta_CT = Eta_CT/Eta_CT.N()*VariantN; // equavilent to /(nx*ny*nz)
-  cudaThreadSynchronize();
+  ///////////////////////////////////////////////////////////////
   dim3 bn(Dimension[1],Dimension[2],VariantN);
   dim3 tn(Dimension[3]);
-#ifdef DEBUG
-  Eta_CT.DeviceToHost(); RTermEta_CT.DeviceToHost();
-#endif
   ElasticEnergyForceCalculate_Diffuse_Kernel<<<bn,tn>>>
 	(RTermEta_CT.Arr_dev,Eta_CT.Arr_dev,B.Arr_dev);
-  cudaThreadSynchronize();
-  cudaThreadSynchronize();
   cufftExecC2C(plan_vn,(cufftComplex*)RTermEta_CT.Arr_dev,(cufftComplex*)RTermEta_CT.Arr_dev,CUFFT_INVERSE);
-  cudaThreadSynchronize();
+  ///////////////////////////////////////////////////////////////
   ElasticForce = 2.0f* RTermEta_CT* (*Eta); // the coefficient 2.0f is ....????
-  cudaThreadSynchronize();
   return 0;
 }
 
@@ -229,6 +217,8 @@ int DynamicsDiffuse::ConcentrationUpdate(){
   set_device(ConRan_CT.Arr_dev,Noise_n.Arr_dev, ConRan_CT.N());
   Con_CT = *Concentration; ///real((nx*ny*nz));
   ConLFE_CT = ConLFE;
+  if (DEBUG){ConRan_CT.DeviceToHost(); Con_CT.DeviceToHost(); ConLFE_CT.DeviceToHost(); }
+  ///////////////////////////////////////////////////////////
   cufftExecC2C(plan_n,(cufftComplex*)ConRan_CT.Arr_dev,(cufftComplex*)ConRan_CT.Arr_dev, CUFFT_FORWARD); 
   cufftExecC2C(plan_n,(cufftComplex*)Con_CT.Arr_dev,(cufftComplex*)Con_CT.Arr_dev, CUFFT_FORWARD); 
   cufftExecC2C(plan_n,(cufftComplex*)ConLFE_CT.Arr_dev,(cufftComplex*)ConLFE_CT.Arr_dev, CUFFT_FORWARD); 
@@ -236,14 +226,18 @@ int DynamicsDiffuse::ConcentrationUpdate(){
   divi_device(Con_CT.Arr_dev,Con_CT.Arr_dev,real(nx*ny*nz),Con_CT.N());
   divi_device(ConRan_CT.Arr_dev, ConRan_CT.Arr_dev,real(nx*ny*nz),ConRan_CT.N());
   divi_device(ConLFE_CT.Arr_dev, ConLFE_CT.Arr_dev,real(nx*ny*nz),ConLFE_CT.N());
+  if (DEBUG){ConRan_CT.DeviceToHost(); Con_CT.DeviceToHost(); ConLFE_CT.DeviceToHost(); }
+  if (DEBUG) { ConRan_CT=0.f; }
   /////////////////
+  ///////////////////////////////////////////////////////////
   // the factor nx*ny*nz within the transformation
   dim3 bn(nx,ny);
   dim3 tn(nz);
-  if (DEBUG) { SetCalPos(Data_DEV); ConRan_CT=0.f; }
   ConcentrationUpdate_Diffuse_Kernel<<<bn,tn>>>(Con_CT.Arr_dev,ConLFE_CT.Arr_dev, ConRan_CT.Arr_dev, B._gSquare.Arr_dev, DeltaTime, Meta ,Beta, weightConNoise);
   cufftExecC2C(plan_n,(cufftComplex*)Con_CT.Arr_dev, (cufftComplex*)Con_CT.Arr_dev, CUFFT_INVERSE);
+  ///////////////////////////////////////////////////////////
   (*Concentration) = Con_CT; // / real(sqrt(nx*ny*nz)); // be done before the update
+  if (DEBUG) { Concentration->DeviceToHost(); }
   return 0;
 }
 
@@ -269,22 +263,29 @@ int DynamicsDiffuse::EtaUpdate(){
   set_device(EtaRan_CT.Arr_dev, Noise_vn.Arr_dev, EtaRan_CT.N());
   EtaRan_CT = EtaRan_CT; ///real(sqrt(nx*ny*nz));
   Eta_CT = (*Eta);///real(sqrt(nx*ny*nz));
+  ///////////////////////////////////////////////////////////
   ElasticTerm_CT = ( Xi * ElasticForce + EtaLFE); ///real(sqrt(nx*ny*nz));
+  ///////////////////////////////////////////////////////////
+  if (DEBUG) { Eta_CT.DeviceToHost(); ElasticTerm_CT.DeviceToHost();ElasticForce.DeviceToHost(); EtaLFE.DeviceToHost(); }
   cufftExecC2C(plan_vn, (cufftComplex*)EtaRan_CT.Arr_dev,(cufftComplex*)EtaRan_CT.Arr_dev,CUFFT_FORWARD);
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_FORWARD);
   cufftExecC2C(plan_vn, (cufftComplex*)ElasticTerm_CT.Arr_dev, (cufftComplex*) ElasticTerm_CT.Arr_dev, CUFFT_FORWARD);
   divi_device(EtaRan_CT.Arr_dev , EtaRan_CT.Arr_dev,real(nx*ny*nz),EtaRan_CT.N());
   divi_device(Eta_CT.Arr_dev,Eta_CT.Arr_dev, real(nx*ny*nz),Eta_CT.N());
   divi_device(ElasticTerm_CT.Arr_dev, ElasticTerm_CT.Arr_dev,real(nx*ny*nz),ElasticTerm_CT.N());
+  if (DEBUG) { Eta_CT.DeviceToHost(); ElasticTerm_CT.DeviceToHost(); }
   if (DEBUG) { SetCalPos(Data_DEV); EtaRan_CT=0.f; }
+  ///////////////////////////////////////////////////////////
   dim3 bn(nx,ny,VariantN), tn(nz);
   EtaUpdate_Diffuse_Kernel<<<bn,tn>>>
 	(Eta_CT.Arr_dev, ElasticTerm_CT.Arr_dev , EtaRan_CT.Arr_dev, B._gSquare.Arr_dev,
 	 DeltaTime, weightEtaNoise, Lpp, Arfi );
+  ///////////////////////////////////////////////////////////
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_INVERSE);
+  ///////////////////////////////////////////////////////////
   //*Eta=(Eta_CT /real(sqrt(nx*ny*nz))); // this room operation has already been done with the divi_device function??? 
-  cudaThreadSynchronize();
   (*Eta)=Eta_CT;
+  if (DEBUG) { Eta->DeviceToHost(); }
   return 0;
 }
 
@@ -298,8 +299,7 @@ int DynamicsDiffuse::Calculate(){
   ////////////////////////////////
   ConcentrationUpdate();
   EtaUpdate();
-
-
+  ////////////////////////////////
   return 0;
 }
 
