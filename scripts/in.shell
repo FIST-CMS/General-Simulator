@@ -1,10 +1,10 @@
 #!/bin/bash
-stepsdiffuse=1000
-stepsmart=1000
+stepsdiffuse=10000
+stepsmart=10000
 nx=128
 ny=128
 nz=128
-dumpN=4
+dumpN=10
 echo "
 ##########################################################
 sys cores #assign the type of the system
@@ -23,7 +23,7 @@ run
 shell cp concentration.final.data data.con.for.diffuse
 shell cp eta.final.data data.eta.for.diffuse
 shell rm eta.final.data concentration.final.data
-"> in.uni.cores
+"> in.cores
 
 echo "
 #device 0 #assign gpu device ID for cal. default 0. also ./gups in.script deviceID
@@ -64,7 +64,7 @@ dump dump_pre $dumpN eta concentration
 run steps
 shell cp dump_pre/eta.final.data data.eta.for.stress
 shell cp dump_pre/concentration.final.data data.con.final
-" > in.uni.diffuse
+" > in.diffuse
 echo "
 ##########################################################
 sys stress #assign the type of the system
@@ -86,7 +86,7 @@ run
 shell cp stress.final.data data.stress.for.mart
 shell cp defect.final.data data.defect.for.mart
 shell rm stress.final.data defect.final.data
-" > in.uni.stress
+" > in.stress
 echo "
 ###########################################################
 #device 0 #assign gpu device ID for cal. default 0. also ./gups in.script deviceID
@@ -117,5 +117,5 @@ dump dump_mart $dumpN eta
 #####################################
 run steps
 shell cp dump_mart/eta.final.data data.eta.final
-"> in.uni.mart
+"> in.mart
 

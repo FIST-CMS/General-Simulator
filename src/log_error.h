@@ -1,12 +1,12 @@
-#ifndef GUPS_LOG_H
-#define GUPS_LOG_H
+#ifndef GS_LOG_H
+#define GS_LOG_H
 
 #include<iostream>
 #include<string>
 #include<fstream>
 using namespace std;
 
-namespace GUPS_NS{
+namespace GS_NS{
 
   class LogAndError{
   public:

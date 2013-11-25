@@ -8,12 +8,12 @@
 
 #include"dynamics.h"
 /////////////////////////////
-//GUPS_SYS_DEFINE_START
+//GS_SYS_DEFINE_START
 #include"dynamics_cores.h"
 #include"dynamics_diffuse.h"
 #include"dynamics_mart.h"
 #include"dynamics_stress.h"
 #include"dynamics_xxx.h"
-//GUPS_SYS_DEFINE_END
+//GS_SYS_DEFINE_END
 /////////////////////////////
-#include"gups.h"
+#include"gs.h"

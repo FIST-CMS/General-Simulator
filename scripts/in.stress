@@ -1,9 +1,8 @@
+
 ##########################################################
 sys stress #assign the type of the system
 ##########################################################
-variable l 64
-###########################################################
-set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
+set gridsize 128 128 128 0.1 0.1 0.1  #the length unit is in nm
 set xi 4000.0
 ###########################################################
 read eta data.eta.for.stress  #read the shape (order parameter)
@@ -20,3 +19,4 @@ run
 shell cp stress.final.data data.stress.for.mart
 shell cp defect.final.data data.defect.for.mart
 shell rm stress.final.data defect.final.data
+

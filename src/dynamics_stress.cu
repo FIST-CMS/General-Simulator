@@ -12,7 +12,7 @@
 
 #include"dynamics_stress.h"
 
-using namespace GUPS_NS;
+using namespace GS_NS;
 using namespace DATA_NS;
 /*
   main calculation:

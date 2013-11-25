@@ -4,7 +4,7 @@
 
 using namespace DATA_NS;
 
-namespace GUPS_NS{
+namespace GS_NS{
 
   class Dynamics: public Data<Real>{//total energy for its main definition
   public:

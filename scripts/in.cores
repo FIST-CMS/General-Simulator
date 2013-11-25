@@ -1,9 +1,8 @@
+
 ##########################################################
 sys cores #assign the type of the system
 ##########################################################
-variable l 64
-###########################################################
-set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
+set gridsize 128 128 128 0.1 0.1 0.1  #the length unit is in nm
 set variantn 4
 set coresn 1
 set radius 6
@@ -17,3 +16,4 @@ run
 shell cp concentration.final.data data.con.for.diffuse
 shell cp eta.final.data data.eta.for.diffuse
 shell rm eta.final.data concentration.final.data
+

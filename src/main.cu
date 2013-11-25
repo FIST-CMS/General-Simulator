@@ -2,15 +2,15 @@
 #include"pub_main.h"
 #include"input.h"
 
-using namespace GUPS_NS;
+using namespace GS_NS;
 using namespace std;
 
 int main(int argn,char* args[]){
-  GV<0>::LogAndError.Init("gups");
+  GV<0>::LogAndError.Init("gs");
   string file;
   if (argn==1){
-	file ="in.gups";	
-	GV<0>::LogAndError<<"Since no input script assigned, default \"in.gups\" is used.\n";
+	file ="in.gs";	
+	GV<0>::LogAndError<<"Since no input script assigned, default \"in.gs\" is used.\n";
   }else{
 	file = args[1];
 	GV<0>::LogAndError<<"Input script \""<<file<<"\" is used.\n";

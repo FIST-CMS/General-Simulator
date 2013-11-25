@@ -2,14 +2,14 @@
 
  */
 
-#ifndef GUPS_Eins_H
-#define GUPS_Eins_H
+#ifndef GS_Eins_H
+#define GS_Eins_H
 
 
 using namespace DATA_NS;
 
-namespace GUPS_NS{
-  class GUPS{//
+namespace GS_NS{
+  class GS{//
   public:
 	Map< string, Data<Real> > 	Datas;
 	Map< string, string > 		Vars;
@@ -20,8 +20,8 @@ namespace GUPS_NS{
 	bool 				IsDynaInit[DynaMax];
 
   public:
-	GUPS();
-	~GUPS();
+	GS();
+	~GS();
 	int SetSys(string ss); //set the system type which should be a pre-command for other commands except the device
 	////////////////////////////////////////////
 	int Set(string); 

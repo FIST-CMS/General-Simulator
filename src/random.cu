@@ -3,7 +3,7 @@
 #include"../include/datamain.th"
 #include"random.h"
 
-using namespace GUPS_NS;
+using namespace GS_NS;
 using namespace DATA_NS;
 
 int Random::InitRandom(int *dimArr, real mean, real variance,real Seed_host,real Seed_dev){

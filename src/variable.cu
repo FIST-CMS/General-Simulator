@@ -3,7 +3,7 @@
 #include"../include/datamain.th"
 #include"variable.h"
 using namespace DATA_NS;
-using namespace GUPS_NS;
+using namespace GS_NS;
 using namespace std;
 
 Variable::Variable(){};

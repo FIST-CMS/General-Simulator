@@ -1,11 +1,11 @@
+
 #device 0 #assign gpu device ID for cal. default 0. also ./gups in.script deviceID
 ##########################################################
 sys diffuse #assign the type of the system
 ##########################################################
-variable l 64
 variable steps 10000
 ###########################################################
-set gridsize l l l 0.1 0.1 0.1  #the length unit is in nm
+set gridsize 128 128 128 0.1 0.1 0.1  #the length unit is in nm
 set deltatime 0.1
 set coefficient 54.00 -17.0 7.0 2.5 0.2 0.2 0.2
 set arfi 300.0
@@ -30,10 +30,11 @@ readhere varianttensor
 }
 ######################################
 ######################################
-info steps/1 # (/ 4 2)
+info steps/10 # (/ 4 2)
 shell rm -rf dump_pre
-dump dump_pre 1 eta concentration
+dump dump_pre 10 eta concentration
 #####################################
 run steps
 shell cp dump_pre/eta.final.data data.eta.for.stress
 shell cp dump_pre/concentration.final.data data.con.final
+

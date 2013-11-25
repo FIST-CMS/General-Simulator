@@ -1,9 +1,9 @@
 
 
-#ifndef RANDOM_EINS_H
-#define RANDOM_EINS_H
+#ifndef GS_RANDOM_EINS_H
+#define GS_RANDOM_EINS_H
 using namespace DATA_NS;
-namespace GUPS_NS{
+namespace GS_NS{
 
   class Random: public Data<Real>{
   public:

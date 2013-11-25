@@ -3,7 +3,7 @@
 #include"log_error.h"
 #include"../include/datamain.th"
 
-using namespace GUPS_NS;
+using namespace GS_NS;
 
 template<int id> class GV{
 public:

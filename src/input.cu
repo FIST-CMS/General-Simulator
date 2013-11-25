@@ -4,7 +4,7 @@
 #include"input.h"
 
 using namespace std;
-using namespace GUPS_NS;
+using namespace GS_NS;
 
 INPUT::INPUT(string infile){
   fin.open(infile.c_str());
@@ -59,20 +59,20 @@ int INPUT::Phrasing(){
 	else if (command== "shell"   		)   err=system(ss.c_str());
 	else if (command== "quit"			)   break;
 	//////////////////////////////////////////////////////////////
-	else if (command== "link"			)   { err= Gups.Link(ss); }
-	else if (command== "set"			)   { Vars.SubVar(ss,1); err=Gups.Set(ss);}
-	else if (command== "read"			)   { Vars.SubVar(ss,1); err=Gups.Read(ss);}
+	else if (command== "link"			)   { err= Gs.Link(ss); }
+	else if (command== "set"			)   { Vars.SubVar(ss,1); err=Gs.Set(ss);}
+	else if (command== "read"			)   { Vars.SubVar(ss,1); err=Gs.Read(ss);}
 	else if (command== "readhere"		)   { err=readhere(ss);}
-	else if (command== "dump" 			)   { Vars.SubVar(ss,1); err=Gups.SetDump(ss); } 
+	else if (command== "dump" 			)   { Vars.SubVar(ss,1); err=Gs.SetDump(ss); } 
 	//////////////////////////////////////////////////////////////
 	else{
 	  Vars.SubVar(ss,0);
 	  if 	  (command== "device"		) 	err=device(ss); 
-	  else if (command== "sys"			)  	err=Gups.SetSys(ss);
-	  else if (command== "info"     	)   err=Gups.SetInfo(ss); 
-	  else if (command== "run"			)   err=Gups.Run(ss);//run(ss);
+	  else if (command== "sys"			)  	err=Gs.SetSys(ss);
+	  else if (command== "info"     	)   err=Gs.SetInfo(ss); 
+	  else if (command== "run"			)   err=Gs.Run(ss);//run(ss);
 	  else{
-		GV<0>::LogAndError<<"Command "<<command<<" is not supported in GUPS!"; 
+		GV<0>::LogAndError<<"Command "<<command<<" is not supported in GS!"; 
 		return -1;
 	  }
 	}
@@ -103,7 +103,7 @@ int INPUT::readhere(string sr){
 	 if ( index > ndim + nele) break;//finish condition // the final index = ndim+nele+1...cause the ndim is counted as 1
   }
   //create the variant number and its corresponding tensor
-  Gups.ReadHere(varname, arrays);
+  Gs.ReadHere(varname, arrays);
   return 0;
 }
 

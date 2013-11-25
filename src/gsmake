@@ -13,7 +13,7 @@
 sfix=".cu"
 flags="-g -G"
 flags="-O2"
-excu="gups"
+excu="gs"
 libs="-lcurand -lcufft"
 prefix="$HOME/bin"
 ##############################################
@@ -21,20 +21,20 @@ cc="nvcc"
 ##############################################
 ##############################################
 #renew the pub_main.h via the pub_main.h.mod
-#renew the gups.cu via the gups.cu.mod
+#renew the gs.cu via the gs.cu.mod
 echo `ls dynamics_*.h` > .dynamics_files.tmp
 diff .dynamics_files.tmp .dynamics_files 1>.tmp 2>>.tmp
 num=`grep -c "" .tmp`
 if [ ${num} -gt 0 ]; then
-  echo "Dynamics files have been changed!!! reconstruct pub_main.h and gups.cu!!!"
+  echo "Dynamics files have been changed!!! reconstruct pub_main.h and gs.cu!!!"
   mhpub="pub_main.h"
   hpub=".pub_main.h"
-  mgcu="gups.cu"
-  gcu=".gups.cu"
-  num11=`grep -n "GUPS_SYS_DEFINE_START" $mhpub |awk -F: '{print $1}'`
-  num12=`grep -n "GUPS_SYS_DEFINE_END" $mhpub |awk -F: '{print $1}'`
-  num21=`grep -n "GUPS_SYS_DEFINE_START" $mgcu |awk -F: '{print $1}'`
-  num22=`grep -n "GUPS_SYS_DEFINE_END" $mgcu |awk -F: '{print $1}'`
+  mgcu="gs.cu"
+  gcu=".gs.cu"
+  num11=`grep -n "GS_SYS_DEFINE_START" $mhpub |awk -F: '{print $1}'`
+  num12=`grep -n "GS_SYS_DEFINE_END" $mhpub |awk -F: '{print $1}'`
+  num21=`grep -n "GS_SYS_DEFINE_START" $mgcu |awk -F: '{print $1}'`
+  num22=`grep -n "GS_SYS_DEFINE_END" $mgcu |awk -F: '{print $1}'`
   sed -n "1,${num11} p" $mhpub > $hpub
   sed -n "1,${num21} p" $mgcu > $gcu
   for hfile in `ls dynamics_*.h`; do

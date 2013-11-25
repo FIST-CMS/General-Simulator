@@ -1,7 +1,7 @@
 
 #include"../include/datamain.th"
 #include"tensorb.h"
-using namespace GUPS_NS;
+using namespace GS_NS;
 using namespace DATA_NS;
 
 /*

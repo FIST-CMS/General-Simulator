@@ -6,10 +6,10 @@
 #define LOG_PREFIX_FALSE	0 
 
 using namespace std;
-namespace GUPS_NS{
+namespace GS_NS{
   class INPUT{
   public:
-	GUPS	Gups;
+	GS	Gs;
 	ifstream fin;
 	int 	 LineNumber;
 	Variable Vars;

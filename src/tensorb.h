@@ -4,7 +4,7 @@
 
 using namespace DATA_NS;
 
-namespace GUPS_NS{
+namespace GS_NS{
 
   class TensorB: public Data<Real>{
   public:

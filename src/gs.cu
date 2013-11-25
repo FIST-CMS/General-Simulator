@@ -4,11 +4,11 @@
 #include"pub.h"
 #include"pub_main.h"
 
-using namespace GUPS_NS;
+using namespace GS_NS;
 using namespace DATA_NS;
 
 
-GUPS::GUPS(){ 
+GS::GS(){ 
   for (int i=0;i<DynaMax;i++){
 	Dyna[i] = NULL;
 	IsDynaInit[i] = false;
@@ -16,12 +16,12 @@ GUPS::GUPS(){
 }
 
 
-GUPS::~GUPS(){
+GS::~GS(){
   for (int i=0;i<DynaMax;i++)
 	if (Dyna[i]!=NULL) delete Dyna[i];
 }
 
-int GUPS::ReadHere(string name, string &arrays){
+int GS::ReadHere(string name, string &arrays){
   int n; arrays>>n;
   int *dim = new int[n+1]; dim[0]=n;
   for (int i=1; i<=n; i++) arrays>>dim[i];
@@ -31,9 +31,9 @@ int GUPS::ReadHere(string name, string &arrays){
   return 0;
 }
 
-int GUPS::SetInfo(string ss){ss>>InfoSteps; InfoMode  = ss; return 0;}
+int GS::SetInfo(string ss){ss>>InfoSteps; InfoMode  = ss; return 0;}
 
-int GUPS::InfoOut(){
+int GS::InfoOut(){
   string sm,ss; sm=InfoMode;
   GV<0>::LogAndError<<"Step  "<<CurrentStep<<" \t";
   while (sm !=""){
@@ -44,7 +44,7 @@ int GUPS::InfoOut(){
   return 0;
 }
 
-int GUPS::SetDump(string ss){
+int GS::SetDump(string ss){
   ss>>DumpFolder>>DumpSteps;
   string cmd="if [ -s "+DumpFolder+" ]; then echo \'dump to folder"+DumpFolder+"\'; else mkdir "+DumpFolder+"; fi";
   if (system(cmd.c_str()));
@@ -52,7 +52,7 @@ int GUPS::SetDump(string ss){
   return 0;
 }
 
-template<class type> int GUPS::DumpFile(string str,Data<type> &data){
+template<class type> int GS::DumpFile(string str,Data<type> &data){
   data.DeviceToHost();
   string file; file<<DumpFolder<<"/"<<str<<CurrentStep<<".data";
   if (CurrentStep==TotalSteps) {file="";file<<DumpFolder<<"/"<<str<<".final.data";}
@@ -63,7 +63,7 @@ template<class type> int GUPS::DumpFile(string str,Data<type> &data){
   return 0;
 }
   
-int GUPS::DumpOut(){
+int GS::DumpOut(){
   string sm,ss;
   sm=DumpMode;
   //if (DumpMode==""){//dedaut mode
@@ -78,7 +78,7 @@ int GUPS::DumpOut(){
   return 0;
 }
 
-int GUPS::SetSys(string ss){
+int GS::SetSys(string ss){
   string sys;
   int id=0;
   ss>>sys>>id;
@@ -93,13 +93,13 @@ int GUPS::SetSys(string ss){
 
   bool hassys=false;
   ///////////////////////////////////
-  //GUPS_SYS_DEFINE_START
+  //GS_SYS_DEFINE_START
   if (sys == "cores"	) { Dyna[DynaID] = new DynamicsCores; hassys=true; }
   if (sys == "diffuse"	) { Dyna[DynaID] = new DynamicsDiffuse; hassys=true; }
   if (sys == "mart"	) { Dyna[DynaID] = new DynamicsMart; hassys=true; }
   if (sys == "stress"	) { Dyna[DynaID] = new DynamicsStress; hassys=true; }
   if (sys == "xxx"	) { Dyna[DynaID] = new DynamicsXxx; hassys=true; }
-  //GUPS_SYS_DEFINE_END
+  //GS_SYS_DEFINE_END
   ///////////////////////////////////
   if (!hassys) {
 	GV<0>::LogAndError>>"System ">>ss>>"is not recognized\n";
@@ -109,21 +109,21 @@ int GUPS::SetSys(string ss){
 }
 
 //////////////////////////////////////////////////
-int GUPS::Set(string ss){
+int GS::Set(string ss){
   string var;
   ss>>var;
   Vars[var] = ss;
   return 0;
 }
 
-int GUPS::Link(string ss){
+int GS::Link(string ss){
   string target,link;
   ss>>target>>link;
   Vars.Link(target,link);
   return 0;
 }
 
-int GUPS::Read(string ss){
+int GS::Read(string ss){
   string file,var; ss>>var>>file;
   ifstream ifs;
   ifs.open(file.c_str());
@@ -137,7 +137,7 @@ int GUPS::Read(string ss){
   return 0;
 }
 
-int GUPS::Run(string ss){
+int GS::Run(string ss){
   int totalsteps=1;
   ss>>totalsteps; TotalSteps=totalsteps; if (totalsteps <= 0 ) return -1;
   //what dyna to use???? defined in sys
@@ -172,7 +172,7 @@ int GUPS::Run(string ss){
   return 0;
 }
 
-int GUPS::RunFunc(string funcName){
+int GS::RunFunc(string funcName){
   Dyna[DynaID]->Datas = &Datas; 
   Dyna[DynaID]->Vars= Vars; 
   if ( !IsDynaInit[DynaID] ){
