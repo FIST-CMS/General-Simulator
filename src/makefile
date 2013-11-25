@@ -4,9 +4,9 @@ CC = nvcc
 FLAGS = -O2 
 SRCS = $(wildcard *.cu)
 OBJECTS = $(patsubst %.cu, %.o, $(SRCS))
-EXCU = gs
+EXCU = gsi
 LIB	=  -lcurand -lcufft
-gs: $(OBJECTS)
+gsi: $(OBJECTS)
 	$(CC) $(FLAGS) -o $(EXCU)  $(OBJECTS) $(LIB) 
 dynamics_cores.o: dynamics_cores.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h random.h gtensorb.h dynamics_cores.h
 	$(CC) $(FLAGS) -c $< -o $@
