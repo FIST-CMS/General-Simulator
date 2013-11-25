@@ -10,22 +10,22 @@ int main(int argn,char* args[]){
   string file;
   if (argn==1){
 	file ="in.gups";	
-	GV<0>::LogAndError<<"No input script assigned, default \"in.gups\" is used.\n";
+	GV<0>::LogAndError<<"Since no input script assigned, default \"in.gups\" is used.\n";
   }else{
 	file = args[1];
-	GV<0>::LogAndError<<"input script \""<<file<<"\" is used.\n";
+	GV<0>::LogAndError<<"Input script \""<<file<<"\" is used.\n";
 	int device=0;
 	if (argn==3) { 
 	  io(args[2],device); 
 	  cudaSetDevice(device);
-	  GV<0>::LogAndError<<"gpu device in use is set to "<<device<<"\n";
+	  GV<0>::LogAndError<<"Gpu device set to "<<device<<"\n";
 	}  
   }
   INPUT qin(file);				// 
   if (! qin.fin.fail())
 	qin.Phrasing();	
   else
-	GV<0>::LogAndError<<"input script "<<file<<" is not found\n";
+	GV<0>::LogAndError<<"Input script "<<file<<" is not found\n";
   return 0;
 }
 

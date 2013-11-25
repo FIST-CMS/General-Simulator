@@ -35,7 +35,7 @@ int DynamicsMart::Initialize(){
   /////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	GV<0>::LogAndError>>"Error: variants' strain tensor does not set while initialize dynamics\n";
 	return -1;
   }
   VariantN = StrainTensor->Dimension[1];
@@ -81,9 +81,9 @@ int DynamicsMart::Initialize(){
   for (int i=0; i<2*VariantN*3*3; i++)
 	vstrain.Arr[i]=StrainTensor->Arr[i%(VariantN*3*3)];
   ///////////////////////////
-  GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
+  GV<0>::LogAndError<<"Space structure tensor is calculating\n";
   B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
-  GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
+  GV<0>::LogAndError<<"Calculating of space structure tensor relating to the elastic terms is finished\n";
   /////////////////////////////////////////////////////////////////
   ElasticEnergy.Init(dim,Data_HOST_DEV);
   ElasticForce.Init(dimN,Data_HOST_DEV);
@@ -92,10 +92,10 @@ int DynamicsMart::Initialize(){
   ReciprocalTerm.Init(dimN,Data_HOST_DEV);
   /////////////////////////////////////////////////////////////////
   int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;
-  GV<0>::LogAndError<<"cuda fft plan is to creat\n";
+  GV<0>::LogAndError<<"Cuda fft plan is to creat\n";
   if (cufftPlanMany(&planAll_Cuda,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,VariantN)==CUFFT_SUCCESS)
-	GV<0>::LogAndError<<"cuda fft plan is created\n";
-  else GV<0>::LogAndError<<"cuda fft plan fails to create\n";
+	GV<0>::LogAndError<<"Cuda fft plan is created\n";
+  else GV<0>::LogAndError<<"Cuda fft plan fails to create\n";
 
   Defect = &((*Datas)["defect"]);
   if (Defect->Arr==NULL){
@@ -345,7 +345,7 @@ int DynamicsMart::Fix(real progress){
 	  (Vars["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
-	  GV<0>::LogAndError>>"Error: fix style ">>mode>>" not find!\n";
+	  GV<0>::LogAndError>>"Error: fix style ">>mode>>" does not find!\n";
 	}
   } while ( ss != "");
 

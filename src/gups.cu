@@ -46,7 +46,7 @@ int GUPS::InfoOut(){
 
 int GUPS::SetDump(string ss){
   ss>>DumpFolder>>DumpSteps;
-  string cmd="mkdir "+DumpFolder;
+  string cmd="if [ -s "+DumpFolder+" ]; then echo \'dump to folder"+DumpFolder+"\'; else mkdir "+DumpFolder+"; fi";
   if (system(cmd.c_str()));
   DumpMode	 = ss;
   return 0;

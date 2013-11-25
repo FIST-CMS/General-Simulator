@@ -1,5 +1,5 @@
 
-#define DEBUG 1
+#define DEBUG 0
 ////////////////////////////////////////
 #include"pub.h"
 #include"dynamics.h"
@@ -32,7 +32,7 @@ int DynamicsDiffuse::Initialize(){
   ////////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	GV<0>::LogAndError>>"Error: variants' strain tensor deoos not set while initialize dynamics\n";
 	return -1;
   }
   VariantN=StrainTensor->Dimension[1]; 
@@ -70,17 +70,17 @@ int DynamicsDiffuse::Initialize(){
   for (int i=0; i<vstrain.N(); i++)
 	vstrain.Arr[i]=StrainTensor->Arr[i%(VariantN*3*3)];
   vstrain.HostToDevice();
-  GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
+  GV<0>::LogAndError<<"calculating space structure tensor \n";
   B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
-  GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
+  GV<0>::LogAndError<<"finished calculating space structure tensor \n";
   ////////////////////////////////////////////////////////////
   int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;
-  GV<0>::LogAndError<<"cuda fft plan is to create\n";
+  GV<0>::LogAndError<<"create cuda fft plan \n";
   if (cufftPlanMany(&plan_vn,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,VariantN)==CUFFT_SUCCESS)
-	GV<0>::LogAndError<<"cuda fft plan vn is created\n";
+	GV<0>::LogAndError<<"finish creating cuda fft plan vn \n";
   else GV<0>::LogAndError<<"cuda fft plan vn fails to create\n";
   if (cufftPlan3d(&plan_n,nx,ny,nz,CUFFT_C2C)==CUFFT_SUCCESS)
-	GV<0>::LogAndError<<"cuda fft plan n is created\n";
+	GV<0>::LogAndError<<"cuda fft plan n created\n";
   else GV<0>::LogAndError<<"cuda fft plan n fails to create\n";
 
   int ndim[5]={3,nx,ny,nz};
@@ -259,7 +259,7 @@ __global__ void EtaUpdate_Diffuse_Kernel(
 
 int DynamicsDiffuse::EtaUpdate(){
   SetCalPos(Data_DEV);
-  Noise_vn.NewNormal_device(); cudaThreadSynchronize();
+  Noise_vn.NewNormal_device();
   set_device(EtaRan_CT.Arr_dev, Noise_vn.Arr_dev, EtaRan_CT.N());
   EtaRan_CT = EtaRan_CT; ///real(sqrt(nx*ny*nz));
   Eta_CT = (*Eta);///real(sqrt(nx*ny*nz));
@@ -283,7 +283,6 @@ int DynamicsDiffuse::EtaUpdate(){
   ///////////////////////////////////////////////////////////
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_INVERSE);
   ///////////////////////////////////////////////////////////
-  //*Eta=(Eta_CT /real(sqrt(nx*ny*nz))); // this room operation has already been done with the divi_device function??? 
   (*Eta)=Eta_CT;
   if (DEBUG) { Eta->DeviceToHost(); }
   return 0;
@@ -317,7 +316,7 @@ int DynamicsDiffuse::Fix(real progress){
 	  (Vars["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
-	  GV<0>::LogAndError>>"Error: fix style ">>mode>>" not find!\n";
+	  GV<0>::LogAndError>>"Error: fix style ">>mode>>" does not find!\n";
 	}
   }
 

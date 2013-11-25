@@ -28,7 +28,7 @@ int DynamicsStress::Initialize(){
   Xi=4000.0f;  Vars["xi"]>>=Xi;
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor not set while initialize dynamics\n";
+	GV<0>::LogAndError>>"Error: variants' strain tensor does not set while initialize dynamics\n";
 	return -1;
   }
   VariantN = StrainTensor->Dimension[1];
@@ -82,19 +82,19 @@ int DynamicsStress::Initialize(){
   for (int i=6*9; i< (6+VariantN)*9; i++)
 	tensor[i]=(*StrainTensor)[i-6*9];
   
-  GV<0>::LogAndError<<"space structure tensor relating to the elastic terms is calculating\n";
+  GV<0>::LogAndError<<"Calculating space structure tensor \n";
   B.InitB(BaseVariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,tensor,cijkl); 
-  GV<0>::LogAndError<<"calculating of space structure tensor relating to the elastic terms is finished\n";
+  GV<0>::LogAndError<<"Calculating space structure finished\n";
 
   int rank=3,ns[3]={nx,ny,nz},dist=nx*ny*nz,stride=1;
-  GV<0>::LogAndError<<"cuda fft plan is to create\n";
+  GV<0>::LogAndError<<"Cuda fft plan is to create\n";
   if (cufftPlanMany(&plan_vn,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,VariantN)==CUFFT_SUCCESS)
-	GV<0>::LogAndError<<"cuda fft plan vn is created\n";
-  else GV<0>::LogAndError<<"cuda fft plan vn fails to create\n";
+	GV<0>::LogAndError<<"Cuda fft plan vn is created\n";
+  else GV<0>::LogAndError<<"Cuda fft plan vn fails to create\n";
 
   if (cufftPlanMany(&plan_bvn,rank,ns,ns,stride,dist,ns,stride,dist,CUFFT_C2C,BaseVariantN/*6*/)==CUFFT_SUCCESS)
-	GV<0>::LogAndError<<"cuda fft plan bvn is created\n";
-  else GV<0>::LogAndError<<"cuda fft plan bvn fails to create\n";
+	GV<0>::LogAndError<<"Cuda fft plan bvn is created\n";
+  else GV<0>::LogAndError<<"Cuda fft plan bvn fails to create\n";
 
   int vndim[6]={4,VariantN,nx,ny,nz};
   int bvndim[6]={4,BaseVariantN,nx,ny,nz};
