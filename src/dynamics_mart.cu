@@ -23,7 +23,7 @@ int DynamicsMart::Initialize(){
 
   weightExternal= 0.f;
   weightDislocation= 0.01f; Vars["weightdislocation"]>>=weightDislocation;
-  weightNoise = 0.01f; Vars["weightnoise"]>>=weightNoise;
+  weightNoise = 1.0f; Vars["weightnoise"]>>=weightNoise;
   DeltaTime =0.01f; Vars["deltatime"]>>=DeltaTime;
   weightGradient= 2.5f; Vars["weightgradient"]>>=weightGradient;
   weightChemical= 1.0f; Vars["weightchemical"]>>=weightChemical;
@@ -319,12 +319,9 @@ int DynamicsMart::Calculate(){
 	/*/dim3 bn(VariantN,Dimension[1],Dimension[2]); dim3 tn(Dimension[3]);
 	  fnoise<<<bn,tn>>>(Noise.Arr_dev);// */
 	Noise.NewNormal_device();
-	cudaThreadSynchronize();
-	Eta_RT += weightNoise* Noise;
+	Eta_RT += weightNoise*0.0001* Noise;
   }
-  cudaThreadSynchronize();
   (*Eta) += DeltaTime* Eta_RT;
-  /**/cudaThreadSynchronize();
   //defect block
   Block();
 

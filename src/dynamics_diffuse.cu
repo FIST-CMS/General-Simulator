@@ -28,7 +28,7 @@ int DynamicsDiffuse::Initialize(){
   ss=Vars["lpp"];  if (ss!="") ss>>Lpp; else Lpp = 0.4f;
   ss=Vars["xi"];   if (ss!="") ss>>Xi; else Xi=400.f;
   ss=Vars["concentration"]; if (ss!="") ss>>Concentration1>>Concentration2; else { Concentration1=0.1; Concentration2=0.44; }
-  ss=Vars["weightnoise"]; if (ss!="") { ss>>weightEtaNoise; weightConNoise = weightEtaNoise; } else{ weightEtaNoise= 0.001; weightConNoise= 0.001;}
+  ss=Vars["weightnoise"]; if (ss!="") { ss>>weightEtaNoise; weightConNoise = weightEtaNoise; } else{ weightEtaNoise= 1.0f; weightConNoise= 1.0f;}
   ////////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
@@ -207,7 +207,7 @@ __global__ void ConcentrationUpdate_Diffuse_Kernel(Complex *Con_CT, Complex* Con
   int tid = (x*ny + y)*nz+z; //(x,y,z)
   //int nn= nx*ny*nz;
   Con_CT[tid] =
-	( Con_CT[tid] - meta * gSquare[tid] *dt * ( ConLFE_CT[tid] + weightConNoise * ConRan_CT[tid] ) )
+	( Con_CT[tid] - meta * gSquare[tid] *dt * ( ConLFE_CT[tid] + 0.0001f*weightConNoise * ConRan_CT[tid] ) )
 	/ ( 1.0f + dt * meta * beta * gSquare[tid] * gSquare[tid] );
 }
 
@@ -253,7 +253,7 @@ __global__ void EtaUpdate_Diffuse_Kernel(
 
   Eta[tid]=
 	(Eta[tid]
-	 - DeltaTime * lpp *( ElasticTerm[tid] + weightEtaNoise* EtaRan[tid]))  
+	 - DeltaTime * lpp *( ElasticTerm[tid] + 0.0001f*weightEtaNoise* EtaRan[tid]))  
 	/(1.0f + DeltaTime* lpp* arfi * gSquare[ntid] );
 }
 
