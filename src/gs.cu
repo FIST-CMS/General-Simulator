@@ -1,6 +1,4 @@
 
-#define DEBUG 0
-
 #include"pub.h"
 #include"pub_main.h"
 
@@ -31,6 +29,20 @@ int GS::ReadHere(string name, string &arrays){
   return 0;
 }
 
+int GS::DumpHere(string sm){
+  string ss,file;
+  while (sm !=""){
+	sm>>ss>>file;
+	if (Datas(ss) != NULL){
+	  if (Datas[ss].Position==Data_DEV)
+		Datas[ss].DeviceToHost();
+	  if (file == "") file<<ss<<".data";
+	  Datas[ss].DumpFile(file);
+	}else GV<0>::LogAndError>>"Error: data ">>ss>>" does not exist!\n";
+  }
+  return 0;
+}
+
 int GS::SetInfo(string ss){ss>>InfoSteps; InfoMode  = ss; return 0;}
 
 int GS::InfoOut(){
@@ -52,28 +64,21 @@ int GS::SetDump(string ss){
   return 0;
 }
 
-template<class type> int GS::DumpFile(string str,Data<type> &data){
-  data.DeviceToHost();
-  string file; file<<DumpFolder<<"/"<<str<<CurrentStep<<".data";
-  if (CurrentStep==TotalSteps) {file="";file<<DumpFolder<<"/"<<str<<".final.data";}
-  ofstream of(file.c_str());
-  cudaThreadSynchronize();
-  of<<data;
-  of.close();
-  return 0;
-}
-  
 int GS::DumpOut(){
   string sm,ss;
   sm=DumpMode;
-  //if (DumpMode==""){//dedaut mode
-  //DumpFile("eta",Datas["eta"]);
-  //}else
   while (sm !=""){
 	sm>>ss;
-	if (Datas(ss) != NULL)
-	  DumpFile(ss,Datas[ss]);
-	else GV<0>::LogAndError>>"Error: data ">>ss>>" does not exist!\n";
+	if (Datas(ss) != NULL){
+	  if (Datas[ss].Position==Data_DEV)
+		Datas[ss].DeviceToHost();
+	  string file; file<<DumpFolder<<"/"<<ss<<"."<<CurrentStep<<".data";
+	  if (CurrentStep==TotalSteps) {
+		file="";
+		file<<DumpFolder<<"/"<<ss<<".final.data";
+	  }
+	  Datas[ss].DumpFile(file);
+	}else GV<0>::LogAndError>>"Error: data ">>ss>>" does not exist!\n";
   }
   return 0;
 }
@@ -94,11 +99,12 @@ int GS::SetSys(string ss){
   bool hassys=false;
   ///////////////////////////////////
   //GS_SYS_DEFINE_START
-  if (sys == "cores"	) { Dyna[DynaID] = new DynamicsCores; hassys=true; }
-  if (sys == "diffuse"	) { Dyna[DynaID] = new DynamicsDiffuse; hassys=true; }
-  if (sys == "mart"	) { Dyna[DynaID] = new DynamicsMart; hassys=true; }
-  if (sys == "stress"	) { Dyna[DynaID] = new DynamicsStress; hassys=true; }
-  if (sys == "xxx"	) { Dyna[DynaID] = new DynamicsXxx; hassys=true; }
+  if (sys == "cores"	) { Dyna[DynaID] = new Dynamics_cores; hassys=true; }
+  if (sys == "diffuse"	) { Dyna[DynaID] = new Dynamics_diffuse; hassys=true; }
+  if (sys == "mart"	) { Dyna[DynaID] = new Dynamics_mart; hassys=true; }
+  if (sys == "pow2"	) { Dyna[DynaID] = new Dynamics_pow2; hassys=true; }
+  if (sys == "stress"	) { Dyna[DynaID] = new Dynamics_stress; hassys=true; }
+  if (sys == "xxx"	) { Dyna[DynaID] = new Dynamics_xxx; hassys=true; }
   //GS_SYS_DEFINE_END
   ///////////////////////////////////
   if (!hassys) {
@@ -158,7 +164,7 @@ int GS::Run(string ss){
   if ( dumpInterval == 0 ) dumpInterval =1;
   //////////////////////////////////////////////////////////////
   string mode=InfoMode,tempss;
-  GV<0>::LogAndError<<"Info style: \t"; while (mode!=""){ mode>>tempss; GV<0>::LogAndError<<tempss<<"\t"; };
+  GV<0>::LogAndError<<"Terms \t"; while (mode!=""){ mode>>tempss; GV<0>::LogAndError<<tempss<<"\t"; };
   GV<0>::LogAndError<<"\n";
   for (int i=1;i<=totalsteps;i++) {
 	CurrentStep = i; // this will be used in dump and info to identity the progress
@@ -172,15 +178,15 @@ int GS::Run(string ss){
   return 0;
 }
 
-int GS::RunFunc(string funcName){
+int GS::RunFunc(string func){
   Dyna[DynaID]->Datas = &Datas; 
   Dyna[DynaID]->Vars= Vars; 
   if ( !IsDynaInit[DynaID] ){
-	GV<0>::LogAndError<<"runfunc command run before dynamics being initialized, run initialize function first\n";
+	GV<0>::LogAndError<<"Runfunc command run before dynamics being initialized, run initialization function first\n";
 	Dyna[DynaID]->Initialize();
 	IsDynaInit[ DynaID ] = true;
-	GV<0>::LogAndError<<"Initialize function called\n";
+	GV<0>::LogAndError<<"Initialization function called\n";
   }
-  Dyna[DynaID]->RunFunc(funcName);
+  Dyna[DynaID]->RunFunc(func);
   return 0;
 }

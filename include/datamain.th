@@ -62,31 +62,39 @@ namespace DATA_NS{
 }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
-template<class type> __host__ __device__ type &PO(type *arr, int *dim,int const p){
+template<class type> __host__ __device__ type&Part(type*a,int*d,int const p){return a[ d[ d[0]+1 ] ];}
+template<class type> __host__ __device__ type&Part(type*a,int*d, int p1,int p2){return a[ p1*d[2]+p2 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d, int p1,int p2,int p3){return a[(p1*d[2]+p2)*d[3]+p3 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d, int p1,int p2,int p3,int p4){return a[ ((p1*d[2]+p2)*d[3]+p3)*d[4]+p4 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d,int p1,int p2,int p3,int p4,int p5){return a[(((p1*d[2]+p2)*d[3]+p3)*d[4]+p4)*d[5]+p5 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d,int p1,int p2,int p3,int p4,int p5,int p6){
+  return a[((((p1*d[2]+p2)*d[3]+p3)*d[4]+p4)*d[5]+p5)*d[6]+p6];};
+/////////////////////
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim,int const p){
   int N= dim[ dim[0] +1 ];
-	return arr[ ( p%N + N ) % N ];
-  }
-template<class type> __host__ __device__ type &PO(type *arr, int *dim, int p1,int p2){
+  return arr[ ( p%N + N ) % N ];
+}
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2){
   int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
   for (int i=2; i<= d; i++) {if (i==2) p=p2; dt=dim[i]; index=(p%dt+dt)%dt+ index*dt;}
   return arr[ index ];
 };
-template<class type> __host__ __device__ type &PO(type *arr, int *dim, int p1,int p2,int p3){
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3){
   int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
   for (int i=2; i<= d; i++) {if (i==2) p=p2; else if (i==3) p=p3; dt=dim[i]; index=(p%dt+dt)%dt+ index*dt;}
   return arr[ index ];
 };
-template<class type> __host__ __device__ type &PO(type *arr, int *dim, int p1,int p2,int p3,int p4){
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3,int p4){
   int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
   for (int i=2; i<= d; i++) {if (i==2) p=p2; else if (i==3) p=p3;else if (i==4) p=p4; dt=dim[i]; index=(p%dt+dt)%dt+ index*dt;}
   return arr[ index ];
 };
-template<class type> __host__ __device__ type &PO(type *arr, int *dim, int p1,int p2,int p3,int p4,int p5){
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3,int p4,int p5){
   int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
   for (int i=2; i<= d; i++) {if (i==2) p=p2; else if (i==3) p=p3;else if (i==4) p=p4; else if (i==5) p=p5; dt=dim[i];index=(p%dt+dt)%dt+ index*dt;}
   return arr[ index ];
 };
-template<class type> __host__ __device__ type &PO(type *arr, int *dim, int p1,int p2,int p3,int p4,int p5,int p6){
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3,int p4,int p5,int p6){
   int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
   for (int i=2; i<= d; i++) {
 	if (i==2) p=p2; else if (i==3) p=p3;else if (i==4) p=p4; else if (i==5) p=p5;else if (i==6) p=p6; dt=dim[i];index=(p%dt+dt)%dt+ index*dt;}
@@ -95,20 +103,18 @@ template<class type> __host__ __device__ type &PO(type *arr, int *dim, int p1,in
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
 namespace DATA_NS{
-  class DataTemp;//defined afterwards
-  //  template<int id> bool IsSameDimensionT(int *dim1,int *dim2);
+  //class DataTemp;//defined afterwards
   inline bool IsSameDimension(int * dime1, int *dim2);
-  //template<class type> int ArrSet(type *arr,...);//the first argument is the array, second is the length, then each element
   template<class type>
   class Data{
   public:
 	int		    ID;
-	//string 		Name;
+	//string		Name;
 	static int	TotalNumber;
 	int		    SerialCode;
 	int 		Position;
 	int 		*Dimension;//0: dimension 1-[0]:length of each [0]+1: total number 
-	int 		*Dimension_dev;//0: dimension 1-[0]:length of each
+	int 		*Dimension_dev;
 	type		*Arr;
 	type	 	*Arr_dev;
 	type		*TotalArr_dev;
@@ -117,35 +123,35 @@ namespace DATA_NS{
 	real 		Portion;
 	type 	    Average;
   public:
-	int VeryInit();	//do the things beginning should done in every construct function function  also a base
+	int VeryInit();	//done in every construct function 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	int Init(int *dimArr,int dataposition); //as a base to uniform the operation and easy to change code
 	int Init(int n,...);	 
 	Data(int *dimArr,int dataposition);
 	Data(int n,...);	 
 	Data();	 
 	Data(int id);	 
+	int Free();
 	~Data();
 	Data(const Data&);
 	//-----------------------------cuda operation
-	int 	HostToDevice();
-	int		DeviceToHost(); 
+	int 		HostToDevice();
+	int			DeviceToHost(); 
 	//-----------------------------return arr address
-	type		*toarr();
-	type		*toarr_dev();
-	// total or reduce the Arr to get information
+	type		*arr();
+	type		*arr_dev();
+	// statistic information
 	static const int BlockSize=512;
 	type 	TotalDevice();
 	type	TotalHost();
 
 	real 	CountHost(type cut_value);
 	real 	CountDevice(type cut_value);
-	//-----------------------------return total number
-	//the index is treated with periodic condition in the function
-	//---------------------------------------
+	//-----------------------------
+	int   N();//total element
 	__host__ __device__ type &Part(const int p);
 	__host__ __device__ type &Part(int *pArr); //a base
 	__host__ __device__ type &PPart(int *pArr); //periodic part function
-	__host__ __device__ int N();
 	__host__ __device__ type &operator[](int p);
 	__host__ __device__ type &operator()(int *pArr);
 	__host__ __device__ type &operator()(int p);
@@ -171,7 +177,7 @@ namespace DATA_NS{
 	template<class istype,class etype> friend istype &operator>>(istype &is,Data<etype>&data);
 	//Read(Dump) in(out) directly with file
 	int  ReadFile(string filename);
-	int 	DumpFile(string filename);
+	int  DumpFile(string filename);
   };
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
@@ -189,12 +195,7 @@ namespace DATA_NS{
   }
 
   template<class type> int Data<type>::Init(int *dimArr,int dataposition){//Assign data dype, dimension, and memory
-	if ( Arr != NULL ) { delete []Arr; Arr=NULL;}
-	if ( Arr_dev != NULL ) {cudaFree(Arr_dev); Arr_dev=NULL;}
-	if ( Dimension != NULL ) {delete []Dimension;Dimension=NULL;}
-	if ( Dimension_dev != NULL ){ cudaFree(Dimension_dev);Dimension_dev=NULL;}
-	if ( TotalArr_dev!= NULL ){ cudaFree(TotalArr_dev);TotalArr_dev=NULL;}
-
+	Free();
 	int n= dimArr[0];
 	Dimension	= new int[ n+2 ];
 	Dimension[0]	=	n;
@@ -254,14 +255,17 @@ namespace DATA_NS{
 	cout<<" warning: copy construct is called!!!"<<endl;
   };
 
-
+  template <class type> int Data<type>::Free(){
+	if ( Arr != NULL ) 			{ delete []Arr; Arr=NULL;}
+	if ( Arr_dev != NULL ) 		{ cudaFree( Arr_dev );Arr_dev=NULL;}
+	if ( Dimension != NULL ) 	{ delete []Dimension; Dimension=NULL;}
+	if ( Dimension_dev != NULL)	{ cudaFree( Dimension_dev); Dimension_dev=NULL;}
+	if ( TotalArr_dev!= NULL ) 	{ cudaFree(TotalArr_dev); TotalArr_dev=NULL;}
+	if ( CountArr_dev!= NULL ) 	{ cudaFree(CountArr_dev); CountArr_dev=NULL;}
+	return 0;
+  }
   template <class type> Data<type>::~Data(){//free allocatted main Arr memory
-	if ( Arr != NULL ) {delete []Arr; Arr=NULL;}
-	if ( Arr_dev != NULL ) {cudaFree( Arr_dev );Arr_dev=NULL;}
-	if ( Dimension != NULL ) {delete []Dimension; Arr=NULL;}
-	if ( Dimension_dev != NULL ) {cudaFree( Dimension_dev); Dimension_dev=NULL;}
-	if ( TotalArr_dev!= NULL ) { cudaFree(TotalArr_dev); TotalArr_dev=NULL;}
-	if ( CountArr_dev!= NULL ) { cudaFree(CountArr_dev); CountArr_dev=NULL;}
+	Free();
   }
 
   //data copy between gpu device and host-------------------
@@ -278,70 +282,43 @@ namespace DATA_NS{
 	return 0;
   }
   // return total number or arr lenghth 
-  template<class type> inline __host__ __device__ int Data<type>::N(){
-#ifdef __CUDA_ARCH__
-    if (Dimension_dev == NULL) return 0;
-    return Dimension_dev[ Dimension_dev[0]+1 ];// originally +1 is missed
-#else
+  template<class type> inline int Data<type>::N(){
     if (Dimension == NULL) return 0;
     return Dimension[ Dimension[0]+1 ];
-#endif
   }
   //overload [] and ()   //with periodic condition applied
 
-  template<class type> __host__ __device__ type &Data<type>::Part(const int p){
-#ifdef __CUDA_ARCH__
-	return Arr_dev[ p ];
-#else
+  template<class type> type &Data<type>::Part(const int p){
 	return Arr[ p ];
-#endif
   }
 
-  template<class type> __host__ __device__ type &Data<type>::Part(int *pArr){
-#ifdef __CUDA_ARCH__
-	int dim=Dimension_dev[0],dt=Dimension_dev[1],index=pArr[0];
-	for (int i=1; i< dim; i++) {
-	  dt=Dimension_dev[i+1]; //pArr and Dimension have differnet meanings
-	  index=pArr[i] + index*dt;
-	}
-	return Arr[ index ];
-#else
+  template<class type>  type &Data<type>::Part(int *pArr){
 	int dim=Dimension[0],dt=Dimension[1],index=pArr[0];
 	for (int i=1; i< dim; i++) {
 	  dt=Dimension[i+1];
 	  index=pArr[i] + index*dt;
 	}
 	return Arr[ index ];
-#endif
   };//a base
-  template<class type> __host__ __device__ type &Data<type>::PPart(int *pArr){ //periodic part function
-#ifdef __CUDA_ARCH__
-	int dim=Dimension_dev[0],dt=Dimension_dev[1],index=(pArr[0]%dt+dt)%dt;
-	for (int i=1; i< dim; i++) {
-	  dt=Dimension_dev[i+1]; //pArr and Dimension have differnet meanings
-	  index=(pArr[i]%dt+dt)%dt+ index*dt;
-	}
-	return Arr[ index ];
-#else
+  template<class type>  type &Data<type>::PPart(int *pArr){ //periodic part function
 	int dim=Dimension[0],dt=Dimension[1],index=(pArr[0]%dt+dt)%dt;
 	for (int i=1; i< dim; i++) {
 	  dt=Dimension[i+1];
 	  index=(pArr[i]%dt+dt)%dt+ index*dt;
 	}
 	return Arr[ index ];
-#endif
   };//a base
 
-  template<class type> __host__ __device__ type	&Data<type>::operator [](const int p){return Part(p);}
-  template<class type> __host__ __device__ type &Data<type>::operator()(int *pArr){return Part(pArr);}
-  template<class type> __host__ __device__ type &Data<type>::operator()(int p){ return Part(p); };
+  template<class type> type	&Data<type>::operator[](const int p){return Part(p);}
+  template<class type> type &Data<type>::operator()(int *pArr){return Part(pArr);}
+  template<class type> type &Data<type>::operator()(int p){ return Part(p); };
   //
-  template<class type> __host__ __device__ type &Data<type>::operator()(int p1,int p2){ int pArr[2]={p1,p2}; return Part(pArr); };
-  template<class type> __host__ __device__ type &Data<type>::operator()(int p1,int p2,int p3){ int pArr[3]={p1,p2,p3}; return Part(pArr); };
-  template<class type> __host__ __device__ type &Data<type>::operator()(int p1,int p2,int p3,int p4){ int pArr[4]={p1,p2,p3,p4}; return Part(pArr); };
-  template<class type> __host__ __device__ type &Data<type>::operator()(int p1,int p2,int p3,int p4,int p5){ int pArr[5]={p1,p2,p3,p4,p5}; return Part(pArr); };
-  template<class type> __host__ __device__ type &Data<type>::operator()(int p1,int p2,int p3,int p4,int p5,int p6){ int pArr[6]={p1,p2,p3,p4,p5,p6}; return Part(pArr); };
-  //overload ==  to verigy that if dimension is the same
+  template<class type> type &Data<type>::operator()(int p1,int p2){ int pArr[2]={p1,p2}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3){ int pArr[3]={p1,p2,p3}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3,int p4){ int pArr[4]={p1,p2,p3,p4}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3,int p4,int p5){ int pArr[5]={p1,p2,p3,p4,p5}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3,int p4,int p5,int p6){ int pArr[6]={p1,p2,p3,p4,p5,p6}; return Part(pArr); };
+  //overload ==  to verify that if dimension is the same
   template<class type,class etype> bool operator ==(Data<type> &data1,Data<etype> &data2){ return IsSameDimension(data1.Dimension,data2.Dimension); }
   template<class type> bool operator ==(Data<type> &data,int *dim){ return IsSameDimension(data.Dimension,dim); }
   template<class type> bool operator ==(int *dim,Data<type>&data){ return IsSameDimension(data.Dimension,dim); }
@@ -361,8 +338,8 @@ namespace DATA_NS{
     ifstream ifs;
     ifs.open(filename.c_str());
     if (ifs){
-	 ifs>>(*this);
-	 ifs.close();
+	  ifs>>(*this); // all done by >>
+	  ifs.close();
     }else{
 	 cerr<<"File "<<filename<<" not found!\n";
 	 return -1;
@@ -402,8 +379,8 @@ namespace DATA_NS{
   }
 
   // toarr   toarr_dev
-  template<class type> type *Data<type>::toarr(){ return Arr; };
-  template<class type> type *Data<type>::toarr_dev(){ return Arr_dev; };
+  template<class type> type *Data<type>::arr(){ return Arr; };
+  template<class type> type *Data<type>::arr_dev(){ return Arr_dev; };
 
   inline int ArrSet(int *arr,...){//the first argument is the array, second is the length, then each element
 	va_list args;
@@ -441,7 +418,6 @@ namespace DATA_NS{
 	//static stringstream TssG;
   };
   template<int id> DataTemp DataBuffer<id>::DataTempG;
-  //template<int id> stringstream DataBuffer<id>::TssG;
   //for some info. about the DataTemp and Data
   template<class type> int Data<type>::TotalNumber=0;
   template<class type> int DataNode<type>::TotalNumber=0;
@@ -722,6 +698,7 @@ namespace DATA_NS{
 	  power_device(pdata->Arr_dev,	data.Arr_dev,	index,	pdata->N());
     return *pdata;
   };
+  ///////////////////////////////////////////////////////////////////////////
 #define Data_BlockSize 512
 #define MaxGridDim 65000
   template<class type> __global__ void DataTotal_Kernel( type *arr,int n_in){

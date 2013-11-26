@@ -1,4 +1,3 @@
-
 #define DEBUG 0
 ////////////////////////////////////////
 #include"pub.h"
@@ -16,7 +15,7 @@
 using namespace GS_NS;
 using namespace DATA_NS;
 
-int DynamicsDiffuse::Initialize(){
+int Dynamics_diffuse::Initialize(){
   //para setting should be finished before or within this function
   string ss;
   ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
@@ -39,7 +38,7 @@ int DynamicsDiffuse::Initialize(){
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
   ////////////////////////////////////////////////////////////
-  Init(3,nx,ny,nz,Data_NONE);
+  //Init(3,nx,ny,nz,Data_NONE);
   SetCalPos(Data_HOST_DEV);
   Concentration = &((*Datas)["concentration"]);
   if ( Concentration->Arr == NULL ){
@@ -111,8 +110,8 @@ int DynamicsDiffuse::Initialize(){
 
 }
 
-DynamicsDiffuse::DynamicsDiffuse(){}
-DynamicsDiffuse::~DynamicsDiffuse(){
+Dynamics_diffuse::Dynamics_diffuse(){}
+Dynamics_diffuse::~Dynamics_diffuse(){
   if (plan_n) cufftDestroy(plan_n);
   if (plan_vn) cufftDestroy(plan_vn);
 }
@@ -128,7 +127,7 @@ __global__ void LocalConFreeEnergyCalculate_Diffuse_Kernel(Real * ConLFE, Real *
   ConLFE[ tid ]+= A1 * ( Concentration[tid] - Concentration1);
 }
 
-int DynamicsDiffuse::LocalConFreeEnergyCalculate(){
+int Dynamics_diffuse::LocalConFreeEnergyCalculate(){
   dim3 bn(nx,ny), tn(nz);
   LocalConFreeEnergyCalculate_Diffuse_Kernel<<<bn,tn>>>
 	(ConLFE.Arr_dev, Eta->Arr_dev, Concentration->Arr_dev, A[1], A[2], Concentration1, VariantN);
@@ -163,7 +162,7 @@ __global__ void LocalEtaFreeEnergyCalculate_Diffuse_Kernel
 	+(A4 * (Eta[ntid]^5));
 }
 
-int DynamicsDiffuse::LocalEtaFreeEnergyCalculate(){
+int Dynamics_diffuse::LocalEtaFreeEnergyCalculate(){
   dim3 bn(nx,ny,VariantN), tn(nz,1,1);
   LocalEtaFreeEnergyCalculate_Diffuse_Kernel<<<bn,tn>>>(EtaLFE.Arr_dev,Eta->Arr_dev,Concentration->Arr_dev,A[1],A[2],A[3],A[4],A[5],A[6],A[7],Concentration2);
 #ifdef DEBUG
@@ -183,15 +182,15 @@ __global__ void ElasticEnergyForceCalculate_Diffuse_Kernel(Complex *RTerm,Comple
   }
 }
 
-int DynamicsDiffuse::ElasticForceCalculate(){
+int Dynamics_diffuse::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
   ///////////////////////////////////////////////////////////////
   cufftExecC2C(plan_vn,(cufftComplex*)Eta_CT.Arr_dev,(cufftComplex*)Eta_CT.Arr_dev,CUFFT_FORWARD);
   Eta_CT = Eta_CT/Eta_CT.N()*VariantN; // equavilent to /(nx*ny*nz)
   ///////////////////////////////////////////////////////////////
-  dim3 bn(Dimension[1],Dimension[2],VariantN);
-  dim3 tn(Dimension[3]);
+  dim3 bn(nx,ny,VariantN);
+  dim3 tn(nz);
   ElasticEnergyForceCalculate_Diffuse_Kernel<<<bn,tn>>>
 	(RTermEta_CT.Arr_dev,Eta_CT.Arr_dev,B.Arr_dev);
   cufftExecC2C(plan_vn,(cufftComplex*)RTermEta_CT.Arr_dev,(cufftComplex*)RTermEta_CT.Arr_dev,CUFFT_INVERSE);
@@ -211,7 +210,7 @@ __global__ void ConcentrationUpdate_Diffuse_Kernel(Complex *Con_CT, Complex* Con
 	/ ( 1.0f + dt * meta * beta * gSquare[tid] * gSquare[tid] );
 }
 
-int DynamicsDiffuse::ConcentrationUpdate(){
+int Dynamics_diffuse::ConcentrationUpdate(){
   SetCalPos(Data_DEV);
   Noise_n.NewNormal_device(); cudaThreadSynchronize();
   set_device(ConRan_CT.Arr_dev,Noise_n.Arr_dev, ConRan_CT.N());
@@ -257,7 +256,7 @@ __global__ void EtaUpdate_Diffuse_Kernel(
 	/(1.0f + DeltaTime* lpp* arfi * gSquare[ntid] );
 }
 
-int DynamicsDiffuse::EtaUpdate(){
+int Dynamics_diffuse::EtaUpdate(){
   SetCalPos(Data_DEV);
   Noise_vn.NewNormal_device();
   set_device(EtaRan_CT.Arr_dev, Noise_vn.Arr_dev, EtaRan_CT.N());
@@ -289,7 +288,7 @@ int DynamicsDiffuse::EtaUpdate(){
 }
 
 
-int DynamicsDiffuse::Calculate(){
+int Dynamics_diffuse::Calculate(){
   string ss;
   Vars["temperature"]>>=Temperature; 
   LocalConFreeEnergyCalculate();
@@ -302,10 +301,10 @@ int DynamicsDiffuse::Calculate(){
   return 0;
 }
 
-int DynamicsDiffuse::RunFunc(string funcName){ return 0;}
+int Dynamics_diffuse::RunFunc(string funcName){ return 0;}
 
 
-int DynamicsDiffuse::Fix(real progress){
+int Dynamics_diffuse::Fix(real progress){
   string ss,mode;
   ss = Vars["fix"];
   while( ss!= "" ){
@@ -323,7 +322,7 @@ int DynamicsDiffuse::Fix(real progress){
   return 0;
 }
 
-string DynamicsDiffuse::Get(string ss){ // return the statistic info.
+string Dynamics_diffuse::Get(string ss){ // return the statistic info.
   string ans="";
   string var; ss>>var;
   if (var == "temperature") return ans<<Temperature; 

@@ -10,32 +10,16 @@
 using namespace GS_NS;
 using namespace DATA_NS;
 
-DynamicsXxx::DynamicsXxx(){}
-DynamicsXxx::~DynamicsXxx(){}
+Dynamics_xxx::Dynamics_xxx(){}
 
-int DynamicsXxx::Initialize(){
-  //para setting should be finished before or within this function
-  string ss;
-  Vars["x"]>>=x;	
-  Matrix = &((*Datas)["matrix"]);
-  return 0;
-}
+int Dynamics_xxx::Initialize(){return 0;}
 
-int DynamicsXxx::Calculate(){
-  (*Matrix)=(*Matrix)*x;
-  return 0;
-}
+int Dynamics_xxx::Calculate(){return 0;}
 
-int DynamicsXxx::RunFunc(string funcName){
-  if (funcName=="calculate") Calculate();
-  return 0;
-}
+int Dynamics_xxx::RunFunc(string func){ return Code_COMMAND_UNKNOW;}
 
-int DynamicsXxx::Fix(real progress){return 0;}
+int Dynamics_xxx::Fix(real progress){return 0;}
 
-string DynamicsXxx::Get(string ss){
-  string ans;
-  if (ss=="x") return ans<<x;
-  if (ss=="sumofmatrix") return ans<<(Matrix->TotalHost());
-  return "nan";
-}
+string Dynamics_xxx::Get(string var){return "nan";}
+
+Dynamics_xxx::~Dynamics_xxx(){}

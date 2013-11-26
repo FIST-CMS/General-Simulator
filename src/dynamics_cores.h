@@ -6,7 +6,7 @@ using namespace DATA_NS;
 
 namespace GS_NS{
 
-  class DynamicsCores: public Dynamics {//total energy for its main definition
+  class Dynamics_cores: public Dynamics {//total energy for its main definition
   public:
 	// virtual functions need to be overriden
 	virtual int Initialize();
@@ -16,8 +16,8 @@ namespace GS_NS{
 	virtual string Get(string );//return the statistic info
 	///////////////////////
 	//virtual int Set(string);
-	DynamicsCores();
-	~DynamicsCores();
+	Dynamics_cores();
+	~Dynamics_cores();
 	// eta and con free chemical free energy
 
 	int 		VariantN,CoresN;

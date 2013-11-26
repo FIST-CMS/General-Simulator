@@ -14,7 +14,7 @@
 using namespace GS_NS;
 using namespace DATA_NS;
 
-int DynamicsMart::Initialize(){
+int Dynamics_mart::Initialize(){
   /////////////////////////////////////////////////////////
   //para setting should be finished before or within this function
   string ss;
@@ -42,7 +42,7 @@ int DynamicsMart::Initialize(){
   /////////////////////////////////////////////////////////
   // it is called to initialize the --run-- function
   // allocate memory initial size and default values
-  Init(3,nx,ny,nz,Data_NONE);
+  //Init(3,nx,ny,nz,Data_NONE);
   SetCalPos(Data_HOST_DEV);
   //Eta=eta; // a pointer assign, not value or memory operation
   Eta = &((*Datas)["eta"]); // may create here
@@ -136,46 +136,46 @@ int DynamicsMart::Initialize(){
   return 0;
 }
 
-DynamicsMart::DynamicsMart(){
+Dynamics_mart::Dynamics_mart(){
   //default weight values
 }
-DynamicsMart::~DynamicsMart(){
+Dynamics_mart::~Dynamics_mart(){
   if (planAll_Cuda) cufftDestroy(planAll_Cuda);
 }
 
 __global__ void Grad_Mart_Kernel(Real *Gradient_arr,  Real* Eta_arr,int *dim, Real dx, Real dy, Real dz){
   // (* 4 128 128) (* 4 128)
   int x=blockIdx.x, y= blockIdx.y, z=threadIdx.x, v=blockIdx.z;
-  /**/PO(Gradient_arr,dim,v,x,y,z)=
-	 (PO(Eta_arr,dim,v,x+1,y,z)+PO(Eta_arr,dim,v,x-1,y,z)-2*PO(Eta_arr,dim,v,x,y,z))/(2.0f* dx)/3.0f
-	+(PO(Eta_arr,dim,v,x,y+1,z)+PO(Eta_arr,dim,v,x,y-1,z)-2*PO(Eta_arr,dim,v,x,y,z))/(2.0f* dy)/3.0f	
-	+(PO(Eta_arr,dim,v,x,y,z+1)+PO(Eta_arr,dim,v,x,y,z-1)-2*PO(Eta_arr,dim,v,x,y,z))/(2.0f* dz)/3.0f	; // */
-  /*PO(Gradient_arr,dim,v,x,y,z)=
-	 (PO(Eta_arr,dim,v,x+1,y,z)+PO(Eta_arr,dim,v,x-1,y,z)-2*PO(Eta_arr,dim,v,x,y,z))/(dx^2)
-	+(PO(Eta_arr,dim,v,x,y+1,z)+PO(Eta_arr,dim,v,x,y-1,z)-2*PO(Eta_arr,dim,v,x,y,z))/(dy^2)	
-	+(PO(Eta_arr,dim,v,x,y,z+1)+PO(Eta_arr,dim,v,x,y,z-1)-2*PO(Eta_arr,dim,v,x,y,z))/(dz^2)	; // */
+  /**/PPart(Gradient_arr,dim,v,x,y,z)=
+	 (PPart(Eta_arr,dim,v,x+1,y,z)+PPart(Eta_arr,dim,v,x-1,y,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(2.0f* dx)/3.0f
+	+(PPart(Eta_arr,dim,v,x,y+1,z)+PPart(Eta_arr,dim,v,x,y-1,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(2.0f* dy)/3.0f	
+	+(PPart(Eta_arr,dim,v,x,y,z+1)+PPart(Eta_arr,dim,v,x,y,z-1)-2*PPart(Eta_arr,dim,v,x,y,z))/(2.0f* dz)/3.0f	; // */
+  /*PPart(Gradient_arr,dim,v,x,y,z)=
+	 (PPart(Eta_arr,dim,v,x+1,y,z)+PPart(Eta_arr,dim,v,x-1,y,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(dx^2)
+	+(PPart(Eta_arr,dim,v,x,y+1,z)+PPart(Eta_arr,dim,v,x,y-1,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(dy^2)	
+	+(PPart(Eta_arr,dim,v,x,y,z+1)+PPart(Eta_arr,dim,v,x,y,z-1)-2*PPart(Eta_arr,dim,v,x,y,z))/(dz^2)	; // */
 
 }
-int DynamicsMart::GradientCalculate(){
-  dim3 bn(Dimension[1],Dimension[2],VariantN);
-  dim3 tn(Dimension[3]);
+int Dynamics_mart::GradientCalculate(){
+  dim3 bn(nx,ny,VariantN);
+  dim3 tn(nz);
   Grad_Mart_Kernel<<<bn,tn>>>(Gradient.Arr_dev,  Eta->Arr_dev, Eta->Dimension_dev, dx,dy,dz);
   if (DEBUG) Gradient.DeviceToHost();
   return 0;
 }
 
-int DynamicsMart::GradientEnergyCalculate(){
+int Dynamics_mart::GradientEnergyCalculate(){
   return 0;
 };
 
-int DynamicsMart::GradientForceCalculate(){
+int Dynamics_mart::GradientForceCalculate(){
   GradientCalculate();
   GradientForce= Gradient;
   if (DEBUG) GradientForce.DeviceToHost();
   return 0;
 }
 
-int DynamicsMart::LPCConstruct(){
+int Dynamics_mart::LPCConstruct(){
   LPC[1]=0.02f *(Temperature-TransitionTemperature);
   return 0;
 }
@@ -189,10 +189,10 @@ __global__ void ChemiEner_Mart_Kernel(Real *ChemE_arr,Real*Eta_arr,int v,Real a1
   ChemE_arr[tid]= a1* term1 - a2* term2 + a3* term3;
 }
 
-int DynamicsMart::ChemicalEnergyCalculate(){
+int Dynamics_mart::ChemicalEnergyCalculate(){
   LPCConstruct();
-  dim3 bn(Dimension[1],Dimension[2]);
-  dim3 tn(Dimension[3]);
+  dim3 bn(nx,ny);
+  dim3 tn(nz);
   LPCConstruct();
   ChemiEner_Mart_Kernel<<<bn,tn>>>(ChemicalEnergy.Arr_dev,Eta->Arr_dev,VariantN,LPC[1],LPC[2],LPC[3]);
   if (DEBUG) ChemicalEnergy.DeviceToHost();
@@ -217,9 +217,9 @@ __global__ void ChemiFor_Mart_Kernel(Real*ChemiForce_arr,Real*Eta_arr,int v,Real
   }
 }
 
-int DynamicsMart::ChemicalForceCalculate(){
-  dim3 bn(Dimension[1],Dimension[2]);
-  dim3 tn(Dimension[3]);
+int Dynamics_mart::ChemicalForceCalculate(){
+  dim3 bn(nx,ny);
+  dim3 tn(nz);
   LPCConstruct();
   ChemiFor_Mart_Kernel<<<bn,tn>>>(ChemicalForce.Arr_dev, Eta->Arr_dev, VariantN, LPC[1], LPC[2], LPC[3]);
   if (DEBUG) ChemicalForce.DeviceToHost();
@@ -236,15 +236,15 @@ __global__ void ElaFor_Mart_Kernel(Complex *ReTerm,Complex*Eta_sq,Real* B){
   for (int i=0;i<v;i++)
 	ReTerm[pvv*n +pn] +=  B[pvv*nv + i*n +pn ]* Eta_sq[i*n + pn ];
 }
-int DynamicsMart::ElasticForceCalculate(){
+int Dynamics_mart::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
   cudaThreadSynchronize();
   if (DEBUG) Eta_CT.DeviceToHost();
   cufftExecC2C(planAll_Cuda,(cufftComplex*)Eta_CT.Arr_dev,(cufftComplex*)Eta_CT.Arr_dev,CUFFT_FORWARD);
   if (DEBUG) Eta_CT.DeviceToHost();
-  dim3 bn(VariantN,Dimension[1],Dimension[2]);
-  dim3 tn(Dimension[3]);
+  dim3 bn(VariantN,nx,ny);
+  dim3 tn(nz);
   cudaThreadSynchronize();
   Eta_CT = Eta_CT/Eta_CT.N()*VariantN;
   cudaThreadSynchronize();
@@ -262,7 +262,7 @@ int DynamicsMart::ElasticForceCalculate(){
   return 0;
 }
 
-int DynamicsMart::DislocationForceInit(){
+int Dynamics_mart::DislocationForceInit(){
   SetCalPos(Data_HOST);
   for (int saq=0;saq<VariantN;saq++){
     for (int i=0;i<nx;i++)
@@ -280,7 +280,7 @@ int DynamicsMart::DislocationForceInit(){
   return 0;
 }
 
-int DynamicsMart::DislocationForceCalculate(){
+int Dynamics_mart::DislocationForceCalculate(){
   SetCalPos(Data_DEV);
   DislocationForce=DislocationForceConst*(*Eta);
   return 0;
@@ -293,15 +293,15 @@ __global__ void Block_Mart_Kernel(Real *Eta_arr, Real *Defect_arr){
   Eta_arr[pvn]=Eta_arr[pvn]*(1.0f-Defect_arr[pn]);
 }
 
-int DynamicsMart::Block(){
-  dim3 bn(VariantN,Dimension[1],Dimension[2]);
-  dim3 tn(Dimension[3]);
+int Dynamics_mart::Block(){
+  dim3 bn(VariantN,nx,ny);
+  dim3 tn(nz);
   Block_Mart_Kernel<<<bn,tn>>>(Eta->Arr_dev,Defect->Arr_dev);
 
   return 0;
 }
 
-int DynamicsMart::Calculate(){
+int Dynamics_mart::Calculate(){
   string ss;
   Vars["temperature"]>>=Temperature; 
   GradientForceCalculate();
@@ -329,9 +329,9 @@ int DynamicsMart::Calculate(){
   return 0;
 }
 
-int DynamicsMart::RunFunc(string funcName){ return 0; }
+int Dynamics_mart::RunFunc(string funcName){ return 0; }
 
-int DynamicsMart::Fix(real progress){
+int Dynamics_mart::Fix(real progress){
   string ss,mode;
   ss = Vars["fix"];
   do{
@@ -349,11 +349,10 @@ int DynamicsMart::Fix(real progress){
   return 0;
 }
 
-string DynamicsMart::Get(string ss){ // return the statistic info.
+string Dynamics_mart::Get(string ss){ // return the statistic info.
   string ans="";
   string var; ss>>var;
   if (var == "temperature") return ans<<Temperature; 
   else return "nan";
 }
 
-//int DynamicsMart::Finalize(){ return 0; }

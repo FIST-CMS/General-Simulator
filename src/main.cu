@@ -21,11 +21,17 @@ int main(int argn,char* args[]){
 	  GV<0>::LogAndError<<"Gpu device set to "<<device<<"\n";
 	}  
   }
-  INPUT qin(file);				// 
-  if (! qin.fin.fail())
-	qin.Phrasing();	
-  else
+  ifstream in(file.c_str(), ios::in);
+  if (in.fail()){
 	GV<0>::LogAndError<<"Input script "<<file<<" is not found\n";
+	return -1;
+  }
+  istreambuf_iterator<char> beg(in), end;
+  string script(beg, end);
+  in.close();
+
+  INPUT qin;				// 
+  qin.Phrasing(script);	
   return 0;
 }
 

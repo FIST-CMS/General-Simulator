@@ -1,0 +1,23 @@
+#/bin/bash
+#############################################
+##############################################
+#Author	: EinsXiao@gmail.com
+#Version  : 1.1
+#Date 	: 2013/11/26
+##############################################
+if [ $# != 1 ]; then
+  echo "usage: newdyna new_dyna_name"
+  exit 0
+fi
+dyna=$1
+if [ -s dynamics_${dyna}.h ]; then
+  echo "dynamics_$1.h already exist"
+  exit 0
+fi
+if [ -s dynamics_${dyna}.cu ]; then
+  echo "dynamics_$1.cu already exist"
+  exit 0
+fi
+echo "new dynamics_${dyna}"
+cat dynamics_xxx.h |sed "s/xxx/$dyna/" > dynamics_${dyna}.h
+cat dynamics_xxx.cu|sed "s/xxx/$dyna/" > dynamics_${dyna}.cu

@@ -3,10 +3,6 @@
 #include"pub.h"
 #include"dynamics.h"
 ////////////////////////////////////////
-#include<curand.h>
-#include<cufft.h>
-#include"random.h"
-#include"gtensorb.h"
 
 #include"dynamics_cores.h"
 
@@ -16,7 +12,7 @@ using namespace DATA_NS;
   main calculation:
  */
 
-int DynamicsCores::Initialize(){
+int Dynamics_cores::Initialize(){
   //para setting should be finished before or within this function
   string ss;
   ss=Vars["gridsize"];    			if (ss!="") { ss>>nx>>ny>>nz>>dx>>dy>>dz;} else {nx=ny=nz=16; dx=dy=dz=0.1;}
@@ -44,10 +40,10 @@ int DynamicsCores::Initialize(){
 
 }
 
-DynamicsCores::DynamicsCores(){}
-DynamicsCores::~DynamicsCores(){}
+Dynamics_cores::Dynamics_cores(){}
+Dynamics_cores::~Dynamics_cores(){}
 
-int DynamicsCores::RandomCores(){
+int Dynamics_cores::RandomCores(){
   SetCalPos(Data_HOST);
   Mark=false;
   (*Concentration)=Concentration1;
@@ -80,7 +76,7 @@ int DynamicsCores::RandomCores(){
   return 0;
 }
 
-int DynamicsCores::RegularCores1D(){
+int Dynamics_cores::RegularCores1D(){
   for (int cn=0;cn<CoresN; cn++){
 	int ox,oy,oz;
 	ox=nx/2; oy=ny/2; oz= nz/CoresN/2+nx/CoresN*cn;
@@ -107,7 +103,7 @@ int DynamicsCores::RegularCores1D(){
   return 0;
 }
 
-int DynamicsCores::RegularCores2D(){
+int Dynamics_cores::RegularCores2D(){
   for (int cn1=0;cn1<CoresN; cn1++){
 	for (int cn2=0;cn2<CoresN; cn2++){
 	  int ox,oy,oz;
@@ -136,7 +132,7 @@ int DynamicsCores::RegularCores2D(){
   }
   return 0;
 }
-int DynamicsCores::RegularCores3D(){
+int Dynamics_cores::RegularCores3D(){
   for (int cn1=0;cn1<CoresN; cn1++){
 	for (int cn2=0;cn2<CoresN; cn2++){
 	  for (int cn3=0;cn3<CoresN; cn3++){
@@ -168,7 +164,7 @@ int DynamicsCores::RegularCores3D(){
   return 0;
 }
 
-int DynamicsCores::Calculate(){
+int Dynamics_cores::Calculate(){
   if (Method == "random") RandomCores();
   else if (Method =="regular") RegularCores1D();
   else if (Method =="regular2d") RegularCores2D();
@@ -177,11 +173,11 @@ int DynamicsCores::Calculate(){
   return 0;
 }
 
-int DynamicsCores::RunFunc(string funcName){return 0;}
+int Dynamics_cores::RunFunc(string funcName){return 0;}
 
-int DynamicsCores::Fix(real progress){return 0;}
+int Dynamics_cores::Fix(real progress){return 0;}
 
-string DynamicsCores::Get(string ss){ // return the statistic info.
+string Dynamics_cores::Get(string ss){ // return the statistic info.
   string var; ss>>var;
   return "nan";
 }

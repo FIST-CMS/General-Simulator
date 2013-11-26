@@ -11,8 +11,8 @@
 ##############################################
 ##############################################
 sfix=".cu"
-flags="-g -G"
 flags="-O2"
+flags="-g -G"
 excu="gsi"
 libs="-lcurand -lcufft"
 prefix="$HOME/bin"
@@ -26,7 +26,7 @@ echo `ls dynamics_*.h` > .dynamics_files.tmp
 diff .dynamics_files.tmp .dynamics_files 1>.tmp 2>>.tmp
 num=`grep -c "" .tmp`
 if [ ${num} -gt 0 ]; then
-  echo "Dynamics files have been changed!!! reconstruct pub_main.h and gs.cu!!!"
+  echo "Dynamics files have been changed! Reconstruct pub_main.h and gs.cu!!!"
   mhpub="pub_main.h"
   hpub=".pub_main.h"
   mgcu="gs.cu"
@@ -41,8 +41,8 @@ if [ ${num} -gt 0 ]; then
     echo "#include\"$hfile\"" >> $hpub
     name=${hfile#dynamics_}
     name=${name%.h}
-    Name=`echo ${name:0:1}|tr a-z A-Z `${name:1}
-    echo "  if (sys == \"${name}\"	) { Dyna[DynaID] = new Dynamics${Name}; hassys=true; }" >>$gcu
+    #Name=`echo ${name:0:1}|tr a-z A-Z `${name:1}
+    echo "  if (sys == \"${name}\"	) { Dyna[DynaID] = new Dynamics_${name}; hassys=true; }" >>$gcu
   done
   sed -n "${num12},\$ p" $mhpub >> $hpub
   sed -n "${num22},\$ p" $mgcu >> $gcu

@@ -6,7 +6,7 @@ using namespace DATA_NS;
 
 namespace GS_NS{
 
-  class DynamicsMart: public Dynamics {//total energy for its main definition
+  class Dynamics_mart: public Dynamics {//total energy for its main definition
   public:
 
 	int 		VariantN;
@@ -25,8 +25,8 @@ namespace GS_NS{
 	///////////////////////
 	//virtual int Set(string);
 
-	DynamicsMart();
-	~DynamicsMart();
+	Dynamics_mart();
+	~Dynamics_mart();
 
 	Random 	Noise;
 	Real	weightNoise;

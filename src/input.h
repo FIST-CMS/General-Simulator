@@ -10,20 +10,20 @@ namespace GS_NS{
   class INPUT{
   public:
 	GS	Gs;
-	ifstream fin;
+	//ifstream fin;
 	int 	 LineNumber;
 	Variable Vars;
   public:
-	INPUT(string infile);
+	INPUT();
 	~INPUT();
 	//////////////////////////////////////////////
-	int 	Phrasing();//process the infile and do the task assigned
+	bool	getline(string &ss, string &script);
+	int		standardize(string &script);
+	int 	Phrasing(string script);//process peice of scripts
 	//////////////////////////////////////////////
-	string 	standardize(string ss);
-	bool	fgets_str(ifstream &ifs, string &ss);
 	//////////////////////////////////////////////
 	int 	device(string ss);
-	int  	readhere(string ss);
+	int  	readhere(string ss,string &script);//read data from script
   };
 }
 #endif

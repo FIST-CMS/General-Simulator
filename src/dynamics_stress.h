@@ -6,7 +6,7 @@ using namespace DATA_NS;
 
 namespace GS_NS{
 
-  class DynamicsStress: public Dynamics {//total energy for its main definition
+  class Dynamics_stress: public Dynamics {//total energy for its main definition
   public:
 	// virtual functions need to be overriden
 	virtual int Initialize();
@@ -17,8 +17,8 @@ namespace GS_NS{
 	///////////////////////
 	//virtual int Set(string);
 
-	DynamicsStress();
-	~DynamicsStress();
+	Dynamics_stress();
+	~Dynamics_stress();
 	// eta and con free chemical free energy
 
 	int 		VariantN;

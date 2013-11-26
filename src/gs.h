@@ -26,27 +26,28 @@ namespace GS_NS{
 	////////////////////////////////////////////
 	int Set(string); 
 	int Link(string);
+	///////////////////////////////////////////
 	int Read(string); 
-	int ReadHere(string name, string &arrays); // read Data in the script directly
+	int ReadHere(string name, string &arrays); // read directly from script
 	////////////////////////////////////////////
-	//real StartTemperature, EndTemperature;
 	int CurrentStep;
 	int	TotalSteps;
 	int Run();
 	int Run(string ss);
 	int RunFunc(string funcName);
-
+	////////////////////////////////////////////
 	int InfoSteps;
 	string InfoMode;
 	int SetInfo(string ss);
 	int InfoOut();
-
+	////////////////////////////////////////////
 	string DumpFolder;
 	int DumpSteps;
 	string DumpMode;
 	int SetDump(string ss);
-	template<class type> int DumpFile(string str,Data<type> &data);
 	int DumpOut();
+	int DumpHere(string);
+	////////////////////////////////////////////
   };
 };
 

@@ -20,7 +20,7 @@ using namespace DATA_NS;
 	derivative of order parameter and concentration
  */
 
-int DynamicsStress::Initialize(){
+int Dynamics_stress::Initialize(){
   //para setting should be finished before or within this function
   string ss;
 
@@ -106,8 +106,8 @@ int DynamicsStress::Initialize(){
 
 }
 
-DynamicsStress::DynamicsStress(){}
-DynamicsStress::~DynamicsStress(){
+Dynamics_stress::Dynamics_stress(){}
+Dynamics_stress::~Dynamics_stress(){
   if (plan_vn) cufftDestroy(plan_vn);
   if (plan_bvn) cufftDestroy(plan_bvn);
 }
@@ -127,7 +127,7 @@ __global__ void ElasticForceCalculate_Stress_Kernel(Complex *ReTerm,Complex*Eta_
   ReTerm[ v*nn + pn ] = temp;
 }
 
-int DynamicsStress::ElasticForceCalculate(){
+int Dynamics_stress::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   //Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
   Eta_CT=(*Eta); //Store it in the buffer area
@@ -142,7 +142,7 @@ int DynamicsStress::ElasticForceCalculate(){
   return 0;
 }
 
-int DynamicsStress::Calculate(){
+int Dynamics_stress::Calculate(){
   string ss;
   
   ElasticForceCalculate();
@@ -159,15 +159,15 @@ int DynamicsStress::Calculate(){
   return 0;
 }
 
-int DynamicsStress::RunFunc(string funcName){ return 0; }
+int Dynamics_stress::RunFunc(string funcName){ return 0; }
  
 
-int DynamicsStress::Fix(real progress){
+int Dynamics_stress::Fix(real progress){
   string ss,mode;
   return 0;
 }
 
-string DynamicsStress::Get(string ss){ // return the statistic info.
+string Dynamics_stress::Get(string ss){ // return the statistic info.
   string var; ss>>var;
   return "nan"; 
 }
