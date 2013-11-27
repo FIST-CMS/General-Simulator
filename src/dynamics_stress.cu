@@ -28,7 +28,7 @@ int Dynamics_stress::Initialize(){
   Xi=4000.0f;  Vars["xi"]>>=Xi;
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor does not set while initialize dynamics\n";
+	GV<0>::LogAndError<<"Error: variants' strain tensor does not set while initialize dynamics\n";
 	return -1;
   }
   VariantN = StrainTensor->Dimension[1];

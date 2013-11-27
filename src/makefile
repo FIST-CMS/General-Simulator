@@ -18,17 +18,19 @@ dynamics_mart.o: dynamics_mart.cu pub.h ./log_error.h ./../include/datamain.th .
 	$(CC) $(FLAGS) -c $< -o $@
 dynamics_pow2.o: dynamics_pow2.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h dynamics_pow2.h
 	$(CC) $(FLAGS) -c $< -o $@
+dynamics_pow.o: dynamics_pow.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h dynamics_pow.h
+	$(CC) $(FLAGS) -c $< -o $@
 dynamics_stress.o: dynamics_stress.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h random.h gtensorb.h dynamics_stress.h
 	$(CC) $(FLAGS) -c $< -o $@
 dynamics_xxx.o: dynamics_xxx.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h dynamics_xxx.h
 	$(CC) $(FLAGS) -c $< -o $@
-gs.o: gs.cu pub.h ./log_error.h ./../include/datamain.th pub_main.h ./../include/datamain.th ./variable.h ./gtensorb.h ./random.h ./dynamics.h ./dynamics_cores.h ./dynamics_diffuse.h ./dynamics_mart.h ./dynamics_pow2.h ./dynamics_stress.h ./dynamics_xxx.h ./gs.h
+gs.o: gs.cu pub.h ./log_error.h ./../include/datamain.th pub_main.h ./../include/datamain.th ./variable.h ./gtensorb.h ./random.h ./dynamics.h ./dynamics_cores.h ./dynamics_diffuse.h ./dynamics_mart.h ./dynamics_pow2.h ./dynamics_pow.h ./dynamics_stress.h ./dynamics_xxx.h ./gs.h
 	$(CC) $(FLAGS) -c $< -o $@
 gtensorb.o: gtensorb.cu ../include/datamain.th ../include/datanumbers.th ../include/datamath.th ../include/datamap.th ../include/datatemp.th gtensorb.h
 	$(CC) $(FLAGS) -c $< -o $@
-input.o: input.cu pub.h ./log_error.h ./../include/datamain.th pub_main.h ./../include/datamain.th ./variable.h ./gtensorb.h ./random.h ./dynamics.h ./dynamics_cores.h ./dynamics_diffuse.h ./dynamics_mart.h ./dynamics_pow2.h ./dynamics_stress.h ./dynamics_xxx.h ./gs.h input.h
+input.o: input.cu pub.h ./log_error.h ./../include/datamain.th pub_main.h ./../include/datamain.th ./variable.h ./gtensorb.h ./random.h ./dynamics.h ./dynamics_cores.h ./dynamics_diffuse.h ./dynamics_mart.h ./dynamics_pow2.h ./dynamics_pow.h ./dynamics_stress.h ./dynamics_xxx.h ./gs.h input.h
 	$(CC) $(FLAGS) -c $< -o $@
-main.o: main.cu pub.h ./log_error.h ./../include/datamain.th pub_main.h ./../include/datamain.th ./variable.h ./gtensorb.h ./random.h ./dynamics.h ./dynamics_cores.h ./dynamics_diffuse.h ./dynamics_mart.h ./dynamics_pow2.h ./dynamics_stress.h ./dynamics_xxx.h ./gs.h input.h
+main.o: main.cu pub.h ./log_error.h ./../include/datamain.th pub_main.h ./../include/datamain.th ./variable.h ./gtensorb.h ./random.h ./dynamics.h ./dynamics_cores.h ./dynamics_diffuse.h ./dynamics_mart.h ./dynamics_pow2.h ./dynamics_pow.h ./dynamics_stress.h ./dynamics_xxx.h ./gs.h input.h
 	$(CC) $(FLAGS) -c $< -o $@
 random.o: random.cu ../include/datamain.th ../include/datanumbers.th ../include/datamath.th ../include/datamap.th ../include/datatemp.th random.h
 	$(CC) $(FLAGS) -c $< -o $@

@@ -23,14 +23,14 @@ namespace DATA_NS{
 		}
 	}
 
-	type *operator()(idtype id){ // will not create new compared to [] and the return type is different
+	type *operator()(idtype id){ // return a pointer or null
 	  for (int i=0;i<Total;i++)
 		if ( ID[i] == id )
 		  return Vars[i];
 	  return NULL;
 	};
 
-	type &operator[](idtype id){//will create new compared to () and the return type is different
+	type &operator[](idtype id){//create new if necc. and return type
 	  for ( int i=0; i<Total; i++)
 		if ( ID[i] == id )
 		  return *Vars[ i ];

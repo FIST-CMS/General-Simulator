@@ -15,7 +15,7 @@ namespace GS_NS{
 	Map< string, string > 		Vars;
 
 	static const int	DynaMax=1000;
-	int 				DynaID; // the current Dyna[i] in calculation
+	int 				DynaID; // current Dyna[i] in calculation
 	Dynamics 			*Dyna[DynaMax]; //base pointer to access derived dynammics
 	bool 				IsDynaInit[DynaMax];
 
@@ -29,6 +29,8 @@ namespace GS_NS{
 	///////////////////////////////////////////
 	int Read(string); 
 	int ReadHere(string name, string &arrays); // read directly from script
+	int Write(string);
+	int WriteHere(string);
 	////////////////////////////////////////////
 	int CurrentStep;
 	int	TotalSteps;
@@ -46,7 +48,6 @@ namespace GS_NS{
 	string DumpMode;
 	int SetDump(string ss);
 	int DumpOut();
-	int DumpHere(string);
 	////////////////////////////////////////////
   };
 };

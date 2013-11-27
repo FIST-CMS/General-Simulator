@@ -31,7 +31,7 @@ namespace DATA_NS{
 	static char			Seperator;
   };
   template<int id> stringstream 	SDataBuffer<id>::TssG;
-  template<int id> char			SDataBuffer<id>::Seperator=' ';
+  template<int id> char				SDataBuffer<id>::Seperator=' ';
   template<class typein,class typeout>void io(typein&in,typeout&out){SDataBuffer<0>::TssG.str("");SDataBuffer<0>::TssG.clear();SDataBuffer<0>::TssG<<in;SDataBuffer<0>::TssG>>out;}
   inline void SetStringSeperator(){ SDataBuffer<0>::Seperator=' '; }
   inline void SetStringSeperator(char ch){ SDataBuffer<0>::Seperator=ch;}
@@ -59,6 +59,8 @@ namespace DATA_NS{
 	ts>>inv;
 	return ts;
   }
+  template<class type> string ToString(type anyval){ string ss; return (ss<<anyval); }
+  template<class type> Real ToReal(type anyval){ string ss;Real x; ss<<anyval; ss>> x; return x; }
 }
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////

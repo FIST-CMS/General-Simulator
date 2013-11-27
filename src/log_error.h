@@ -11,24 +11,18 @@ namespace GS_NS{
   class LogAndError{
   public:
 	string Name;
-	ofstream Logofs, Errorofs;
+	ofstream Logofs;
+	bool On;
 	int Init(string name){
 	  Name=name;
+	  On=true;
 	  Logofs.open((name+".log").c_str());
-	  Errorofs.open((name+".err").c_str());
 	  return 0;
 	}
 	~LogAndError(){
 	  if (Logofs) Logofs.close();
-	  if (Errorofs) Errorofs.close();
 	}
 	template<class type> LogAndError &operator<<(type val){ //for log
-	  Logofs<<""<<val;
-	  cout<<""<<val;
-	  return *this;
-	}
-	template<class type> LogAndError &operator>>(type val){ //for error
-	  Errorofs<<""<<val;
 	  Logofs<<""<<val;
 	  cout<<""<<val;
 	  return *this;

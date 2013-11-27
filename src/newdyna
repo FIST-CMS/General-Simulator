@@ -19,5 +19,5 @@ if [ -s dynamics_${dyna}.cu ]; then
   exit 0
 fi
 echo "new dynamics_${dyna}"
-cat dynamics_xxx.h |sed "s/xxx/$dyna/" > dynamics_${dyna}.h
-cat dynamics_xxx.cu|sed "s/xxx/$dyna/" > dynamics_${dyna}.cu
+cat dynamics_xxx.h |sed "s/xxx/$dyna/g" > dynamics_${dyna}.h
+cat dynamics_xxx.cu |sed "s/xxx/$dyna/g" > dynamics_${dyna}.cu

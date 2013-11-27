@@ -120,8 +120,8 @@ namespace DATA_NS{
   inline __host__ __device__ Real::Real(Complex c){ Re= c.Re.Re;}
   //^ of int  when index is integer
   template<class type> __host__ __device__ type operator^(type r1, int r2) {
-	type temp=r1; 
-	for (int i=2; i<= r2; i++) 
+	type temp=1; 
+	for (int i=1; i<= r2; i++) 
 	  temp=temp *r1;
 	return temp;
   }

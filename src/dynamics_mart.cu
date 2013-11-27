@@ -35,7 +35,7 @@ int Dynamics_mart::Initialize(){
   /////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor does not set while initialize dynamics\n";
+	GV<0>::LogAndError<<"Error: variants' strain tensor does not set while initialize dynamics\n";
 	return -1;
   }
   VariantN = StrainTensor->Dimension[1];
@@ -342,7 +342,7 @@ int Dynamics_mart::Fix(real progress){
 	  (Vars["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
-	  GV<0>::LogAndError>>"Error: fix style ">>mode>>" does not find!\n";
+	  GV<0>::LogAndError<<"Error: fix style "<<mode<<" does not find!\n";
 	}
   } while ( ss != "");
 

@@ -19,30 +19,6 @@ GS::~GS(){
 	if (Dyna[i]!=NULL) delete Dyna[i];
 }
 
-int GS::ReadHere(string name, string &arrays){
-  int n; arrays>>n;
-  int *dim = new int[n+1]; dim[0]=n;
-  for (int i=1; i<=n; i++) arrays>>dim[i];
-  Datas[name].Init(dim,Data_HOST);
-  for (int i=0; i<Datas[name].N(); i++)
-	arrays>>Datas[name].Arr[i];
-  return 0;
-}
-
-int GS::DumpHere(string sm){
-  string ss,file;
-  while (sm !=""){
-	sm>>ss>>file;
-	if (Datas(ss) != NULL){
-	  if (Datas[ss].Position==Data_DEV)
-		Datas[ss].DeviceToHost();
-	  if (file == "") file<<ss<<".data";
-	  Datas[ss].DumpFile(file);
-	}else GV<0>::LogAndError>>"Error: data ">>ss>>" does not exist!\n";
-  }
-  return 0;
-}
-
 int GS::SetInfo(string ss){ss>>InfoSteps; InfoMode  = ss; return 0;}
 
 int GS::InfoOut(){
@@ -78,7 +54,7 @@ int GS::DumpOut(){
 		file<<DumpFolder<<"/"<<ss<<".final.data";
 	  }
 	  Datas[ss].DumpFile(file);
-	}else GV<0>::LogAndError>>"Error: data ">>ss>>" does not exist!\n";
+	}else GV<0>::LogAndError<<"Error: data "<<ss<<" does not exist!\n";
   }
   return 0;
 }
@@ -103,12 +79,13 @@ int GS::SetSys(string ss){
   if (sys == "diffuse"	) { Dyna[DynaID] = new Dynamics_diffuse; hassys=true; }
   if (sys == "mart"	) { Dyna[DynaID] = new Dynamics_mart; hassys=true; }
   if (sys == "pow2"	) { Dyna[DynaID] = new Dynamics_pow2; hassys=true; }
+  if (sys == "pow"	) { Dyna[DynaID] = new Dynamics_pow; hassys=true; }
   if (sys == "stress"	) { Dyna[DynaID] = new Dynamics_stress; hassys=true; }
   if (sys == "xxx"	) { Dyna[DynaID] = new Dynamics_xxx; hassys=true; }
   //GS_SYS_DEFINE_END
   ///////////////////////////////////
   if (!hassys) {
-	GV<0>::LogAndError>>"System ">>ss>>"is not recognized\n";
+	GV<0>::LogAndError<<"Error: System "<<ss<<"is not recognized\n";
 	return -1;
   }
   return 0;
@@ -137,11 +114,53 @@ int GS::Read(string ss){
 	ifs>>Datas[var];
 	ifs.close();
   }else{
-	GV<0>::LogAndError>>"File ">>file>>" not found!\n";
+	GV<0>::LogAndError<<"Error: File "<<file<<" not found!\n";
 	return -1;
   }
   return 0;
 }
+
+int GS::ReadHere(string name, string &arrays){
+  int n; arrays>>n;
+  int *dim = new int[n+1]; dim[0]=n;
+  for (int i=1; i<=n; i++) arrays>>dim[i];
+  Datas[name].Init(dim,Data_HOST);
+  for (int i=0; i<Datas[name].N(); i++)
+	arrays>>Datas[name].Arr[i];
+  return 0;
+}
+
+int GS::Write(string sm){
+  string ss,file;
+  while (sm !=""){
+	sm>>ss>>file;
+	if (Datas(ss) != NULL){
+	  if (Datas[ss].Position==Data_DEV)
+		Datas[ss].DeviceToHost();
+	  if (file == "") file<<ss<<".data";
+	  Datas[ss].DumpFile(file);
+	}else GV<0>::LogAndError<<"Error: data "<<ss<<" does not exist!\n";
+  }
+  return 0;
+}
+
+int GS::WriteHere(string sm){
+  string ss;
+  while (sm !=""){
+	sm>>ss;
+	if (Datas(ss) != NULL){
+	  if (Datas[ss].Position==Data_DEV)
+		Datas[ss].DeviceToHost();
+	  cout<<Datas[ss];
+	  GV<0>::LogAndError.Logofs<<Datas[ss];
+	}if (Vars(ss) != NULL){
+	  cout<<Vars[ss];
+	  GV<0>::LogAndError.Logofs<<Vars[ss];
+	}else GV<0>::LogAndError<<"Error: data "<<ss<<" does not exist!\n";
+  }
+  return 0;
+}
+
 
 int GS::Run(string ss){
   int totalsteps=1;
@@ -164,7 +183,7 @@ int GS::Run(string ss){
   if ( dumpInterval == 0 ) dumpInterval =1;
   //////////////////////////////////////////////////////////////
   string mode=InfoMode,tempss;
-  GV<0>::LogAndError<<"Terms \t"; while (mode!=""){ mode>>tempss; GV<0>::LogAndError<<tempss<<"\t"; };
+  GV<0>::LogAndError<<"Info \t\t"; while (mode!=""){ mode>>tempss; GV<0>::LogAndError<<tempss<<"\t"; };
   GV<0>::LogAndError<<"\n";
   for (int i=1;i<=totalsteps;i++) {
 	CurrentStep = i; // this will be used in dump and info to identity the progress
@@ -179,13 +198,16 @@ int GS::Run(string ss){
 }
 
 int GS::RunFunc(string func){
+  if (Dyna[DynaID]==NULL){
+	GV<0>::LogAndError<<"Error: no system set, runfunc commands not available\n";
+	return Code_ERR;
+  }
   Dyna[DynaID]->Datas = &Datas; 
   Dyna[DynaID]->Vars= Vars; 
   if ( !IsDynaInit[DynaID] ){
-	GV<0>::LogAndError<<"Runfunc command run before dynamics being initialized, run initialization function first\n";
+	GV<0>::LogAndError<<"Warning: Initialization function called\n";
 	Dyna[DynaID]->Initialize();
 	IsDynaInit[ DynaID ] = true;
-	GV<0>::LogAndError<<"Initialization function called\n";
   }
   Dyna[DynaID]->RunFunc(func);
   return 0;

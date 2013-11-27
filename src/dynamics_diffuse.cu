@@ -31,7 +31,7 @@ int Dynamics_diffuse::Initialize(){
   ////////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
-	GV<0>::LogAndError>>"Error: variants' strain tensor deoos not set while initialize dynamics\n";
+	GV<0>::LogAndError<<"Error: variants' strain tensor deoos not set while initialize dynamics\n";
 	return -1;
   }
   VariantN=StrainTensor->Dimension[1]; 
@@ -315,7 +315,7 @@ int Dynamics_diffuse::Fix(real progress){
 	  (Vars["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
-	  GV<0>::LogAndError>>"Error: fix style ">>mode>>" does not find!\n";
+	  GV<0>::LogAndError<<"Error: fix style "<<mode<<" does not find!\n";
 	}
   }
 
