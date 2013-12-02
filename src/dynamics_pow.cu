@@ -16,7 +16,7 @@ Dynamics_pow::Dynamics_pow(){}
 
 
 int Dynamics_pow::Initialize(){
-  x=2.0f; Vars["x"]>>=x;// x default set to 2.0
+  x=1.0f; (*Vars)["x"]>>=x;// x default set to 2.0
   Matrix = &((*Datas)["matrix"]);
   return 0;
 }

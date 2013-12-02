@@ -1,9 +1,10 @@
 ########################################################
 sys pow
 ########################################################
-variable total_step 20
+expr total_step=20
+:x=20
 ########################################################
-set x 2
+set x {x x}
 ########################################################
 readhere matrix
 2 3 3
@@ -11,8 +12,8 @@ readhere matrix
 1 2 3
 6 5 4
 ########################################################
-info total_step x sum_of_matrix
-dump dump_pow_matrix total_step matrix
+info {total_step} x sum_of_matrix
+dump dump_pow_matrix {total_step} matrix
 ########################################################
-run total_step
+run {total_step}
 

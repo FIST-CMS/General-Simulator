@@ -14,8 +14,8 @@ namespace GS_NS{
 	int 		nx,ny,nz;
 	Real 		dx,dy,dz;
 	///////////////////////////////////////////
-	Map< string, Data<Real> >*	Datas; //big data
-	Map< string, string > 		Vars;   //small para
+	Map< Data<Real> >*	Datas; //big data
+	Map< string >* 		Vars;   //small para
 	///////////////////////////////////////////
 	virtual int 	Initialize()=0;
 	virtual int 	Calculate()=0;

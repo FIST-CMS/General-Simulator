@@ -15,12 +15,12 @@ using namespace DATA_NS;
 int Dynamics_cores::Initialize(){
   //para setting should be finished before or within this function
   string ss;
-  ss=Vars["gridsize"];    			if (ss!="") { ss>>nx>>ny>>nz>>dx>>dy>>dz;} else {nx=ny=nz=16; dx=dy=dz=0.1;}
-  ss=Vars["variantn"];              if (ss!="") { ss>>VariantN;} else {VariantN=4;}
-  ss=Vars["coresn"];				if (ss!="") { ss>>CoresN; }else { CoresN=5;}
-  ss=Vars["radius"];				if (ss!="") { ss>>Radius; }else { Radius=5;}
-  ss=Vars["concentration"];			if (ss!="") { ss>>Concentration1>>Concentration2; }else {Concentration1=0.2f; Concentration2 = 0.44f;}
-  ss=Vars["method"];                if (ss!="") { ss>>Method; } else { Method = "random"; }
+  ss=(*Vars)["gridsize"];    			if (ss!="") { ss>>nx>>ny>>nz>>dx>>dy>>dz;} else {nx=ny=nz=16; dx=dy=dz=0.1;}
+  ss=(*Vars)["variantn"];              if (ss!="") { ss>>VariantN;} else {VariantN=4;}
+  ss=(*Vars)["coresn"];				if (ss!="") { ss>>CoresN; }else { CoresN=5;}
+  ss=(*Vars)["radius"];				if (ss!="") { ss>>Radius; }else { Radius=5;}
+  ss=(*Vars)["concentration"];			if (ss!="") { ss>>Concentration1>>Concentration2; }else {Concentration1=0.2f; Concentration2 = 0.44f;}
+  ss=(*Vars)["method"];                if (ss!="") { ss>>Method; } else { Method = "random"; }
   // it is called to initialize the --run-- function
   ///////////////////////////////////////////////////
   Eta = &((*Datas)["eta"]); // may create here

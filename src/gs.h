@@ -11,13 +11,16 @@ using namespace DATA_NS;
 namespace GS_NS{
   class GS{//
   public:
-	Map< string, Data<Real> > 	Datas;
-	Map< string, string > 		Vars;
-
-	static const int	DynaMax=1000;
-	int 				DynaID; // current Dyna[i] in calculation
-	Dynamics 			*Dyna[DynaMax]; //base pointer to access derived dynammics
-	bool 				IsDynaInit[DynaMax];
+	Map< Data<Real> > 	*Datas;
+	Map< string > 		*Vars;
+	////////////////////////////////
+	const static int 	DynaMax  = 1000;
+	int					DynaTotal;
+	Dynamics	        *Dynas[DynaMax];
+	Map< bool >			DynasInited;
+	Map< int  >			DynaPositions;
+	string				DynaName;
+	int					DynaPosition;
 
   public:
 	GS();

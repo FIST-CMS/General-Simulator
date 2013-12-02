@@ -5,18 +5,18 @@
 #ifndef DATA_Eins_H
 #define DATA_Eins_H
 
-#include<stdio.h>
+//#include<stdio.h>
 #include<stdarg.h>
 #include<iostream>
 #include<fstream>
 #include<sstream>
 #include<typeinfo>
 
-
+#include<map>
+#include<set>
 
 #include"datanumbers.th"
 #include"datamath.th"
-#include"datamap.th"
 using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////
 namespace DATA_NS{
@@ -351,6 +351,10 @@ namespace DATA_NS{
 
   //overload <<  >>
   template<class ostype,class etype> ostype &operator<<(ostype &os, Data<etype> &data){
+     if (data.Dimension==NULL){ // not assigned space
+	  cerr<<"no data\n";
+	  return os;
+	}
 	for (int i=0; i<= data.Dimension[0]; i++)
 	  os<<data.Dimension[i]<<" ";
 	os<<endl;
@@ -790,6 +794,9 @@ namespace DATA_NS{
 
 }
 //---------------------------------------------------------
+
+#include"datamap.th"
+
 #endif
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////

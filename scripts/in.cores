@@ -7,7 +7,6 @@ set variantn 4
 set coresn 1
 set radius 6
 set concentration 0.2 0.44
-#set method regular
 set method regular
 ###########################################################
 ##########################################################

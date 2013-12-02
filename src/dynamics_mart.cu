@@ -18,20 +18,20 @@ int Dynamics_mart::Initialize(){
   /////////////////////////////////////////////////////////
   //para setting should be finished before or within this function
   string ss;
-  ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
+  ss=(*Vars)["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
 
 
   weightExternal= 0.f;
-  weightDislocation= 0.01f; Vars["weightdislocation"]>>=weightDislocation;
-  weightNoise = 1.0f; Vars["weightnoise"]>>=weightNoise;
-  DeltaTime =0.01f; Vars["deltatime"]>>=DeltaTime;
-  weightGradient= 2.5f; Vars["weightgradient"]>>=weightGradient;
-  weightChemical= 1.0f; Vars["weightchemical"]>>=weightChemical;
-  weightElastic=  100000.0f;  Vars["weightelastic"]>>=weightElastic;
-  TransitionTemperature=450.0f; Vars["transitiontemperature"]>>=TransitionTemperature;
+  weightDislocation= 0.01f; (*Vars)["weightdislocation"]>>=weightDislocation;
+  weightNoise = 1.0f; (*Vars)["weightnoise"]>>=weightNoise;
+  DeltaTime =0.01f; (*Vars)["deltatime"]>>=DeltaTime;
+  weightGradient= 2.5f; (*Vars)["weightgradient"]>>=weightGradient;
+  weightChemical= 1.0f; (*Vars)["weightchemical"]>>=weightChemical;
+  weightElastic=  100000.0f;  (*Vars)["weightelastic"]>>=weightElastic;
+  TransitionTemperature=450.0f; (*Vars)["transitiontemperature"]>>=TransitionTemperature;
   /////////////////////////////////////////////////////////
   LPC[2]=32.05f; LPC[3]=37.5f;
-  ss=Vars["coefficient"]; if (ss!="") ss>>LPC[1]>>LPC[2]>>LPC[3];
+  ss=(*Vars)["coefficient"]; if (ss!="") ss>>LPC[1]>>LPC[2]>>LPC[3];
   /////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
@@ -303,7 +303,7 @@ int Dynamics_mart::Block(){
 
 int Dynamics_mart::Calculate(){
   string ss;
-  Vars["temperature"]>>=Temperature; 
+  (*Vars)["temperature"]>>=Temperature; 
   GradientForceCalculate();
   ChemicalForceCalculate();
   ElasticForceCalculate();
@@ -333,13 +333,13 @@ int Dynamics_mart::RunFunc(string funcName){ return 0; }
 
 int Dynamics_mart::Fix(real progress){
   string ss,mode;
-  ss = Vars["fix"];
+  ss = (*Vars)["fix"];
   do{
 	ss>>mode;
 	if      (mode=="temperature"	){
 	  real st,et; //start and end temperature
 	  ss>>st>>et;
-	  (Vars["temperature"])<<=(st+ progress*(et- st));
+	  ((*Vars)["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
 	  GV<0>::LogAndError<<"Error: fix style "<<mode<<" does not find!\n";

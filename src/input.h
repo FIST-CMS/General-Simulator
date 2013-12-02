@@ -5,6 +5,7 @@
 #define LOG_PREFIX_TRUE 	1
 #define LOG_PREFIX_FALSE	0 
 
+
 using namespace std;
 namespace GS_NS{
   class INPUT{
@@ -23,7 +24,7 @@ namespace GS_NS{
 	int		standardize(string&script);
 	//////////////////////////////////////////////
 	int 	device(string ss);
-	int 	expresion(string ss);
+	int 	print(string ss);
 	int  	readhere(string ss,string&script);//read data from script
 	//////////////////////////////////////////////
 	int		get_expresion(string &expr,string &script);

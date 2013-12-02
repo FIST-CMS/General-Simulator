@@ -24,8 +24,8 @@ int Dynamics_stress::Initialize(){
   //para setting should be finished before or within this function
   string ss;
 
-  (((((Vars["gridsize"]>>=nx)>>=ny)>>=nz)>>=dx)>>=dy)>>=dz;
-  Xi=4000.0f;  Vars["xi"]>>=Xi;
+  ((((((*Vars)["gridsize"]>>=nx)>>=ny)>>=nz)>>=dx)>>=dy)>>=dz;
+  Xi=4000.0f;  (*Vars)["xi"]>>=Xi;
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
 	GV<0>::LogAndError<<"Error: variants' strain tensor does not set while initialize dynamics\n";

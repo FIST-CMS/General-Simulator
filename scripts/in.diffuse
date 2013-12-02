@@ -3,7 +3,7 @@
 ##########################################################
 sys diffuse #assign the type of the system
 ##########################################################
-variable steps 10000
+:steps=10000
 ###########################################################
 set gridsize 128 128 128 0.1 0.1 0.1  #the length unit is in nm
 set deltatime 0.1
@@ -14,8 +14,6 @@ set meta 0.4
 set lpp  0.4
 set xi   400
 set concentration 0.1 0.44 # the init con of the mother phase is 0.2
-#set transitiontemperature 450
-#set fix temperature 460 300 #assign the temperature route  
 ###########################################################
 read eta data.eta.for.diffuse
 read concentration data.con.for.diffuse
@@ -30,7 +28,7 @@ readhere varianttensor
 }
 ######################################
 ######################################
-info steps/10 # (/ 4 2)
+info {steps/10} # (/ 4 2)
 shell rm -rf dump_pre
 dump dump_pre 10 eta concentration
 #####################################

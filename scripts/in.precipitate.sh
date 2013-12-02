@@ -14,7 +14,6 @@ set variantn 4
 set coresn 1
 set radius 6
 set concentration 0.2 0.44
-#set method regular
 set method regular
 ###########################################################
 ##########################################################
@@ -30,7 +29,7 @@ echo "
 ##########################################################
 sys diffuse #assign the type of the system
 ##########################################################
-variable steps $stepsdiffuse
+:steps=${stepsdiffuse}
 ###########################################################
 set gridsize $nx $ny $nz 0.1 0.1 0.1  #the length unit is in nm
 set deltatime 0.1
@@ -41,8 +40,6 @@ set meta 0.4
 set lpp  0.4
 set xi   400
 set concentration 0.1 0.44 # the init con of the mother phase is 0.2
-#set transitiontemperature 450
-#set fix temperature 460 300 #assign the temperature route  
 ###########################################################
 read eta data.eta.for.diffuse
 read concentration data.con.for.diffuse
@@ -57,7 +54,7 @@ readhere varianttensor
 }
 ######################################
 ######################################
-info steps/10 # (/ 4 2)
+info {steps/10} # (/ 4 2)
 shell rm -rf dump_pre
 dump dump_pre $dumpN eta concentration
 #####################################
@@ -76,10 +73,12 @@ read eta data.eta.for.stress  #read the shape (order parameter)
 ##########################################################
 readhere varianttensor
 3 4 3 3 
+{
 -1.835*0.01, -8.1868274*0.001, -5.7889605*0.001,-8.1868256*0.001, -8.897*0.001, -3.3422573*0.001,-5.7889605*0.001, -3.3422580*0.001, -6.54*0.001
 -4.17*0.001,  0.0,  0.0, 0.0, -2.3*0.01, 6.6845156*0.001, 0.0,  6.6845166*0.001, -6.5*0.001
 -4.17*0.001,  0.0,  0.0, 0.0, -4.17*0.001, 0.0,0.0,  0.0, -2.544*0.01
 -1.835*0.01,  8.1868265*0.001,  5.788961*0.001,8.1868256*0.001, -8.897*0.001, -3.3422573*0.001,5.7889605*0.001, -3.3422580*0.001, -6.5*0.001
+}
 ###########################################################
 dump ./ 1 stress defect
 run
@@ -92,7 +91,7 @@ echo "
 #device 0 #assign gpu device ID for cal. default 0. also ./gups in.script deviceID
 sys mart  #assign the type of the system
 ###########################################################
-variable steps $stepsmart
+:steps=${stepsmart}
 ###########################################################
 set gridsize $nx $ny $nz 0.1 0.1 0.1  #the length unit is in nm
 set transitiontemperature 450
@@ -111,11 +110,11 @@ readhere varianttensor
   { {0.00, -0.0063, -0.0063}, { -0.0063, 0.0, 0.0063}, { -0.0063, 0.0063, 0.0}}};
 ######################################
 ######################################
-info steps/10 temperature # (/ 4 2)
+info {steps/10} temperature # (/ 4 2)
 shell rm -rf dump_mart
 dump dump_mart $dumpN eta
 #####################################
-run steps
+run {steps}
 shell cp dump_mart/eta.final.data data.eta.final
 "> in.mart
 

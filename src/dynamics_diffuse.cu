@@ -18,16 +18,16 @@ using namespace DATA_NS;
 int Dynamics_diffuse::Initialize(){
   //para setting should be finished before or within this function
   string ss;
-  ss=Vars["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
-  ss=Vars["deltatime"];             if (ss!="") ss>>DeltaTime;else DeltaTime=0.1;
-  ss=Vars["coefficient"];           if (ss!="") ss>>A[1]>>A[2]>>A[3]>>A[4]>>A[5]>>A[6]>>A[7]; else {A[1]=54.0;A[2]=-17.0;A[3]=7.0;A[4]=2.5;A[5]=0.2;A[6]=0.2;A[7]=0.2;}
-  ss=Vars["arfi"]; if (ss!="") ss>>Arfi; else Arfi=300.0f;
-  ss=Vars["beta"]; if (ss!="") ss>>Beta; else Beta=300.0f;
-  ss=Vars["meta"]; if (ss!="") ss>>Meta; else Meta=0.4f;
-  ss=Vars["lpp"];  if (ss!="") ss>>Lpp; else Lpp = 0.4f;
-  ss=Vars["xi"];   if (ss!="") ss>>Xi; else Xi=400.f;
-  ss=Vars["concentration"]; if (ss!="") ss>>Concentration1>>Concentration2; else { Concentration1=0.1; Concentration2=0.44; }
-  ss=Vars["weightnoise"]; if (ss!="") { ss>>weightEtaNoise; weightConNoise = weightEtaNoise; } else{ weightEtaNoise= 1.0f; weightConNoise= 1.0f;}
+  ss=(*Vars)["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
+  ss=(*Vars)["deltatime"];             if (ss!="") ss>>DeltaTime;else DeltaTime=0.1;
+  ss=(*Vars)["coefficient"];           if (ss!="") ss>>A[1]>>A[2]>>A[3]>>A[4]>>A[5]>>A[6]>>A[7]; else {A[1]=54.0;A[2]=-17.0;A[3]=7.0;A[4]=2.5;A[5]=0.2;A[6]=0.2;A[7]=0.2;}
+  ss=(*Vars)["arfi"]; if (ss!="") ss>>Arfi; else Arfi=300.0f;
+  ss=(*Vars)["beta"]; if (ss!="") ss>>Beta; else Beta=300.0f;
+  ss=(*Vars)["meta"]; if (ss!="") ss>>Meta; else Meta=0.4f;
+  ss=(*Vars)["lpp"];  if (ss!="") ss>>Lpp; else Lpp = 0.4f;
+  ss=(*Vars)["xi"];   if (ss!="") ss>>Xi; else Xi=400.f;
+  ss=(*Vars)["concentration"]; if (ss!="") ss>>Concentration1>>Concentration2; else { Concentration1=0.1; Concentration2=0.44; }
+  ss=(*Vars)["weightnoise"]; if (ss!="") { ss>>weightEtaNoise; weightConNoise = weightEtaNoise; } else{ weightEtaNoise= 1.0f; weightConNoise= 1.0f;}
   ////////////////////////////////////////////////////////////
   StrainTensor = &((*Datas)["varianttensor"]);
   if (StrainTensor->Arr == NULL){
@@ -54,7 +54,7 @@ int Dynamics_diffuse::Initialize(){
   }else{ Eta->HostToDevice(); }
   ////////////////////////////////////////////////////////////
   real C00=3.5,C01=1.5,C33=1.0;
-  ss=Vars["modulus"];if (ss!="") ss>>C00>>C01>>C33;
+  ss=(*Vars)["modulus"];if (ss!="") ss>>C00>>C01>>C33;
   Data<Real> cijkl; SetCalPos(Data_HOST);
   cijkl.Init(4,3,3,3,3,Data_HOST_DEV); cijkl=0.f;
   cijkl(0,0,0,0) =C00; cijkl(1,1,1,1) =C00; cijkl(2,2,2,2) =C00;
@@ -290,7 +290,7 @@ int Dynamics_diffuse::EtaUpdate(){
 
 int Dynamics_diffuse::Calculate(){
   string ss;
-  Vars["temperature"]>>=Temperature; 
+  (*Vars)["temperature"]>>=Temperature; 
   LocalConFreeEnergyCalculate();
   LocalEtaFreeEnergyCalculate();
   ElasticForceCalculate();
@@ -306,13 +306,13 @@ int Dynamics_diffuse::RunFunc(string funcName){ return 0;}
 
 int Dynamics_diffuse::Fix(real progress){
   string ss,mode;
-  ss = Vars["fix"];
+  ss = (*Vars)["fix"];
   while( ss!= "" ){
 	ss>>mode;
 	if      (mode=="temperature"	){
 	  real st,et; //start and end temperature
 	  ss>>st>>et;
-	  (Vars["temperature"])<<=(st+ progress*(et- st));
+	  ((*Vars)["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
 	  GV<0>::LogAndError<<"Error: fix style "<<mode<<" does not find!\n";

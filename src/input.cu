@@ -12,13 +12,20 @@ INPUT::~INPUT(){}
 
 int INPUT::Phrasing(string script){
   int err=0;
-  string ss;
+  string ss,line;
   while (getline(ss,script)){
+	line = ss;
 	////////////////////
 	while (ss[0]==' ') ss.erase(0,1); //delete the heading space of each line
     if (ss=="") continue;
+	///////////////////////
     string command; ss>>command;
-	if 		(command== "shell"   	)   { err=system(ss.c_str()); }
+	if (command[0]==':'){ ss=command.substr(1)+" "+ss; command="expr";}
+	Vars.ReplaceExpr(ss);  // all to be sub
+	///////////////////////
+	if 		(command== "expr"	 	)   { err= Vars.Evaluate(ss); }
+	///////////////////////
+	else if	(command== "shell"   	)   { err= system(ss.c_str()); }
 	//////////////////////////////////////////////////////////////
 	else if (command== "logon"		)	{GV<0>::LogAndError.On=true; }
 	else if (command== "logoff"		)	{GV<0>::LogAndError.On=false; }
@@ -26,39 +33,37 @@ int INPUT::Phrasing(string script){
 	else if (command== "quit"		)   { err=Code_QUIT; break; }
 	//////////////////////////////////////////////////////////////
 	else if (command== "link"		)   { err=Gs.Link(ss); }
-	else if (command== "set"		)   { Vars.SubVar(ss,1);err=Gs.Set(ss);}
 	/////////////
-	else if (command== "info"     	)   { Vars.SubVar(ss,0);err=Gs.SetInfo(ss);  }
-	else if (command== "dump" 	)   { Vars.SubVar(ss,1);err=Gs.SetDump(ss);} 
+	else if (command== "info"     	)   { err=Gs.SetInfo(ss);  }
+	else if (command== "dump" 		)   { err=Gs.SetDump(ss);} 
 	/////////////
-	else if (command== "read"		)   { Vars.SubVar(ss,1);err=Gs.Read(ss);}
+	else if (command== "set"		)   { err=Gs.Set(ss); } //in program
+	else if (command== "read"		)   { err=Gs.Read(ss);}
 	else if (command== "readhere"	)   { err=readhere(ss,script);}
 	else if (command== "write"		)   { err=Gs.Write(ss);} 
 	else if (command== "writehere"	)   { err=Gs.WriteHere(ss);} 
 	//////////////////////////////////////////////////////////////
-	else if (command== "device"		)	{ Vars.SubVar(ss,0);err=device(ss); }
-	//else if (command== "var"	 	)   { err=Vars.Set(ss); }
-	else if (command== "expr"	 	)   { err=expresion(ss); }
-	else if (command== "sys"		)  	{ Vars.SubVar(ss,0); err=Gs.SetSys(ss); }
-	else if (command== "run"		)   { Vars.SubVar(ss,0); err=Gs.Run(ss);}
+	else if (command== "device"		)	{ err=device(ss); }
+	else if (command== "print"		)   { err=print(ss); } 
+	else if (command== "sys"		)  	{ err=Gs.SetSys(ss); }
+	else if (command== "run"		)   { err=Gs.Run(ss);}
 	//////////////////////////////////////////////////////////////
 	else if (command== "loop"		) 	{ err=stat_loop(ss,script);}
 	else if (command== "while"		) 	{ err=stat_while(ss,script);}
 	else if (command== "if"			) 	{ err=stat_if(ss,script);}
 	//////////////////////////////////////////////////////////////
-	else if (command== "runfunc"	)   { Vars.SubVar(ss,0);err=Gs.RunFunc(ss);}
+	else if (command== "runfunc"	)   { err=Gs.RunFunc(ss);}
 	else {
-	  Vars.SubVar(ss,0);
 	  err=Gs.RunFunc(command+" "+ss);
 	} // default leave out runfunc command
 
 	/////////////////////////////////////////////////////////////////////////
 	if (err == Code_COMMAND_UNKNOW){
-	  GV<0>::LogAndError<<"Command "<<command <<" is unknow.\n"; 
+	  GV<0>::LogAndError<<"Erro: unknown command : "<<line<<"\n"; 
 	  return Code_ERR;
 	}
 	if ( err == Code_ERR ) {
-	  GV<0>::LogAndError<<"Error occured when excuting command "<<command<<".\n"; 
+	  GV<0>::LogAndError<<"Error occured when excuting command \""<<line<<"\"\n"; 
 	  return Code_ERR;
 	}
 	if (err == Code_QUIT ) return Code_QUIT;
@@ -71,6 +76,7 @@ int INPUT::Phrasing(string script){
 bool INPUT::getline(string &ss, string &script){
   if (script=="") return false;
   int n=script.find("\n");
+  if (n<0&&script!="") n=script.length();
   ss=script.substr(0, n);
   script.erase(0,n+1);
   if (ss!=""&&GV<0>::LogAndError.On)
@@ -83,11 +89,8 @@ int INPUT::standardize(string &script){
   //repalce some cut as space
   //////////////////////////////////////////////////
   while ((p=script.find('\t'))>=0)  script[p]=' ';
-  while ((p=script.find(",")) >=0)  script[p]=' ';
-  while ((p=script.find(";")) >=0)  script[p]=' ';
-  while ((p=script.find(":")) >=0)  script[p]=' ';
-  while ((p=script.find("{")) >=0)  script[p]=' ';
-  while ((p=script.find("}")) >=0)  script[p]=' ';
+  //////////////////////////////////////////////////
+  while ((p=script.find(";")) >=0)  script[p]='\n';
   //////////////////////////////////////////////////
   int p1=script.find("#"),p2;
   while (p1>=0){
@@ -96,8 +99,7 @@ int INPUT::standardize(string &script){
 	p1=script.find("#");
   }
   //delete extra space
-  while ((p=script.find("  "))>=0)
-	script.erase(p,1);
+  while ((p=script.find("  "))>=0) script.erase(p,1);
   ///delete space around operator is not practicle in this case, cause space is an important mark
   // delete space and other chars between two bracket---an expression
   int n_brack=0, pre_pos=-1,pos=0;
@@ -122,6 +124,34 @@ int INPUT::standardize(string &script){
 	}
 	pos++;
   }
+  // deel with "," spcace and "\n" in {}
+  n_brack=0, pre_pos=-1,pos=0;
+  while ( pos<script.length() ){
+	if (script[pos]=='{') {
+	  n_brack++;
+	  if (n_brack==1) pre_pos=pos;
+	}else if (script[pos]=='}'){
+	  n_brack--;
+	  if (n_brack==0){
+		//standardize the expression found
+		temp=script.substr(pre_pos,pos-pre_pos+1);
+		int p=0;
+		while (p<temp.length()){
+		  if (temp[p]==' '||temp[p]=='\n'||temp[p]==','){
+			temp.replace(p,1,"} {");
+			p=p+2;
+			continue;
+		  }
+		  p=p++;
+		}
+		script.replace(pre_pos,pos-pre_pos+1,temp);
+		pos=pre_pos+temp.length();
+	  }
+	}
+	pos++;
+  }
+  ///exra "," to " "
+  while ((p=script.find(";")) >=0)  script[p]='\n';
   return 0;
 }
 /////////////////////////////////////////////////////////////
@@ -132,7 +162,6 @@ int INPUT::readhere(string sr,string &script){
   int 	index=0;
   sr>>varname;
   while (getline(ss,script)){
-	 Vars.SubVar(ss,0);
 	 while (ss!=""){
 	   if (index==0) {
 		 ss>>ndim; arrays<<ndim<<" "; }
@@ -161,17 +190,6 @@ int INPUT::device(string ss){
   return 0;
 }
 
-int INPUT::expresion(string ss){
-  string str_t,str_hold=ss;
-  ss>>str_t;
-  if (ss==""){
-	Vars.SubVar(str_t,0);
-	GV<0>::LogAndError<<str_t<<"\n";
-	return 0;
-  }else{
-	return Vars.Set(str_hold);
-  }
-}
 ////////////////////////////////////////////////////////////
 
 int INPUT::find_sub_script(string&script,string&sub_script){
@@ -193,11 +211,10 @@ int INPUT::find_sub_script(string&script,string&sub_script){
 }
 
 int INPUT::stat_loop(string ss,string &script){
-  string sub_script,temp_sub,var; ss>>=var;
+  string sub_script,temp_sub,var; ss>>var; script=ss+"\n"+script;
   int err=0;
   find_sub_script(script,sub_script);
-  err=Vars.SubVar(var,0);
-  if (err!=Code_NORMAL) return err;
+  err=Vars.Evaluate(var); if (err!=Code_NORMAL) return err;
   Real loop_n; var>>loop_n;
   ////////////////////////////
   for (int i=0;i<loop_n;i++){
@@ -209,17 +226,17 @@ int INPUT::stat_loop(string ss,string &script){
 }
 
 int INPUT::stat_while(string ss,string &script){
-  string sub_script,temp_sub,expr; ss>>=expr;
+  string sub_script,temp_sub,expr,sss=ss; sss>>expr; script = sss+"\n"+script;
   int err=0;
   find_sub_script(script,sub_script);
-  err=Vars.SubVar(expr,0); if (err!=Code_NORMAL) return err;
+  err=Vars.Evaluate(expr); if (err!=Code_NORMAL) return err;
   ////////////////////////////
   while( ToReal(expr)>0 ){
 	temp_sub= sub_script;
 	err=Phrasing(temp_sub);
 	if (err!=Code_NORMAL) return err;
 	ss>>=expr;
-	Vars.SubVar(expr,0);
+	Vars.Evaluate(expr);
   }
   return 0;
 }
@@ -256,10 +273,10 @@ int INPUT::find_else_script(string&script,string&sub_script1,string &sub_script2
 
 
 int INPUT::stat_if(string ss,string &script){
-  string sub_script1,sub_script2,expr; ss>>=expr;
+  string sub_script1,sub_script2,expr; ss>>=expr; script=ss+"\n"+script;
   int err=0;
   find_else_script(script,sub_script1,sub_script2);
-  Vars.SubVar(expr,0);
+  Vars.Evaluate(expr);
   if (ToReal(expr)>0){
 	err=Phrasing(sub_script1);
   }else{
@@ -268,3 +285,10 @@ int INPUT::stat_if(string ss,string &script){
   return err;
 }
 
+
+int INPUT::print(string ss){
+  int err;
+  err=Vars.ReplaceExpr(ss);
+  GV<0>::LogAndError<<ss<<"\n";
+  return err;
+}

@@ -13,7 +13,7 @@
 #include"dynamics_cores.h"
 #include"dynamics_diffuse.h"
 #include"dynamics_mart.h"
-#include"dynamics_pow2.h"
+#include"dynamics_multi.h"
 #include"dynamics_pow.h"
 #include"dynamics_stress.h"
 #include"dynamics_xxx.h"

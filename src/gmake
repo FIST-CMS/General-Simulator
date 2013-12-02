@@ -42,7 +42,7 @@ if [ ${num} -gt 0 ]; then
     name=${hfile#dynamics_}
     name=${name%.h}
     #Name=`echo ${name:0:1}|tr a-z A-Z `${name:1}
-    echo "  if (sys == \"${name}\"	) { Dyna[DynaID] = new Dynamics_${name}; hassys=true; }" >>$gcu
+    echo "  if (sys == \"${name}\"	) { Dynas[ pos ] = new Dynamics_${name}; hassys=true; }" >>$gcu
   done
   sed -n "${num12},\$ p" $mhpub >> $hpub
   sed -n "${num22},\$ p" $mgcu >> $gcu
