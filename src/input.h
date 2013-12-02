@@ -11,7 +11,6 @@ namespace GS_NS{
   class INPUT{
   public:
 	GS	Gs;
-	//ifstream fin;
 	int 	 LineNumber;
 	Variable Vars;
   public:

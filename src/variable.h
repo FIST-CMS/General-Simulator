@@ -16,7 +16,7 @@ namespace GS_NS{
   class Variable{
   public:
 	Map<string>  	  *Vars;
-	Map< Data<Real> > *Datas;
+	Map<string>  	  *Vars_gs;
 	//////////////////////////////////////////////////////
 	Variable();
 	~Variable();
@@ -39,10 +39,9 @@ namespace GS_NS{
 	real 	Val;
 	string 	Opera;
 	ExprTree *Left, *Right;
-	Map<string> *Vars;
 	ExprTree();
 	~ExprTree();
-	int Init(string expr,Map<string> *vars);
+	int Init(string expr,Map<string> *vars,Map<string> *vars_gs);
   };
 }
 

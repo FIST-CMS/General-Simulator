@@ -7,6 +7,7 @@ using namespace std;
 using namespace GS_NS;
 
 INPUT::INPUT(){
+  Vars.Vars_gs = Gs.Vars;
 }
 INPUT::~INPUT(){}
 
@@ -55,6 +56,8 @@ int INPUT::Phrasing(string script){
 	else if (command== "runfunc"	)   { err=Gs.RunFunc(ss);}
 	else {
 	  err=Gs.RunFunc(command+" "+ss);
+	  if (err == Code_COMMAND_UNKNOW){
+	  }
 	} // default leave out runfunc command
 
 	/////////////////////////////////////////////////////////////////////////
