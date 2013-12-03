@@ -86,9 +86,10 @@ int GS::SetSys(string ss){
 	return -1;
   }
   ///then a new will be create
+  DynasInited[sys]=false;
+  DynaPositions[sys]=pos;
   DynaName=sys;
   DynaPosition=pos;
-  DynaPositions[sys]=pos;
   DynaTotal++;
   return 0;
 }
@@ -174,9 +175,6 @@ int GS::Run(string ss){
   ss>>totalsteps; TotalSteps=totalsteps;
   if (totalsteps <= 0 )
 	return -1;
-  //what dyna to use???? defined in sys
-  // the data is passed by reference ( big )
-  // paras is passed by value ( small )
   Dynas[DynaPosition]->Datas = Datas; 
   Dynas[DynaPosition]->Vars = Vars; 
   if ( !DynasInited[DynaName] ){

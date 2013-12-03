@@ -10,7 +10,6 @@ readhere mat2
 1 2
 3 4
 5 6
-#runfunc matrix_multi mat1 mat2 mat3
 matrix_multi mat1 mat2 mat3 
-writehere mat3 
 ########################################################
+writehere mat3 

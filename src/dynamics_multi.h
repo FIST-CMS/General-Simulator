@@ -18,8 +18,6 @@ namespace GS_NS{
 	virtual string 	Get(string var);
 	~Dynamics_multi();
 	////////////////////////////////
-	float x;
-	Data<Real>* Matrix;
   };
 }
 #endif

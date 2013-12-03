@@ -20,7 +20,6 @@ int Dynamics_mart::Initialize(){
   string ss;
   ss=(*Vars)["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
 
-
   weightExternal= 0.f;
   weightDislocation= 0.01f; (*Vars)["weightdislocation"]>>=weightDislocation;
   weightNoise = 1.0f; (*Vars)["weightnoise"]>>=weightNoise;
@@ -350,9 +349,8 @@ int Dynamics_mart::Fix(real progress){
 }
 
 string Dynamics_mart::Get(string ss){ // return the statistic info.
-  string ans="";
   string var; ss>>var;
-  if (var == "temperature") return ans<<Temperature; 
+  if (var == "temperature") return ToString(Temperature); 
   else return "nan";
 }
 

@@ -28,8 +28,8 @@ int INPUT::Phrasing(string script){
 	///////////////////////
 	else if	(command== "shell"   	)   { err= system(ss.c_str()); }
 	//////////////////////////////////////////////////////////////
-	else if (command== "logon"		)	{GV<0>::LogAndError.On=true; }
-	else if (command== "logoff"		)	{GV<0>::LogAndError.On=false; }
+	else if (command== "logon"		)	{ GV<0>::LogAndError.On=true; }
+	else if (command== "logoff"		)	{ GV<0>::LogAndError.On=false; }
 	else if (command== "break"		)   { break; }
 	else if (command== "quit"		)   { err=Code_QUIT; break; }
 	//////////////////////////////////////////////////////////////
@@ -153,8 +153,7 @@ int INPUT::standardize(string &script){
 	}
 	pos++;
   }
-  ///exra "," to " "
-  while ((p=script.find(";")) >=0)  script[p]='\n';
+  while ((p=script.find(",")) >=0)  script[p]=' ';
   return 0;
 }
 /////////////////////////////////////////////////////////////
@@ -276,7 +275,7 @@ int INPUT::find_else_script(string&script,string&sub_script1,string &sub_script2
 
 
 int INPUT::stat_if(string ss,string &script){
-  string sub_script1,sub_script2,expr; ss>>=expr; script=ss+"\n"+script;
+  string sub_script1,sub_script2,expr; ss>>expr; script=ss+"\n"+script;
   int err=0;
   find_else_script(script,sub_script1,sub_script2);
   Vars.Evaluate(expr);

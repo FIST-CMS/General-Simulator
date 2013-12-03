@@ -13,14 +13,10 @@ using namespace DATA_NS;
 Dynamics_multi::Dynamics_multi(){}
 
 int Dynamics_multi::Initialize(){
-  //para setting should be finished before or within this function
-  (*Vars)["x"]>>=x;	
-  Matrix = &((*Datas)["matrix"]);
   return 0;
 }
 
 int Dynamics_multi::Calculate(){
-  (*Matrix)=(*Matrix)*2;
   return 0;
 }
 
@@ -33,17 +29,13 @@ int Dynamics_multi::RunFunc(string func){
 int Dynamics_multi::Fix(real progress){return 0;}
 
 string Dynamics_multi::Get(string ss){
-  string ans;
-  if (ss=="x") return ans<<x;
-  if (ss=="sum_of_matrix") return ans<<(Matrix->TotalHost());
   return "nan";
 }
 
 Dynamics_multi::~Dynamics_multi(){}
 
 __global__ void Dynamics_multi_kernel_matrix_multi
-(
- Real *mat1, Real*mat2,Real *mat3,
+( Real *mat1, Real*mat2,Real *mat3,
  int d_mid){
   int ny=blockDim.x;
   int x=blockIdx.x,y=threadIdx.x;
