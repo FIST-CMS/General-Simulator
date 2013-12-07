@@ -32,11 +32,9 @@ namespace GS_NS{
 	Real	weightNoise;
 	
 	Data<Real> Gradient;
-	Data<Real> GradientEnergy;
 	Data<Real> GradientForce;
 	Real weightGradient;
 	int GradientCalculate();
-	int GradientEnergyCalculate();
 	int GradientForceCalculate();
 
 	real TransitionTemperature;
@@ -44,14 +42,12 @@ namespace GS_NS{
 	real LPC[4];//Landau_Poly_Coefficients
 	int SetCoeff(string ss);
 	int LPCConstruct();// the function form can be uniformed
-	Data<Real> ChemicalEnergy;
 	Data<Real> ChemicalForce;
 	Real weightChemical;
-	int ChemicalEnergyCalculate();
 	int ChemicalForceCalculate();
 	
 	GTensorB	B;
-	Data<Real> 	ElasticEnergy;
+	//Data<Real> 	ElasticEnergy;
 	Data<Real> 	ElasticForce;
 	Real 		weightElastic;
 	int 		ElasticEnergyCalculate();

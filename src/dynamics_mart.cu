@@ -1,12 +1,9 @@
 #define DEBUG 0
 #include"pub.h"
-#include"../include/datamain.th"
 #include<curand.h>
 #include<cufft.h>
 #include"random.h"
-//#include"tensorb.h"
 #include"gtensorb.h"
-
 #include"dynamics.h"
 #include"dynamics_mart.h"
 
@@ -57,14 +54,13 @@ int Dynamics_mart::Initialize(){
   Noise.InitRandom(4,VariantN,nx,ny,nz, 0, 0.001, 0,0);
 
   Gradient.Init(dimN,Data_HOST_DEV);
-  GradientEnergy.Init(dim,Data_HOST_DEV);
   GradientForce.Init(dimN,Data_HOST_DEV);
 
-  ChemicalEnergy.Init(dim,Data_HOST_DEV);
   ChemicalForce.Init(dimN,Data_HOST_DEV);
   /////////////////////////////////////////////////////////////////
   real C00=3.5f, C01=1.5f, C33=1.0f;//defaut values
   Data<Real> cijkl(4,3,3,3,3,Data_HOST_DEV); SetCalPos(Data_HOST);
+  cijkl=0.0f;
   cijkl(0,0,0,0) =C00; cijkl(1,1,1,1) =C00; cijkl(2,2,2,2) =C00;
   cijkl(0,0,1,1) =C01; cijkl(1,1,2,2) =C01; cijkl(2,2,0,0) =C01;
   cijkl(0,1,0,1) =C33; cijkl(1,2,1,2) =C33; cijkl(2,0,2,0) =C33;
@@ -83,8 +79,10 @@ int Dynamics_mart::Initialize(){
   GV<0>::LogAndError<<"Space structure tensor is calculating\n";
   B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
   GV<0>::LogAndError<<"Calculating of space structure tensor relating to the elastic terms is finished\n";
+  if (DEBUG){ 
+    B.DeviceToHost(); B.DumpFile("data.b"); 
+  }
   /////////////////////////////////////////////////////////////////
-  ElasticEnergy.Init(dim,Data_HOST_DEV);
   ElasticForce.Init(dimN,Data_HOST_DEV);
   Eta_RT.Init(dimN,Data_HOST_DEV);
   Eta_CT.Init(dimN,Data_HOST_DEV);
@@ -136,7 +134,6 @@ int Dynamics_mart::Initialize(){
 }
 
 Dynamics_mart::Dynamics_mart(){
-  //default weight values
 }
 Dynamics_mart::~Dynamics_mart(){
   if (planAll_Cuda) cufftDestroy(planAll_Cuda);
@@ -149,28 +146,18 @@ __global__ void Grad_Mart_Kernel(Real *Gradient_arr,  Real* Eta_arr,int *dim, Re
 	 (PPart(Eta_arr,dim,v,x+1,y,z)+PPart(Eta_arr,dim,v,x-1,y,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(2.0f* dx)/3.0f
 	+(PPart(Eta_arr,dim,v,x,y+1,z)+PPart(Eta_arr,dim,v,x,y-1,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(2.0f* dy)/3.0f	
 	+(PPart(Eta_arr,dim,v,x,y,z+1)+PPart(Eta_arr,dim,v,x,y,z-1)-2*PPart(Eta_arr,dim,v,x,y,z))/(2.0f* dz)/3.0f	; // */
-  /*PPart(Gradient_arr,dim,v,x,y,z)=
-	 (PPart(Eta_arr,dim,v,x+1,y,z)+PPart(Eta_arr,dim,v,x-1,y,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(dx^2)
-	+(PPart(Eta_arr,dim,v,x,y+1,z)+PPart(Eta_arr,dim,v,x,y-1,z)-2*PPart(Eta_arr,dim,v,x,y,z))/(dy^2)	
-	+(PPart(Eta_arr,dim,v,x,y,z+1)+PPart(Eta_arr,dim,v,x,y,z-1)-2*PPart(Eta_arr,dim,v,x,y,z))/(dz^2)	; // */
-
 }
 int Dynamics_mart::GradientCalculate(){
   dim3 bn(nx,ny,VariantN);
   dim3 tn(nz);
   Grad_Mart_Kernel<<<bn,tn>>>(Gradient.Arr_dev,  Eta->Arr_dev, Eta->Dimension_dev, dx,dy,dz);
-  if (DEBUG) Gradient.DeviceToHost();
   return 0;
 }
 
-int Dynamics_mart::GradientEnergyCalculate(){
-  return 0;
-};
 
 int Dynamics_mart::GradientForceCalculate(){
   GradientCalculate();
   GradientForce= Gradient;
-  if (DEBUG) GradientForce.DeviceToHost();
   return 0;
 }
 
@@ -178,86 +165,54 @@ int Dynamics_mart::LPCConstruct(){
   LPC[1]=0.02f *(Temperature-TransitionTemperature);
   return 0;
 }
-__global__ void ChemiEner_Mart_Kernel(Real *ChemE_arr,Real*Eta_arr,int v,Real a1, Real a2, Real a3){
-  int tid=blockIdx.x* gridDim.y* blockIdx.x + blockIdx.y* blockDim.x + threadIdx.x ;
-  int vn=gridDim.x*gridDim.y*blockDim.x;
-  Real term1=0.f,term2=0.f,term3=0.f;
-  for (int i=0; i<v; i++) term1=term1+(Eta_arr[tid+i*vn]^2);
-  for (int i=0; i<v; i++) term2=term2+(Eta_arr[tid+i*vn]^4);
-  term3=(term1^3);
-  ChemE_arr[tid]= a1* term1 - a2* term2 + a3* term3;
-}
-
-int Dynamics_mart::ChemicalEnergyCalculate(){
-  LPCConstruct();
-  dim3 bn(nx,ny);
-  dim3 tn(nz);
-  LPCConstruct();
-  ChemiEner_Mart_Kernel<<<bn,tn>>>(ChemicalEnergy.Arr_dev,Eta->Arr_dev,VariantN,LPC[1],LPC[2],LPC[3]);
-  if (DEBUG) ChemicalEnergy.DeviceToHost();
-
-  return 0;
-}
-
-__global__ void ChemiFor_Mart_Kernel(Real*ChemiForce_arr,Real*Eta_arr,int v,Real a1,Real a2,Real a3){// n1*n2*n3 each variant have an driving force
-  int tid=blockIdx.x* gridDim.y* blockDim.x
-	+ blockIdx.y* blockDim.x 
-	+ threadIdx.x ;
-  int vn=gridDim.x*gridDim.y*blockDim.x;
-  Real term3=0;
-  for (int i=0;i<v;i++)
-	term3=term3+(Eta_arr[tid+i*vn]^2);
-  for (int i=0;i<v;i++){
-	if (Eta_arr[tid+i*vn]<0){//1 2 3 and for energy it is 2 3 4 
-	  ChemiForce_arr[tid+i*vn]= Eta_arr[tid+i*vn]* ( a1 - a2* Eta_arr[tid+i*vn] + a3*term3 );
-	}else{//1 3 5  //For energy it is 2 4 6
-	  ChemiForce_arr[tid+i*vn]= Eta_arr[tid+i*vn]* ( a1 - a2*(Eta_arr[tid+i*vn]^2) + a3*(term3^2) );
-	} //(sqrt (/ 9608  37.5))
+__global__ void ChemiFor_Mart_Kernel(Real*ChemiForce_arr,
+    Real*Eta_arr,Real a1,Real a2,Real a3){// n1*n2*n3 each variant have an driving force
+  int x=blockIdx.x, y=blockIdx.y, z=threadIdx.x,v=blockIdx.z, nx=gridDim.x, ny=gridDim.y, nz=blockDim.x,nv=gridDim.z;
+  int tid=((v*nx+x)*ny+y)*nz+z;
+  // request the same memory at the same time will lead to nan at the wrost situation
+  ChemiForce_arr[tid]=0.0;
+  if (Eta_arr<=0){
+    for (int i=0;i<nv;i++) ChemiForce_arr[tid]+=(Eta_arr[((i*nx+x)*ny+y)*nz+z]^2);
+    ChemiForce_arr[tid]= Eta_arr[tid]*( a1 -a2*(Eta_arr[tid]^2) +a3*ChemiForce_arr[tid]);
+  }else{
+    for (int i=0;i<nv;i++) ChemiForce_arr[tid]+=(Eta_arr[((i*nx+x)*ny+y)*nz+z]);
+    ChemiForce_arr[tid]= Eta_arr[tid]*( a1 -a2*Eta_arr[tid] +a3*ChemiForce_arr[tid]);
   }
 }
 
 int Dynamics_mart::ChemicalForceCalculate(){
-  dim3 bn(nx,ny);
+  /////////////////////////
+  dim3 bn(nx,ny,VariantN);
   dim3 tn(nz);
   LPCConstruct();
-  ChemiFor_Mart_Kernel<<<bn,tn>>>(ChemicalForce.Arr_dev, Eta->Arr_dev, VariantN, LPC[1], LPC[2], LPC[3]);
-  if (DEBUG) ChemicalForce.DeviceToHost();
+  ChemiFor_Mart_Kernel<<<bn,tn>>>(ChemicalForce.Arr_dev, Eta->Arr_dev, LPC[1], LPC[2], LPC[3]);
   return 0;
 } //(* 2373 0.9)
 
 __global__ void ElaFor_Mart_Kernel(Complex *ReTerm,Complex*Eta_sq,Real* B){
-  int v=gridDim.x;
-  int nv= gridDim.x* gridDim.y *gridDim.z *blockDim.x;
-  int n=  gridDim.y *gridDim.z *blockDim.x;
-  int pvv = blockIdx.x;
-  int pn= blockIdx.y *gridDim.z*blockDim.x + blockIdx.z *blockDim.x + threadIdx.x;
-  ReTerm[pvv*n +pn] = 0;
+  int  nx=gridDim.x, ny=gridDim.y, nz=blockDim.x,nv=gridDim.z;
+  int x=blockIdx.x, y=blockIdx.y, z=threadIdx.x, v=blockIdx.z;
+  ReTerm[((v*nx+x)*ny+y)*nz+z] = 0;
   for (int i=0;i<v;i++)
-	ReTerm[pvv*n +pn] +=  B[pvv*nv + i*n +pn ]* Eta_sq[i*n + pn ];
+	ReTerm[((v*nx+x)*ny+y)*nz+z] +=  B[(((v*nv+i)*nx+x)*ny+y)*nz+z]* Eta_sq[((i*nx+x)*ny+y)*nz+z];
 }
 int Dynamics_mart::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
-  cudaThreadSynchronize();
-  if (DEBUG) Eta_CT.DeviceToHost();
   cufftExecC2C(planAll_Cuda,(cufftComplex*)Eta_CT.Arr_dev,(cufftComplex*)Eta_CT.Arr_dev,CUFFT_FORWARD);
-  if (DEBUG) Eta_CT.DeviceToHost();
-  dim3 bn(VariantN,nx,ny);
+  dim3 bn(nx,ny,VariantN);
   dim3 tn(nz);
-  cudaThreadSynchronize();
   Eta_CT = Eta_CT/Eta_CT.N()*VariantN;
-  cudaThreadSynchronize();
-  if (DEBUG) {Eta_CT.DeviceToHost();}
   ElaFor_Mart_Kernel<<<bn,tn>>>(ReciprocalTerm.Arr_dev,Eta_CT.Arr_dev,B.Arr_dev);
-  cudaThreadSynchronize();
-  if (DEBUG) ReciprocalTerm.DeviceToHost();
   cufftExecC2C(planAll_Cuda,(cufftComplex*)ReciprocalTerm.Arr_dev,(cufftComplex*)ReciprocalTerm.Arr_dev,CUFFT_INVERSE);
-  cudaThreadSynchronize();
-  if (DEBUG) ReciprocalTerm.DeviceToHost();
   ElasticForce = ReciprocalTerm* (*Eta);
-  cudaThreadSynchronize();
-  if (DEBUG) ElasticForce.DeviceToHost();
+  if (0){
+    Eta_CT.DeviceToHost();
+    ElasticForce.DeviceToHost();
 
+    Eta_CT.DumpFile("data.eta_squre");
+    ElasticForce.DumpFile("data.r_term");
+  }
   return 0;
 }
 
@@ -309,21 +264,30 @@ int Dynamics_mart::Calculate(){
   DislocationForceCalculate();
   ////////////////////////////
   Eta_RT=0.f;
-  if (weightGradient>0) Eta_RT += weightGradient*GradientForce; cudaThreadSynchronize();
-  if (weightChemical>0) Eta_RT += (0-weightChemical)*ChemicalForce; cudaThreadSynchronize();
-  if (weightElastic>0) Eta_RT  += (0-weightElastic)*ElasticForce; cudaThreadSynchronize();
-  if (weightDislocation>0) Eta_RT += (0-weightDislocation)*DislocationForce; cudaThreadSynchronize();
-  if (weightExternal>0) Eta_RT += (0-weightExternal)*ExternalForce; cudaThreadSynchronize();
+  if (weightGradient>0) Eta_RT += weightGradient*GradientForce; 
+  if (weightChemical>0) Eta_RT += (0-weightChemical)*ChemicalForce;
+  if (weightElastic>0) Eta_RT  += (0-weightElastic)*ElasticForce;
+  if (weightDislocation>0) Eta_RT += (0-weightDislocation)*DislocationForce; 
+  if (weightExternal>0) Eta_RT += (0-weightExternal)*ExternalForce; 
   if (weightNoise>0){
-	/*/dim3 bn(VariantN,Dimension[1],Dimension[2]); dim3 tn(Dimension[3]);
-	  fnoise<<<bn,tn>>>(Noise.Arr_dev);// */
 	Noise.NewNormal_device();
 	Eta_RT += weightNoise*0.0001* Noise;
   }
   (*Eta) += DeltaTime* Eta_RT;
   //defect block
   Block();
-
+  ///////////
+  if (DEBUG) {
+    GradientForce.DeviceToHost();
+    ChemicalForce.DeviceToHost();
+    ElasticForce.DeviceToHost();
+    Eta->DeviceToHost();
+    ///
+    GradientForce.DumpFile("data.gradient");
+    ChemicalForce.DumpFile("data.chemical");
+    ElasticForce.DumpFile("data.elastic");
+    Eta->DumpFile("data.eta");
+  }
   ///////////////////////////////
   return 0;
 }

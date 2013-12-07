@@ -1,7 +1,7 @@
 
 #compile setting
 CC = nvcc
-FLAGS = -g -G 
+FLAGS = -O2 
 SRCS = $(wildcard *.cu)
 OBJECTS = $(patsubst %.cu, %.o, $(SRCS))
 EXCU = gsi
@@ -14,7 +14,7 @@ dynamics.o: dynamics.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h
 	$(CC) $(FLAGS) -c $< -o $@
 dynamics_diffuse.o: dynamics_diffuse.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h random.h gtensorb.h dynamics_diffuse.h
 	$(CC) $(FLAGS) -c $< -o $@
-dynamics_mart.o: dynamics_mart.cu pub.h ./log_error.h ./../include/datamain.th ../include/datamain.th ../include/datanumbers.th ../include/datamath.th ../include/datatemp.th ../include/datamap.th random.h gtensorb.h dynamics.h dynamics_mart.h
+dynamics_mart.o: dynamics_mart.cu pub.h ./log_error.h ./../include/datamain.th random.h gtensorb.h dynamics.h dynamics_mart.h
 	$(CC) $(FLAGS) -c $< -o $@
 dynamics_multi.o: dynamics_multi.cu pub.h ./log_error.h ./../include/datamain.th dynamics.h dynamics_multi.h
 	$(CC) $(FLAGS) -c $< -o $@
