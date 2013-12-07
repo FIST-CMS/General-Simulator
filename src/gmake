@@ -12,8 +12,8 @@
 ##############################################
 sfix=".cu"
 flags="-O2 -g -G"
-flags="-O2"
 flags="-g -G"
+flags="-O2"
 excu="gsi"
 libs="-lcurand -lcufft"
 prefix="$HOME/bin"

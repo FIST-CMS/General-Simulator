@@ -47,7 +47,5 @@ string Dynamics_pow::Get(string var){
 }
 
 
-
-
-
 Dynamics_pow::~Dynamics_pow(){}
+

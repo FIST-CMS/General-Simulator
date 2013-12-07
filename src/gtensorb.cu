@@ -57,6 +57,10 @@ int GTensorB::InitB (int variantN1,int variantN2,
 					real a1, real a2, real a3,
 					 Data<Real> &tensor, Data<Real>&modulus ){
 
+  ////
+  tensor.HostToDevice();
+  modulus.HostToDevice();
+  ////
   Init(5,variantN1, variantN2, lx, ly, lz,Data_HOST_DEV);
   _gSquare.Init(3,lx,ly,lz,Data_HOST_DEV);
   unitVector.Init(4,lx,ly,lz,3,Data_HOST_DEV);
