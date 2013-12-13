@@ -47,7 +47,12 @@ string Dynamics_pow::Get(string var){
 }
 
 
+<<<<<<< HEAD
 
 
 
 Dynamics_pow::~Dynamics_pow(){}
+=======
+Dynamics_pow::~Dynamics_pow(){}
+
+>>>>>>> origin/master

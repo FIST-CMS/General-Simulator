@@ -15,12 +15,21 @@ using namespace DATA_NS;
 int Dynamics_cores::Initialize(){
   //para setting should be finished before or within this function
   string ss;
+<<<<<<< HEAD
   ss=(*Vars)["gridsize"];if (ss!="") { ss>>nx>>ny>>nz>>dx>>dy>>dz;} else {nx=ny=nz=16; dx=dy=dz=0.1;}
   ss=(*Vars)["variantn"];if (ss!="") { ss>>VariantN;} else {VariantN=4;}
   ss=(*Vars)["coresn"];	if (ss!="") { ss>>CoresN; }else { CoresN=5;}
   ss=(*Vars)["radius"];	if (ss!="") { ss>>Radius; }else { Radius=5;}
   ss=(*Vars)["concentration"];			if (ss!="") { ss>>Concentration1>>Concentration2; }else {Concentration1=0.2f; Concentration2 = 0.44f;}
   ss=(*Vars)["method"];  if (ss!="") { ss>>Method; } else { Method = "random"; }
+=======
+  ss=(*Vars)["gridsize"];    			if (ss!="") { ss>>nx>>ny>>nz>>dx>>dy>>dz;} else {nx=ny=nz=16; dx=dy=dz=0.1;}
+  ss=(*Vars)["variantn"];              if (ss!="") { ss>>VariantN;} else {VariantN=4;}
+  ss=(*Vars)["coresn"];				if (ss!="") { ss>>CoresN; }else { CoresN=5;}
+  ss=(*Vars)["radius"];				if (ss!="") { ss>>Radius; }else { Radius=5;}
+  ss=(*Vars)["concentration"];			if (ss!="") { ss>>Concentration1>>Concentration2; }else {Concentration1=0.2f; Concentration2 = 0.44f;}
+  ss=(*Vars)["method"];                if (ss!="") { ss>>Method; } else { Method = "random"; }
+>>>>>>> origin/master
   // it is called to initialize the --run-- function
   ///////////////////////////////////////////////////
   Eta = &((*Datas)["eta"]); // may create here
@@ -81,7 +90,11 @@ int Dynamics_cores::RegularCores1D(){
 	int ox,oy,oz;
 	ox=nx/2; oy=ny/2; oz= nz/CoresN/2+nx/CoresN*cn;
 	Cores(cn,0)=ox; Cores(cn,1)=oy; Cores(cn,2)=oz;
+<<<<<<< HEAD
 	int vtype=(int)floor(random()%VariantN);
+=======
+	int vtype=floor(random()%VariantN);
+>>>>>>> origin/master
 	vtype = cn % VariantN; // for debug????
 	for (int i=0;i<nx; i++)
 	  for (int j=0;j<ny; j++)
@@ -111,7 +124,11 @@ int Dynamics_cores::RegularCores2D(){
 	  oy= ny/CoresN/2+ny/CoresN*cn2;
 	  oz= nz/CoresN/2+nx/CoresN*cn1;
 	  Cores(cn1*CoresN+cn2,0)=ox; Cores(cn1*CoresN+cn2,1)=oy; Cores(cn1*CoresN+cn2,2)=oz;
+<<<<<<< HEAD
 	  int vtype=(int)floor(random()*VariantN);
+=======
+	  int vtype=floor(random()*VariantN);
+>>>>>>> origin/master
 	  for (int i=0;i<nx; i++)
 		for (int j=0;j<ny; j++)
 		  for (int k=0;k<nz; k++)
@@ -141,7 +158,11 @@ int Dynamics_cores::RegularCores3D(){
 		oy= ny/CoresN/2+ny/CoresN*cn2;
 		oz= nz/CoresN/2+nx/CoresN*cn1;
 		Cores((cn1*CoresN+cn2)*CoresN+cn3,0)=ox; Cores((cn1*CoresN+cn2)*CoresN+cn3,1)=oy; Cores((cn1*CoresN+cn2)*CoresN+cn3,2)=oz;
+<<<<<<< HEAD
 		int vtype=(int)floor(random()*VariantN);
+=======
+		int vtype=floor(random()*VariantN);
+>>>>>>> origin/master
 		for (int i=0;i<nx; i++)
 		  for (int j=0;j<ny; j++)
 			for (int k=0;k<nz; k++)

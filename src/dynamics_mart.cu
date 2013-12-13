@@ -16,6 +16,7 @@ int Dynamics_mart::Initialize(){
   //para setting should be finished before or within this function
   string ss;
   ss=(*Vars)["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
+<<<<<<< HEAD
   DeltaTime =0.01f; (*Vars)["deltatime"]>>=DeltaTime;
   TransitionTemperature=450.0f; (*Vars)["transitiontemperature"]>>=TransitionTemperature;
 
@@ -24,6 +25,17 @@ int Dynamics_mart::Initialize(){
   weightElastic=  100000.0f;  (*Vars)["weightelastic"]>>=weightElastic;
   weightDislocation= 1.0f; (*Vars)["weightdislocation"]>>=weightDislocation;
   weightNoise = 0.0001f; (*Vars)["weightnoise"]>>=weightNoise;
+=======
+
+  weightExternal= 0.f;
+  weightDislocation= 0.01f; (*Vars)["weightdislocation"]>>=weightDislocation;
+  weightNoise = 1.0f; (*Vars)["weightnoise"]>>=weightNoise;
+  DeltaTime =0.01f; (*Vars)["deltatime"]>>=DeltaTime;
+  weightGradient= 2.5f; (*Vars)["weightgradient"]>>=weightGradient;
+  weightChemical= 1.0f; (*Vars)["weightchemical"]>>=weightChemical;
+  weightElastic=  100000.0f;  (*Vars)["weightelastic"]>>=weightElastic;
+  TransitionTemperature=450.0f; (*Vars)["transitiontemperature"]>>=TransitionTemperature;
+>>>>>>> origin/master
   /////////////////////////////////////////////////////////
   LPC[2]=32.05f; LPC[3]=37.5f;
   ss=(*Vars)["coefficient"]; if (ss!="") ss>>LPC[1]>>LPC[2]>>LPC[3];
@@ -50,13 +62,20 @@ int Dynamics_mart::Initialize(){
   int dim[5]={3,nx,ny,nz};
   int dimN[6]={4,VariantN,nx,ny,nz};
 
+<<<<<<< HEAD
   Noise.InitRandom(4,VariantN,nx,ny,nz);
+=======
+  Noise.InitRandom(4,VariantN,nx,ny,nz, 0, 0.001, 0,0);
+>>>>>>> origin/master
 
   Gradient.Init(dimN,Data_HOST_DEV);
   GradientForce.Init(dimN,Data_HOST_DEV);
 
   ChemicalForce.Init(dimN,Data_HOST_DEV);
+<<<<<<< HEAD
   //ChemicalFreeEnergy.Init(dim,Data_DEV);
+=======
+>>>>>>> origin/master
   /////////////////////////////////////////////////////////////////
   real C00=3.5f, C01=1.5f, C33=1.0f;//defaut values
   Data<Real> cijkl(4,3,3,3,3,Data_HOST_DEV); SetCalPos(Data_HOST);
@@ -79,6 +98,12 @@ int Dynamics_mart::Initialize(){
   GV<0>::LogAndError<<"Space structure tensor is calculating\n";
   B.InitB(VariantN,VariantN,nx,ny,nz,dx.Re,dy.Re,dz.Re,vstrain,cijkl); 
   GV<0>::LogAndError<<"Calculating of space structure tensor relating to the elastic terms is finished\n";
+<<<<<<< HEAD
+=======
+  if (DEBUG){ 
+    B.DeviceToHost(); B.DumpFile("data.b"); 
+  }
+>>>>>>> origin/master
   /////////////////////////////////////////////////////////////////
   ElasticForce.Init(dimN,Data_HOST_DEV);
   Eta_RT.Init(dimN,Data_HOST_DEV);
@@ -127,6 +152,7 @@ int Dynamics_mart::Initialize(){
   DislocationForce.Init(dimN,Data_HOST_DEV);
   DislocationForceConst.Init(dimN,Data_HOST_DEV);
   DislocationForceInit(); //this only need one calculation
+<<<<<<< HEAD
 
   if (1&&DEBUG){
     SetCalPos(Data_HOST);
@@ -141,6 +167,8 @@ int Dynamics_mart::Initialize(){
 		  (*Eta)(v,i,j,k)=0.f;
     Eta->HostToDevice();
   }
+=======
+>>>>>>> origin/master
   return 0;
 }
 
@@ -168,7 +196,11 @@ int Dynamics_mart::GradientCalculate(){
 
 int Dynamics_mart::GradientForceCalculate(){
   GradientCalculate();
+<<<<<<< HEAD
   GradientForce= weightGradient* Gradient;
+=======
+  GradientForce= Gradient;
+>>>>>>> origin/master
   return 0;
 }
 
@@ -176,6 +208,7 @@ int Dynamics_mart::LPCConstruct(){
   LPC[1]=0.02f *(Temperature-TransitionTemperature);
   return 0;
 }
+<<<<<<< HEAD
 
 __global__ void ChemicalFreeEnergy_mart_kernel(Real*cfn,Real*eta, int VariantN){
   int x=blockIdx.x, y=blockIdx.y, z=threadIdx.x, nx=gridDim.x, ny=gridDim.y, nz=blockDim.x;
@@ -188,10 +221,15 @@ __global__ void ChemicalFreeEnergy_mart_kernel(Real*cfn,Real*eta, int VariantN){
 
 __global__ void ChemiFor_Mart_Kernel(Real*ChemiForce_arr,
     Real*Eta_arr,Real a1,Real a2,Real a3,Real weight){// n1*n2*n3 each variant have an driving force
+=======
+__global__ void ChemiFor_Mart_Kernel(Real*ChemiForce_arr,
+    Real*Eta_arr,Real a1,Real a2,Real a3){// n1*n2*n3 each variant have an driving force
+>>>>>>> origin/master
   int x=blockIdx.x, y=blockIdx.y, z=threadIdx.x,v=blockIdx.z, nx=gridDim.x, ny=gridDim.y, nz=blockDim.x,nv=gridDim.z;
   int tid=((v*nx+x)*ny+y)*nz+z;
   // request the same memory at the same time will lead to nan at the wrost situation
   ChemiForce_arr[tid]=0.0;
+<<<<<<< HEAD
   sqrt(abs(a1/(a2-a3)));
   for (int i=0;i<nv;i++) ChemiForce_arr[tid]+=((sqrt(abs(a1/(a2-a3)))*Eta_arr[((i*nx+x)*ny+y)*nz+z])^2);
   if (Eta_arr[tid]>=0){
@@ -200,17 +238,32 @@ __global__ void ChemiFor_Mart_Kernel(Real*ChemiForce_arr,
 	 *( a1 -a2*((sqrt(abs(a1/(a2-a3)))*Eta_arr[tid])^2) +a3*ChemiForce_arr[tid]);
   }else{//<0 power 2
     ChemiForce_arr[tid]= 1000.0*weight*a2*Eta_arr[tid]*Eta_arr[tid] ;
+=======
+  if (Eta_arr<=0){
+    for (int i=0;i<nv;i++) ChemiForce_arr[tid]+=(Eta_arr[((i*nx+x)*ny+y)*nz+z]^2);
+    ChemiForce_arr[tid]= Eta_arr[tid]*( a1 -a2*(Eta_arr[tid]^2) +a3*ChemiForce_arr[tid]);
+  }else{
+    for (int i=0;i<nv;i++) ChemiForce_arr[tid]+=(Eta_arr[((i*nx+x)*ny+y)*nz+z]);
+    ChemiForce_arr[tid]= Eta_arr[tid]*( a1 -a2*Eta_arr[tid] +a3*ChemiForce_arr[tid]);
+>>>>>>> origin/master
   }
 }
 
 int Dynamics_mart::ChemicalForceCalculate(){
   /////////////////////////
+<<<<<<< HEAD
   dim3 bvn(nx,ny,VariantN);
   dim3 bn(nx,ny);
   dim3 tn(nz);
   LPCConstruct();
   ChemiFor_Mart_Kernel<<<bvn,tn>>>(ChemicalForce.Arr_dev, Eta->Arr_dev, LPC[1], LPC[2], LPC[3],weightChemical);
   //ChemicalFreeEnergy_mart_kernel<<<bn,tn>>>(ChemicalFreeEnergy.Arr_dev,Eta->Arr_dev,VariantN);
+=======
+  dim3 bn(nx,ny,VariantN);
+  dim3 tn(nz);
+  LPCConstruct();
+  ChemiFor_Mart_Kernel<<<bn,tn>>>(ChemicalForce.Arr_dev, Eta->Arr_dev, LPC[1], LPC[2], LPC[3]);
+>>>>>>> origin/master
   return 0;
 } //(* 2373 0.9)
 
@@ -218,7 +271,11 @@ __global__ void ElaFor_Mart_Kernel(Complex *ReTerm,Complex*Eta_sq,Real* B){
   int  nx=gridDim.x, ny=gridDim.y, nz=blockDim.x,nv=gridDim.z;
   int x=blockIdx.x, y=blockIdx.y, z=threadIdx.x, v=blockIdx.z;
   ReTerm[((v*nx+x)*ny+y)*nz+z] = 0;
+<<<<<<< HEAD
   for (int i=0;i<nv;i++)
+=======
+  for (int i=0;i<v;i++)
+>>>>>>> origin/master
 	ReTerm[((v*nx+x)*ny+y)*nz+z] +=  B[(((v*nv+i)*nx+x)*ny+y)*nz+z]* Eta_sq[((i*nx+x)*ny+y)*nz+z];
 }
 int Dynamics_mart::ElasticForceCalculate(){
@@ -230,7 +287,18 @@ int Dynamics_mart::ElasticForceCalculate(){
   Eta_CT = Eta_CT/Eta_CT.N()*VariantN;
   ElaFor_Mart_Kernel<<<bn,tn>>>(ReciprocalTerm.Arr_dev,Eta_CT.Arr_dev,B.Arr_dev);
   cufftExecC2C(planAll_Cuda,(cufftComplex*)ReciprocalTerm.Arr_dev,(cufftComplex*)ReciprocalTerm.Arr_dev,CUFFT_INVERSE);
+<<<<<<< HEAD
   ElasticForce = - weightElastic* ReciprocalTerm* (*Eta);
+=======
+  ElasticForce = ReciprocalTerm* (*Eta);
+  if (0){
+    Eta_CT.DeviceToHost();
+    ElasticForce.DeviceToHost();
+
+    Eta_CT.DumpFile("data.eta_squre");
+    ElasticForce.DumpFile("data.r_term");
+  }
+>>>>>>> origin/master
   return 0;
 }
 
@@ -254,7 +322,11 @@ int Dynamics_mart::DislocationForceInit(){
 
 int Dynamics_mart::DislocationForceCalculate(){
   SetCalPos(Data_DEV);
+<<<<<<< HEAD
   DislocationForce = -weightDislocation*DislocationForceConst*(*Eta);
+=======
+  DislocationForce=DislocationForceConst*(*Eta);
+>>>>>>> origin/master
   return 0;
 }
 
@@ -274,12 +346,15 @@ int Dynamics_mart::Block(){
 }
 
 int Dynamics_mart::Calculate(){
+<<<<<<< HEAD
   if (1&&DEBUG) {
     Eta->DeviceToHost();
     Eta->DumpFile("data.eta.before");
   }
 
   SetCalPos(Data_DEV);
+=======
+>>>>>>> origin/master
   string ss;
   (*Vars)["temperature"]>>=Temperature; 
   GradientForceCalculate();
@@ -288,6 +363,7 @@ int Dynamics_mart::Calculate(){
   DislocationForceCalculate();
   ////////////////////////////
   Eta_RT=0.f;
+<<<<<<< HEAD
   Eta_RT += GradientForce;  
   Eta_RT += ChemicalForce;
   Eta_RT += ElasticForce;
@@ -295,24 +371,46 @@ int Dynamics_mart::Calculate(){
   //////////////
   Noise.NewNormal_device(); Eta_RT += weightNoise * Noise;
   //////////////
+=======
+  if (weightGradient>0) Eta_RT += weightGradient*GradientForce; 
+  if (weightChemical>0) Eta_RT += (0-weightChemical)*ChemicalForce;
+  if (weightElastic>0) Eta_RT  += (0-weightElastic)*ElasticForce;
+  if (weightDislocation>0) Eta_RT += (0-weightDislocation)*DislocationForce; 
+  if (weightExternal>0) Eta_RT += (0-weightExternal)*ExternalForce; 
+  if (weightNoise>0){
+	Noise.NewNormal_device();
+	Eta_RT += weightNoise*0.0001* Noise;
+  }
+>>>>>>> origin/master
   (*Eta) += DeltaTime* Eta_RT;
   //defect block
   Block();
   ///////////
+<<<<<<< HEAD
   if (1&&DEBUG) {
     GradientForce.DeviceToHost();
     ChemicalForce.DeviceToHost();
     ElasticForce.DeviceToHost();
     DislocationForce.DeviceToHost();
+=======
+  if (DEBUG) {
+    GradientForce.DeviceToHost();
+    ChemicalForce.DeviceToHost();
+    ElasticForce.DeviceToHost();
+>>>>>>> origin/master
     Eta->DeviceToHost();
     ///
     GradientForce.DumpFile("data.gradient");
     ChemicalForce.DumpFile("data.chemical");
     ElasticForce.DumpFile("data.elastic");
+<<<<<<< HEAD
     DislocationForce.DumpFile("data.dislocation");
     Eta->DumpFile("data.eta");
     Eta_RT = weightNoise * Noise; Eta_RT.DeviceToHost(); Eta_RT.DumpFile("data.noise");
     //string ss; cin>>ss;
+=======
+    Eta->DumpFile("data.eta");
+>>>>>>> origin/master
   }
   ///////////////////////////////
   return 0;
@@ -326,7 +424,12 @@ int Dynamics_mart::Fix(real progress){
   do{
 	ss>>mode;
 	if      (mode=="temperature"	){
+<<<<<<< HEAD
 	  real st,et; ss>>st>>et;
+=======
+	  real st,et; //start and end temperature
+	  ss>>st>>et;
+>>>>>>> origin/master
 	  ((*Vars)["temperature"])<<=(st+ progress*(et- st));
 	} else if (mode=="pressure"		){ 
 	} else{
@@ -340,12 +443,15 @@ int Dynamics_mart::Fix(real progress){
 string Dynamics_mart::Get(string ss){ // return the statistic info.
   string var; ss>>var;
   if (var == "temperature") return ToString(Temperature); 
+<<<<<<< HEAD
   if (var == "eta") return ToString(Eta->TotalDevice()/Eta->N()); 
   if (var == "gradient"   ) return ToString(GradientForce.TotalDevice()/GradientForce.N());
   if (var == "chemical"   ) return ToString(ChemicalForce.TotalDevice()/ChemicalForce.N());
   if (var == "elastic"    ) return ToString(ElasticForce.TotalDevice()/ElasticForce.N());
   if (var == "dislocation") return ToString(DislocationForce.TotalDevice()/DislocationForce.N());
   //if (var == "chemical.free.energy") return ToString(ChemicalFreeEnergy.TotalDevice()/ChemicalFreeEnergy.N());
+=======
+>>>>>>> origin/master
   else return "nan";
 }
 

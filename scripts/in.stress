@@ -2,9 +2,16 @@
 ##########################################################
 sys stress #assign the type of the system
 ##########################################################
+<<<<<<< HEAD
 set gridsize 64 64 64 0.2 0.2 0.2  #the length unit is in nm
 ###########################################################
 read eta dump.precipitate/eta.2000.data  #read the shape (order parameter)
+=======
+set gridsize 128 128 128 0.1 0.1 0.1  #the length unit is in nm
+set xi 4000.0
+###########################################################
+read eta data.eta.for.stress  #read the shape (order parameter)
+>>>>>>> origin/master
 ##########################################################
 readhere varianttensor
 3 4 3 3 
@@ -17,6 +24,12 @@ readhere varianttensor
 ###########################################################
 dump ./ 1 stress defect
 run
+<<<<<<< HEAD
 shell mv stress.1.data data.stress.for.mart
 shell mv defect.1.data data.defect.for.mart
+=======
+shell cp stress.final.data data.stress.for.mart
+shell cp defect.final.data data.defect.for.mart
+shell rm stress.final.data defect.final.data
+>>>>>>> origin/master
 

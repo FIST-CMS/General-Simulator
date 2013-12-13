@@ -3,6 +3,7 @@
 #device 0 #assign gpu device ID for cal. default 0. also ./gups in.script deviceID
 sys mart  #assign the type of the system
 ###########################################################
+<<<<<<< HEAD
 :steps=3000
 ###########################################################
 set gridsize 64 64 64 0.2 0.2 0.2  #the length unit is in nm
@@ -30,4 +31,31 @@ run {steps}
 #####################################
 set fix temperature 300 300 #assign the temperature route  
 run {steps}
+=======
+:steps=1000
+###########################################################
+set gridsize 64 64 64 0.1 0.1 0.1  #the length unit is in nm
+set transitiontemperature 450
+set deltatime 0.01
+set fix temperature 460 300 #assign the temperature route  
+set weightdislocation 1
+##########################################################
+#read dislocationstress data.stress.for.mart
+#read defect data.defect.for.mart
+###########################################################
+readhere varianttensor
+3 4 3 3
+0.00, 0.0063, 	0.0063 , 0.0063, 0.0, 0.0063  ,  0.0063, 0.0063, 0.0 
+0.00, 0.0063, 	-0.0063,  0.0063, 0.0, -0.0063, -0.0063, -0.0063, 0.0
+0.00, -0.0063, 0.0063 , -0.0063, 0.0, -0.0063,  0.0063, -0.0063, 0.0
+0.00, -0.0063, -0.0063,  -0.0063, 0.0, 0.0063,  -0.0063, 0.0063, 0.0
+######################################
+######################################
+info {steps/10} temperature # (/ 4 2)
+shell rm -rf dump_mart
+dump dump_mart 10 eta
+#####################################
+run {steps}
+shell cp dump_mart/eta.final.data data.eta.final
+>>>>>>> origin/master
 

@@ -22,16 +22,28 @@ int INPUT::Phrasing(string script){
 	///////////////////////
     string command; ss>>command;
 	if (command[0]==':'){ ss=command.substr(1)+" "+ss; command="expr";}
+<<<<<<< HEAD
 	///////////////////////
 	if 		(command== "expr"	 	)   { err= Vars.Evaluate(ss); }
 	///////////////////////
 	else if	(command== "shell"   	)   {err= Vars.shell(ss.c_str()); }
 	//////////////////////////////////////////////////////////////
 	else if (command== "log"			)	{GV<0>::LogAndError.On=true; }
+=======
+	Vars.ReplaceExpr(ss);  // all to be sub
+	///////////////////////
+	if 		(command== "expr"	 	)   { err= Vars.Evaluate(ss); }
+	///////////////////////
+	else if	(command== "shell"   	)   { err= system(ss.c_str()); }
+	//////////////////////////////////////////////////////////////
+	else if (command== "logon"		)	{ GV<0>::LogAndError.On=true; }
+	else if (command== "logoff"		)	{ GV<0>::LogAndError.On=false; }
+>>>>>>> origin/master
 	else if (command== "break"		)   { break; }
 	else if (command== "quit"		)   { err=Code_QUIT; break; }
 	//////////////////////////////////////////////////////////////
 	else if (command== "link"		)   { err=Gs.Link(ss); }
+<<<<<<< HEAD
 	/////////////////
 	else if (command== "info"     	)   { err=Gs.SetInfo(ss);  }
 	else if (command== "dump" 		)   { err=Gs.SetDump(ss);} 
@@ -39,13 +51,27 @@ int INPUT::Phrasing(string script){
 	else if (command== "set"			)   { err=Gs.Set(ss); } //in program
 	else if (command== "read"		)   { err=Gs.Read(ss);}
 	else if (command== "readhere"		)   { err=readhere(ss,script);}
+=======
+	/////////////
+	else if (command== "info"     	)   { err=Gs.SetInfo(ss);  }
+	else if (command== "dump" 		)   { err=Gs.SetDump(ss);} 
+	/////////////
+	else if (command== "set"		)   { err=Gs.Set(ss); } //in program
+	else if (command== "read"		)   { err=Gs.Read(ss);}
+	else if (command== "readhere"	)   { err=readhere(ss,script);}
+>>>>>>> origin/master
 	else if (command== "write"		)   { err=Gs.Write(ss);} 
 	else if (command== "writehere"	)   { err=Gs.WriteHere(ss);} 
 	//////////////////////////////////////////////////////////////
 	else if (command== "device"		)	{ err=device(ss); }
 	else if (command== "print"		)   { err=print(ss); } 
+<<<<<<< HEAD
 	else if (command== "sys"			)  	{ err=Gs.SetSys(ss); }
 	else if (command== "run"			)   { err=Gs.Run(ss);}
+=======
+	else if (command== "sys"		)  	{ err=Gs.SetSys(ss); }
+	else if (command== "run"		)   { err=Gs.Run(ss);}
+>>>>>>> origin/master
 	//////////////////////////////////////////////////////////////
 	else if (command== "loop"		) 	{ err=stat_loop(ss,script);}
 	else if (command== "while"		) 	{ err=stat_while(ss,script);}
@@ -60,11 +86,19 @@ int INPUT::Phrasing(string script){
 
 	/////////////////////////////////////////////////////////////////////////
 	if (err == Code_COMMAND_UNKNOW){
+<<<<<<< HEAD
 	  GV<0>::LogAndError<<"Error: "<<line<<" unknown\n"; 
 	  return Code_ERR;
 	}
 	if ( err == Code_ERR ) {
 	  GV<0>::LogAndError<<"Error: error in command \""<<line<<"\"\n"; 
+=======
+	  GV<0>::LogAndError<<"Erro: unknown command : "<<line<<"\n"; 
+	  return Code_ERR;
+	}
+	if ( err == Code_ERR ) {
+	  GV<0>::LogAndError<<"Error occured when excuting command \""<<line<<"\"\n"; 
+>>>>>>> origin/master
 	  return Code_ERR;
 	}
 	if (err == Code_QUIT ) return Code_QUIT;
@@ -76,6 +110,7 @@ int INPUT::Phrasing(string script){
 /////////////////////////////////////////////////////////////
 bool INPUT::getline(string &ss, string &script){
   if (script=="") return false;
+<<<<<<< HEAD
   int n=script.find("\n"),p;
   if (n<0&&script!="") n=script.length();
   ss=script.substr(0, n);
@@ -85,6 +120,12 @@ bool INPUT::getline(string &ss, string &script){
     if (Vars.ReplaceExpr(ss)<0) return Code_ERR;  // all to be sub
     while ((p=ss.find(",")) >=0)  ss[p]=' '; // coporate with standardize
   }
+=======
+  int n=script.find("\n");
+  if (n<0&&script!="") n=script.length();
+  ss=script.substr(0, n);
+  script.erase(0,n+1);
+>>>>>>> origin/master
   if (ss!=""&&GV<0>::LogAndError.On)
 	GV<0>::LogAndError<<">>>"<<ss<<"\n";
   return true;
@@ -94,7 +135,11 @@ int INPUT::standardize(string &script){
   int p;
   //repalce some cut as space
   //////////////////////////////////////////////////
+<<<<<<< HEAD
   //while ((p=script.find('\t'))>=0)  script[p]=' ';
+=======
+  while ((p=script.find('\t'))>=0)  script[p]=' ';
+>>>>>>> origin/master
   //////////////////////////////////////////////////
   while ((p=script.find(";")) >=0)  script[p]='\n';
   //////////////////////////////////////////////////
@@ -105,7 +150,11 @@ int INPUT::standardize(string &script){
 	p1=script.find("#");
   }
   //delete extra space
+<<<<<<< HEAD
   //while ((p=script.find("  "))>=0) script.erase(p,1);
+=======
+  while ((p=script.find("  "))>=0) script.erase(p,1);
+>>>>>>> origin/master
   ///delete space around operator is not practicle in this case, cause space is an important mark
   // delete space and other chars between two bracket---an expression
   int n_brack=0, pre_pos=-1,pos=0;
@@ -156,6 +205,10 @@ int INPUT::standardize(string &script){
 	}
 	pos++;
   }
+<<<<<<< HEAD
+=======
+  while ((p=script.find(",")) >=0)  script[p]=' ';
+>>>>>>> origin/master
   return 0;
 }
 /////////////////////////////////////////////////////////////
@@ -166,7 +219,11 @@ int INPUT::readhere(string sr,string &script){
   int 	index=0;
   sr>>varname;
   while (getline(ss,script)){
+<<<<<<< HEAD
 	while (ss!=""){
+=======
+	 while (ss!=""){
+>>>>>>> origin/master
 	   if (index==0) {
 		 ss>>ndim; arrays<<ndim<<" "; }
 	   else if (index<=ndim) {
@@ -296,6 +353,9 @@ int INPUT::print(string ss){
   GV<0>::LogAndError<<ss<<"\n";
   return err;
 }
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> origin/master

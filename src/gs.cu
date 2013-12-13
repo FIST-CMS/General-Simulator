@@ -167,7 +167,7 @@ int GS::WriteHere(string sm){
 
 int GS::Run(string ss){
   if (DynaName=="") {
-	GV<0>::LogAndError<<"Error: run before system setting\n";
+	GV<0>::LogAndError<<"Error: system not set\n";
 	return -1;
   }
   ////////////////////////////////////
@@ -219,7 +219,7 @@ int GS::RunFunc(string func ){
   Dynas[DynaPosition]->Datas = Datas; 
   Dynas[DynaPosition]->Vars= Vars; 
   if ( !DynasInited[DynaName] ){
-	GV<0>::LogAndError<<"Warning: Initialization function called\n";
+	GV<0>::LogAndError<<"Warning: Initialization function called before \"run\"\n";
 	Dynas[ DynaPosition]->Initialize();
 	DynasInited[ DynaName ] = true;
   }

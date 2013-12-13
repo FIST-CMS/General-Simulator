@@ -2,6 +2,7 @@
 
 #ifndef GS_RANDOM_EINS_H
 #define GS_RANDOM_EINS_H
+#include<curand.h>
 using namespace DATA_NS;
 namespace GS_NS{
 

@@ -45,7 +45,10 @@ namespace GS_NS{
 	Data<Real> ChemicalForce;
 	Real weightChemical;
 	int ChemicalForceCalculate();
+<<<<<<< HEAD
 	Data<Real> ChemicalFreeEnergy;
+=======
+>>>>>>> origin/master
 	
 	GTensorB	B;
 	//Data<Real> 	ElasticEnergy;

@@ -3,11 +3,10 @@
 #include"pub.h"
 #include"dynamics.h"
 ////////////////////////////////////////
-#include<curand.h>
+//#include<curand.h>
 #include<cufft.h>
 #include"random.h"
 #include"gtensorb.h"
-
 
 #include"dynamics_precipitate.h"
 
@@ -212,7 +211,6 @@ int Dynamics_precipitate::ConcentrationUpdate(){
   set_device(ConRan_CT.Arr_dev,Noise_n.Arr_dev, ConRan_CT.N());
   Con_CT = *Concentration; ///real((nx*ny*nz));
   ConLFE_CT = ConLFE;
-  if (DEBUG){ConRan_CT.DeviceToHost(); Con_CT.DeviceToHost(); ConLFE_CT.DeviceToHost(); }
   ///////////////////////////////////////////////////////////
   cufftExecC2C(plan_n,(cufftComplex*)ConRan_CT.Arr_dev,(cufftComplex*)ConRan_CT.Arr_dev, CUFFT_FORWARD); 
   cufftExecC2C(plan_n,(cufftComplex*)Con_CT.Arr_dev,(cufftComplex*)Con_CT.Arr_dev, CUFFT_FORWARD); 
@@ -221,8 +219,6 @@ int Dynamics_precipitate::ConcentrationUpdate(){
   divi_device(Con_CT.Arr_dev,Con_CT.Arr_dev,real(nx*ny*nz),Con_CT.N());
   divi_device(ConRan_CT.Arr_dev, ConRan_CT.Arr_dev,real(nx*ny*nz),ConRan_CT.N());
   divi_device(ConLFE_CT.Arr_dev, ConLFE_CT.Arr_dev,real(nx*ny*nz),ConLFE_CT.N());
-  if (DEBUG){ConRan_CT.DeviceToHost(); Con_CT.DeviceToHost(); ConLFE_CT.DeviceToHost(); }
-  if (DEBUG) { ConRan_CT=0.f; }
   /////////////////
   ///////////////////////////////////////////////////////////
   // the factor nx*ny*nz within the transformation
@@ -232,7 +228,6 @@ int Dynamics_precipitate::ConcentrationUpdate(){
   cufftExecC2C(plan_n,(cufftComplex*)Con_CT.Arr_dev, (cufftComplex*)Con_CT.Arr_dev, CUFFT_INVERSE);
   ///////////////////////////////////////////////////////////
   (*Concentration) = Con_CT; // / real(sqrt(nx*ny*nz)); // be done before the update
-  if (DEBUG) { Concentration->DeviceToHost(); }
   return 0;
 }
 
@@ -261,15 +256,12 @@ int Dynamics_precipitate::EtaUpdate(){
   ///////////////////////////////////////////////////////////
   ElasticTerm_CT = ( Xi * ElasticForce + EtaLFE); ///real(sqrt(nx*ny*nz));
   ///////////////////////////////////////////////////////////
-  if (DEBUG) { Eta_CT.DeviceToHost(); ElasticTerm_CT.DeviceToHost();ElasticForce.DeviceToHost(); EtaLFE.DeviceToHost(); }
   cufftExecC2C(plan_vn, (cufftComplex*)EtaRan_CT.Arr_dev,(cufftComplex*)EtaRan_CT.Arr_dev,CUFFT_FORWARD);
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_FORWARD);
   cufftExecC2C(plan_vn, (cufftComplex*)ElasticTerm_CT.Arr_dev, (cufftComplex*) ElasticTerm_CT.Arr_dev, CUFFT_FORWARD);
   divi_device(EtaRan_CT.Arr_dev , EtaRan_CT.Arr_dev,real(nx*ny*nz),EtaRan_CT.N());
   divi_device(Eta_CT.Arr_dev,Eta_CT.Arr_dev, real(nx*ny*nz),Eta_CT.N());
   divi_device(ElasticTerm_CT.Arr_dev, ElasticTerm_CT.Arr_dev,real(nx*ny*nz),ElasticTerm_CT.N());
-  if (DEBUG) { Eta_CT.DeviceToHost(); ElasticTerm_CT.DeviceToHost(); }
-  if (DEBUG) { SetCalPos(Data_DEV); EtaRan_CT=0.f; }
   ///////////////////////////////////////////////////////////
   dim3 bn(nx,ny,VariantN), tn(nz);
   EtaUpdate_Diffuse_Kernel<<<bn,tn>>>
@@ -279,7 +271,6 @@ int Dynamics_precipitate::EtaUpdate(){
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_INVERSE);
   ///////////////////////////////////////////////////////////
   (*Eta)=Eta_CT;
-  if (DEBUG) { Eta->DeviceToHost(); }
   return 0;
 }
 

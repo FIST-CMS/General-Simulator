@@ -11,10 +11,17 @@
 #include"dynamics.h"
 //GS_SYS_DEFINE_START
 #include"dynamics_cores.h"
+<<<<<<< HEAD
 #include"dynamics_mart.h"
 #include"dynamics_multi.h"
 #include"dynamics_pow.h"
 #include"dynamics_precipitate.h"
+=======
+#include"dynamics_diffuse.h"
+#include"dynamics_mart.h"
+#include"dynamics_multi.h"
+#include"dynamics_pow.h"
+>>>>>>> origin/master
 #include"dynamics_stress.h"
 #include"dynamics_xxx.h"
 //GS_SYS_DEFINE_END

@@ -5,6 +5,10 @@
 #ifndef DATA_Eins_H
 #define DATA_Eins_H
 
+<<<<<<< HEAD
+=======
+//#include<stdio.h>
+>>>>>>> origin/master
 #include<stdarg.h>
 #include<iostream>
 #include<fstream>
@@ -178,9 +182,13 @@ namespace DATA_NS{
 	template<class istype,class etype> friend istype &operator>>(istype &is,Data<etype>&data);
 	//Read(Dump) in(out) directly with file
 	int  ReadFile(string filename);
+<<<<<<< HEAD
 	int  BinaryReadFile(string filename);
 	int  DumpFile(string filename);
 	int  BinaryDumpFile(string filename);
+=======
+	int  DumpFile(string filename);
+>>>>>>> origin/master
   };
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
@@ -328,10 +336,13 @@ namespace DATA_NS{
 
   // Write Data to a File  (read from a file)
   template<class type> int Data<type>::DumpFile(string filename){
+<<<<<<< HEAD
     if (Dimension==NULL){ 
 	 cerr<<"Error: data not initilized while dumping\n"; 
 	 return -1;
     }
+=======
+>>>>>>> origin/master
     ofstream os(filename.c_str());
     for (int i=0; i<= Dimension[0]; i++)
 	 os<<Dimension[i]<<" ";
@@ -341,6 +352,7 @@ namespace DATA_NS{
     os.close();
     return 0;
   }
+<<<<<<< HEAD
   template<class type> int Data<type>::BinaryDumpFile(string filename){
     if (Dimension==NULL){ 
 	 cerr<<"Error: data not initilized while dumping\n"; 
@@ -356,6 +368,8 @@ namespace DATA_NS{
     return 0;
   }
 
+=======
+>>>>>>> origin/master
   template<class type> int Data<type>::ReadFile(string filename){
     ifstream ifs;
     ifs.open(filename.c_str());
@@ -363,6 +377,7 @@ namespace DATA_NS{
 	  ifs>>(*this); // all done by >>
 	  ifs.close();
     }else{
+<<<<<<< HEAD
 	 cerr<<"Error: \""<<filename<<"\" not found!\n";
 	 return -1;
     }
@@ -394,13 +409,22 @@ namespace DATA_NS{
     Arr = new type[ Dimension[n+1] ];
     ifs.read((char*)&Arr[0],Dimension[n+1]*sizeof(type));
     ifs.close();
+=======
+	 cerr<<"File "<<filename<<" not found!\n";
+	 return -1;
+    }
+>>>>>>> origin/master
     return 0;
   }
 
   //overload <<  >>
   template<class ostype,class etype> ostype &operator<<(ostype &os, Data<etype> &data){
      if (data.Dimension==NULL){ // not assigned space
+<<<<<<< HEAD
 	  cerr<<"Error: no element for <<\n";
+=======
+	  cerr<<"no data\n";
+>>>>>>> origin/master
 	  return os;
 	}
 	for (int i=0; i<= data.Dimension[0]; i++)
