@@ -3,19 +3,18 @@
 #include"pub.h"
 #include"dynamics.h"
 ////////////////////////////////////////
-#include<curand.h>
+//#include<curand.h>
 #include<cufft.h>
 #include"random.h"
 #include"gtensorb.h"
 
-
-#include"dynamics_diffuse.h"
+#include"dynamics_precipitate.h"
 
 
 using namespace GS_NS;
 using namespace DATA_NS;
 
-int Dynamics_diffuse::Initialize(){
+int Dynamics_precipitate::Initialize(){
   //para setting should be finished before or within this function
   string ss;
   ss=(*Vars)["gridsize"];    			if (ss!="") ss>>nx>>ny>>nz>>dx>>dy>>dz;
@@ -110,8 +109,8 @@ int Dynamics_diffuse::Initialize(){
 
 }
 
-Dynamics_diffuse::Dynamics_diffuse(){}
-Dynamics_diffuse::~Dynamics_diffuse(){
+Dynamics_precipitate::Dynamics_precipitate(){}
+Dynamics_precipitate::~Dynamics_precipitate(){
   if (plan_n) cufftDestroy(plan_n);
   if (plan_vn) cufftDestroy(plan_vn);
 }
@@ -127,7 +126,7 @@ __global__ void LocalConFreeEnergyCalculate_Diffuse_Kernel(Real * ConLFE, Real *
   ConLFE[ tid ]+= A1 * ( Concentration[tid] - Concentration1);
 }
 
-int Dynamics_diffuse::LocalConFreeEnergyCalculate(){
+int Dynamics_precipitate::LocalConFreeEnergyCalculate(){
   dim3 bn(nx,ny), tn(nz);
   LocalConFreeEnergyCalculate_Diffuse_Kernel<<<bn,tn>>>
 	(ConLFE.Arr_dev, Eta->Arr_dev, Concentration->Arr_dev, A[1], A[2], Concentration1, VariantN);
@@ -162,13 +161,9 @@ __global__ void LocalEtaFreeEnergyCalculate_Diffuse_Kernel
 	+(A4 * (Eta[ntid]^5));
 }
 
-int Dynamics_diffuse::LocalEtaFreeEnergyCalculate(){
+int Dynamics_precipitate::LocalEtaFreeEnergyCalculate(){
   dim3 bn(nx,ny,VariantN), tn(nz,1,1);
   LocalEtaFreeEnergyCalculate_Diffuse_Kernel<<<bn,tn>>>(EtaLFE.Arr_dev,Eta->Arr_dev,Concentration->Arr_dev,A[1],A[2],A[3],A[4],A[5],A[6],A[7],Concentration2);
-#ifdef DEBUG
-  if (DEBUG)
-	EtaLFE.DeviceToHost();
-#endif
   return 0;
 }
 
@@ -178,11 +173,11 @@ __global__ void ElasticEnergyForceCalculate_Diffuse_Kernel(Complex *RTerm,Comple
   int x = blockIdx.x, y = blockIdx.y, z = threadIdx.x, v = blockIdx.z;
   RTerm[((v*nx+x)*ny+y)*nz+z]=0.f;
   for (int i=0;i<VariantN;i++){
-	RTerm[((v*nx+x)*ny+y)*nz+z]+=B[(((v*VariantN+i)*nx+x)*ny+y)*nz+z]* Eta_sq[((v*nx+x)*ny+y)*nz+z];
+	RTerm[((v*nx+x)*ny+y)*nz+z]+=B[(((v*VariantN+i)*nx+x)*ny+y)*nz+z]* Eta_sq[((i*nx+x)*ny+y)*nz+z];
   }
 }
 
-int Dynamics_diffuse::ElasticForceCalculate(){
+int Dynamics_precipitate::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
   ///////////////////////////////////////////////////////////////
@@ -210,13 +205,12 @@ __global__ void ConcentrationUpdate_Diffuse_Kernel(Complex *Con_CT, Complex* Con
 	/ ( 1.0f + dt * meta * beta * gSquare[tid] * gSquare[tid] );
 }
 
-int Dynamics_diffuse::ConcentrationUpdate(){
+int Dynamics_precipitate::ConcentrationUpdate(){
   SetCalPos(Data_DEV);
   Noise_n.NewNormal_device(); cudaThreadSynchronize();
   set_device(ConRan_CT.Arr_dev,Noise_n.Arr_dev, ConRan_CT.N());
   Con_CT = *Concentration; ///real((nx*ny*nz));
   ConLFE_CT = ConLFE;
-  if (DEBUG){ConRan_CT.DeviceToHost(); Con_CT.DeviceToHost(); ConLFE_CT.DeviceToHost(); }
   ///////////////////////////////////////////////////////////
   cufftExecC2C(plan_n,(cufftComplex*)ConRan_CT.Arr_dev,(cufftComplex*)ConRan_CT.Arr_dev, CUFFT_FORWARD); 
   cufftExecC2C(plan_n,(cufftComplex*)Con_CT.Arr_dev,(cufftComplex*)Con_CT.Arr_dev, CUFFT_FORWARD); 
@@ -225,8 +219,6 @@ int Dynamics_diffuse::ConcentrationUpdate(){
   divi_device(Con_CT.Arr_dev,Con_CT.Arr_dev,real(nx*ny*nz),Con_CT.N());
   divi_device(ConRan_CT.Arr_dev, ConRan_CT.Arr_dev,real(nx*ny*nz),ConRan_CT.N());
   divi_device(ConLFE_CT.Arr_dev, ConLFE_CT.Arr_dev,real(nx*ny*nz),ConLFE_CT.N());
-  if (DEBUG){ConRan_CT.DeviceToHost(); Con_CT.DeviceToHost(); ConLFE_CT.DeviceToHost(); }
-  if (DEBUG) { ConRan_CT=0.f; }
   /////////////////
   ///////////////////////////////////////////////////////////
   // the factor nx*ny*nz within the transformation
@@ -236,7 +228,6 @@ int Dynamics_diffuse::ConcentrationUpdate(){
   cufftExecC2C(plan_n,(cufftComplex*)Con_CT.Arr_dev, (cufftComplex*)Con_CT.Arr_dev, CUFFT_INVERSE);
   ///////////////////////////////////////////////////////////
   (*Concentration) = Con_CT; // / real(sqrt(nx*ny*nz)); // be done before the update
-  if (DEBUG) { Concentration->DeviceToHost(); }
   return 0;
 }
 
@@ -256,7 +247,7 @@ __global__ void EtaUpdate_Diffuse_Kernel(
 	/(1.0f + DeltaTime* lpp* arfi * gSquare[ntid] );
 }
 
-int Dynamics_diffuse::EtaUpdate(){
+int Dynamics_precipitate::EtaUpdate(){
   SetCalPos(Data_DEV);
   Noise_vn.NewNormal_device();
   set_device(EtaRan_CT.Arr_dev, Noise_vn.Arr_dev, EtaRan_CT.N());
@@ -265,15 +256,12 @@ int Dynamics_diffuse::EtaUpdate(){
   ///////////////////////////////////////////////////////////
   ElasticTerm_CT = ( Xi * ElasticForce + EtaLFE); ///real(sqrt(nx*ny*nz));
   ///////////////////////////////////////////////////////////
-  if (DEBUG) { Eta_CT.DeviceToHost(); ElasticTerm_CT.DeviceToHost();ElasticForce.DeviceToHost(); EtaLFE.DeviceToHost(); }
   cufftExecC2C(plan_vn, (cufftComplex*)EtaRan_CT.Arr_dev,(cufftComplex*)EtaRan_CT.Arr_dev,CUFFT_FORWARD);
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_FORWARD);
   cufftExecC2C(plan_vn, (cufftComplex*)ElasticTerm_CT.Arr_dev, (cufftComplex*) ElasticTerm_CT.Arr_dev, CUFFT_FORWARD);
   divi_device(EtaRan_CT.Arr_dev , EtaRan_CT.Arr_dev,real(nx*ny*nz),EtaRan_CT.N());
   divi_device(Eta_CT.Arr_dev,Eta_CT.Arr_dev, real(nx*ny*nz),Eta_CT.N());
   divi_device(ElasticTerm_CT.Arr_dev, ElasticTerm_CT.Arr_dev,real(nx*ny*nz),ElasticTerm_CT.N());
-  if (DEBUG) { Eta_CT.DeviceToHost(); ElasticTerm_CT.DeviceToHost(); }
-  if (DEBUG) { SetCalPos(Data_DEV); EtaRan_CT=0.f; }
   ///////////////////////////////////////////////////////////
   dim3 bn(nx,ny,VariantN), tn(nz);
   EtaUpdate_Diffuse_Kernel<<<bn,tn>>>
@@ -283,12 +271,11 @@ int Dynamics_diffuse::EtaUpdate(){
   cufftExecC2C(plan_vn, (cufftComplex*)Eta_CT.Arr_dev, (cufftComplex*)Eta_CT.Arr_dev, CUFFT_INVERSE);
   ///////////////////////////////////////////////////////////
   (*Eta)=Eta_CT;
-  if (DEBUG) { Eta->DeviceToHost(); }
   return 0;
 }
 
 
-int Dynamics_diffuse::Calculate(){
+int Dynamics_precipitate::Calculate(){
   string ss;
   (*Vars)["temperature"]>>=Temperature; 
   LocalConFreeEnergyCalculate();
@@ -301,10 +288,10 @@ int Dynamics_diffuse::Calculate(){
   return 0;
 }
 
-int Dynamics_diffuse::RunFunc(string funcName){ return 0;}
+int Dynamics_precipitate::RunFunc(string funcName){ return 0;}
 
 
-int Dynamics_diffuse::Fix(real progress){
+int Dynamics_precipitate::Fix(real progress){
   string ss,mode;
   ss = (*Vars)["fix"];
   while( ss!= "" ){
@@ -322,9 +309,9 @@ int Dynamics_diffuse::Fix(real progress){
   return 0;
 }
 
-string Dynamics_diffuse::Get(string ss){ // return the statistic info.
-  string ans="";
+string Dynamics_precipitate::Get(string ss){ // return the statistic info.
   string var; ss>>var;
-  if (var == "temperature") return ans<<Temperature; 
+  if (var == "temperature") return ToString(Temperature); 
+  if (var == "eta_average") return ToString(Eta->TotalDevice()/Eta->N());
   else return "nan";
 }

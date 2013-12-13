@@ -6,6 +6,18 @@
 using namespace GS_NS;
 using namespace DATA_NS;
 
+<<<<<<< HEAD
+int Random::InitRandom(int *dimArr, real mean, real variance,int seed_host,int seed_dev){
+  curandCreateGenerator(&Gen_dev,CURAND_RNG_PSEUDO_DEFAULT);
+  curandCreateGeneratorHost(&Gen_host,CURAND_RNG_PSEUDO_DEFAULT);
+  curandSetPseudoRandomGeneratorSeed(Gen_dev,seed_dev);
+  curandSetPseudoRandomGeneratorSeed(Gen_host,seed_host);
+  Init(dimArr,Data_HOST_DEV);
+  Mean=mean;
+  Variance=variance;
+  Seed_dev=seed_dev;
+  Seed_host=seed_host;
+=======
 int Random::InitRandom(int *dimArr, real mean, real variance,real Seed_host,real Seed_dev){
   curandCreateGenerator(&Gen_dev,CURAND_RNG_PSEUDO_DEFAULT);
   curandCreateGeneratorHost(&Gen_host,CURAND_RNG_PSEUDO_DEFAULT);
@@ -14,14 +26,22 @@ int Random::InitRandom(int *dimArr, real mean, real variance,real Seed_host,real
   Init(dimArr,Data_HOST_DEV);
   Mean=mean;
   Variance=variance;
+>>>>>>> origin/master
   return 0;
 }
 
 Random::Random(){
+<<<<<<< HEAD
+  Mean=0.0f;
+  Variance=1.0f;
+  Seed_dev=0;
+  Seed_host=0;
+=======
   Mean=0.0;
   Variance=1.0;
   Seed_dev=0.0;
   Seed_host=0.0;
+>>>>>>> origin/master
   Gen_host = NULL;
   Gen_dev  = NULL;
 }
@@ -41,7 +61,11 @@ int Random::InitRandom(int n, ...){
   delete[]arr;
   return 0;
 }
+<<<<<<< HEAD
+int Random::SetParas(real mean,real variance,int seed_host,int seed_dev){
+=======
 int Random::SetParas(real mean,real variance,real seed_host,real seed_dev){
+>>>>>>> origin/master
   Mean=mean;
   Variance=variance;
   Seed_host=seed_host;

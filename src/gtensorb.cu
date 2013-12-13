@@ -99,7 +99,10 @@ int GTensorB::InitB (int variantN1,int variantN2,
 	 );
 
   DeviceToHost();
+<<<<<<< HEAD
+=======
   //DumpFile("data.structure.factor");
+>>>>>>> origin/master
   return 0;
   
 }

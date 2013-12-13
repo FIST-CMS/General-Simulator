@@ -30,13 +30,23 @@ namespace GS_NS{
 	int SubVar(string &ss,int start_words_num,int num);
 	int Calculate(string ss,string &value);
 	////////////////////////////////////////////////////
+<<<<<<< HEAD
+	int shell(string ss);
+	int shell(string ss,string&result);
+=======
+>>>>>>> origin/master
 	int Evaluate(string &ss);
 	int ReplaceExpr(string &ss);
   };
   class ExprTree{
   public:
 	string 	Expr;
+<<<<<<< HEAD
+	//real 	Val;
+	double 	Val;
+=======
 	real 	Val;
+>>>>>>> origin/master
 	string 	Opera;
 	ExprTree *Left, *Right;
 	ExprTree();

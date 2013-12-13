@@ -1,0 +1,7 @@
+set log off
+print `date`
+:x1=`date +%s`
+shell sleep 3
+print `date`
+:x2=`date +%s`
+print since time point {x1} to time point {x2}, {x2-x1} seconds have passed.

@@ -5,7 +5,10 @@
 #ifndef DATA_Eins_H
 #define DATA_Eins_H
 
+<<<<<<< HEAD
+=======
 //#include<stdio.h>
+>>>>>>> origin/master
 #include<stdarg.h>
 #include<iostream>
 #include<fstream>
@@ -179,7 +182,13 @@ namespace DATA_NS{
 	template<class istype,class etype> friend istype &operator>>(istype &is,Data<etype>&data);
 	//Read(Dump) in(out) directly with file
 	int  ReadFile(string filename);
+<<<<<<< HEAD
+	int  BinaryReadFile(string filename);
 	int  DumpFile(string filename);
+	int  BinaryDumpFile(string filename);
+=======
+	int  DumpFile(string filename);
+>>>>>>> origin/master
   };
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////
@@ -327,6 +336,13 @@ namespace DATA_NS{
 
   // Write Data to a File  (read from a file)
   template<class type> int Data<type>::DumpFile(string filename){
+<<<<<<< HEAD
+    if (Dimension==NULL){ 
+	 cerr<<"Error: data not initilized while dumping\n"; 
+	 return -1;
+    }
+=======
+>>>>>>> origin/master
     ofstream os(filename.c_str());
     for (int i=0; i<= Dimension[0]; i++)
 	 os<<Dimension[i]<<" ";
@@ -336,6 +352,24 @@ namespace DATA_NS{
     os.close();
     return 0;
   }
+<<<<<<< HEAD
+  template<class type> int Data<type>::BinaryDumpFile(string filename){
+    if (Dimension==NULL){ 
+	 cerr<<"Error: data not initilized while dumping\n"; 
+	 return -1;
+    }
+    ofstream os(filename.c_str(),ios::binary);
+    //for (int i=0; i<= Dimension[0]; i++) os<<Dimension[i]<<" ";
+    //os<<endl;
+    //for ( int i = 0; i < N() ; i++) os<<Arr[i]<<endl;
+    os.write((char*)&Dimension[0],(Dimension[0]+1)*sizeof(int));
+    os.write((char*)&Arr[0],N()*sizeof(type));
+    os.close();
+    return 0;
+  }
+
+=======
+>>>>>>> origin/master
   template<class type> int Data<type>::ReadFile(string filename){
     ifstream ifs;
     ifs.open(filename.c_str());
@@ -343,16 +377,54 @@ namespace DATA_NS{
 	  ifs>>(*this); // all done by >>
 	  ifs.close();
     }else{
+<<<<<<< HEAD
+	 cerr<<"Error: \""<<filename<<"\" not found!\n";
+	 return -1;
+    }
+    return 0;
+  }
+
+  template<class type> int Data<type>::BinaryReadFile(string filename){
+    ifstream ifs;
+    ifs.open(filename.c_str(),ios::binary);
+    if (!ifs){
+	 cerr<<"Error: \""<<filename<<"\" not found!\n";
+	 return -1;
+    }
+    if ( Arr != NULL ) { delete []Arr; Arr=NULL;}
+    if ( Arr_dev != NULL ) {cudaFree(Arr_dev); Arr_dev=NULL;}
+    if ( Dimension != NULL ) {delete []Dimension;Dimension=NULL;}
+    if ( Dimension_dev != NULL ){ cudaFree(Dimension_dev);Dimension_dev=NULL;}
+    /////////////////////
+    int n; 
+    ifs.read((char*)&n,sizeof(int));
+    Dimension	=	new int[n+2];
+    Dimension[0]	=	n;
+    ifs.read((char*)&Dimension[1],n*sizeof(int));
+    Dimension[n+1]=	1; for (int i = 1; i <= n ; i++) Dimension[n+1]*=Dimension[i];
+    Position		=	Data_HOST;
+
+    cudaMalloc((void**)&Dimension_dev,sizeof(int)*(n+2) 	);
+    cudaMemcpy(Dimension_dev,Dimension,sizeof(int)*(n+2) ,cudaMemcpyHostToDevice);
+    Arr = new type[ Dimension[n+1] ];
+    ifs.read((char*)&Arr[0],Dimension[n+1]*sizeof(type));
+    ifs.close();
+=======
 	 cerr<<"File "<<filename<<" not found!\n";
 	 return -1;
     }
+>>>>>>> origin/master
     return 0;
   }
 
   //overload <<  >>
   template<class ostype,class etype> ostype &operator<<(ostype &os, Data<etype> &data){
      if (data.Dimension==NULL){ // not assigned space
+<<<<<<< HEAD
+	  cerr<<"Error: no element for <<\n";
+=======
 	  cerr<<"no data\n";
+>>>>>>> origin/master
 	  return os;
 	}
 	for (int i=0; i<= data.Dimension[0]; i++)

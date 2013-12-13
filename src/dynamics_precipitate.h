@@ -1,12 +1,12 @@
 
-#ifndef DYNAMICS_DIFFUSE_Eins_H
-#define DYNAMICS_DIFFUSE_Eins_H
+#ifndef DYNAMICS_precipitate_Eins_H
+#define DYNAMICS_precipitate_Eins_H
 
 using namespace DATA_NS;
 
 namespace GS_NS{
 
-  class Dynamics_diffuse: public Dynamics {//total energy for its main definition
+  class Dynamics_precipitate: public Dynamics {//total energy for its main definition
   public:
 	// virtual functions need to be overriden
 	virtual int Initialize();
@@ -17,8 +17,8 @@ namespace GS_NS{
 	///////////////////////
 	//virtual int Set(string);
 
-	Dynamics_diffuse();
-	~Dynamics_diffuse();
+	Dynamics_precipitate();
+	~Dynamics_precipitate();
 	// eta and con free chemical free energy
 
 	int 		VariantN;

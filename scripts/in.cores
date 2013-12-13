@@ -1,5 +1,20 @@
 
 ##########################################################
+<<<<<<< HEAD
+sys cores 
+##########################################################
+set gridsize 64 64 64 0.2 0.2 0.2 
+set variantn 4
+set coresn 2
+set radius 10
+set concentration 0.2 0.44
+set method random
+##########################################################
+dump ./ 1 eta concentration 
+run
+shell mv concentration.1.data data.con.for.precipitate
+shell mv eta.1.data data.eta.for.precipitate
+=======
 sys cores #assign the type of the system
 ##########################################################
 set gridsize 128 128 128 0.1 0.1 0.1  #the length unit is in nm
@@ -15,4 +30,5 @@ run
 shell cp concentration.final.data data.con.for.diffuse
 shell cp eta.final.data data.eta.for.diffuse
 shell rm eta.final.data concentration.final.data
+>>>>>>> origin/master
 

@@ -1,0 +1,27 @@
+This is the General-Simulator package.
+
+All rights reserved ... ...
+
+-------------------------------------------------------------------
+
+GS is a code designed to seperate the modeling and coding procedure
+in scientific calculating. It is coding with cuda C and can runs
+efficiently on computures with cuda devices. It was developed at 
+Center of Microsstructure Science, a department of Xi'an Jiaotong 
+University. 
+
+The primary author of the code is Xiao, Hu, who can be emailed at
+einsxiao@gmial.com||einsxiao@stu.xjtu.edu.cn
+...
+
+The GS distribution includes the following files and directories:
+
+README 				this file
+LICENSE				...
+include				header files GS included
+scripts				script examples 
+src					source files
+doc					documentation
+
+
+

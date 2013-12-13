@@ -47,11 +47,8 @@ int GS::DumpOut(){
 	  if ((*Datas)[ss].Position==Data_DEV)
 		(*Datas)[ss].DeviceToHost();
 	  string file; file<<DumpFolder<<"/"<<ss<<"."<<CurrentStep<<".data";
-	  if (CurrentStep==TotalSteps) {
-		file="";
-		file<<DumpFolder<<"/"<<ss<<".final.data";
-	  }
-	  (*Datas)[ss].DumpFile(file);
+	  if (BinaryMode) (*Datas)[ss].BinaryDumpFile(file);
+	  else (*Datas)[ss].DumpFile(file);
 	}else GV<0>::LogAndError<<"Error: data "<<ss<<" does not exist!\n";
   }
   return 0;
@@ -73,10 +70,10 @@ int GS::SetSys(string ss){
   ///////////////////////////////////
   //GS_SYS_DEFINE_START
   if (sys == "cores"	) { Dynas[ pos ] = new Dynamics_cores; hassys=true; }
-  if (sys == "diffuse"	) { Dynas[ pos ] = new Dynamics_diffuse; hassys=true; }
   if (sys == "mart"	) { Dynas[ pos ] = new Dynamics_mart; hassys=true; }
   if (sys == "multi"	) { Dynas[ pos ] = new Dynamics_multi; hassys=true; }
   if (sys == "pow"	) { Dynas[ pos ] = new Dynamics_pow; hassys=true; }
+  if (sys == "precipitate"	) { Dynas[ pos ] = new Dynamics_precipitate; hassys=true; }
   if (sys == "stress"	) { Dynas[ pos ] = new Dynamics_stress; hassys=true; }
   if (sys == "xxx"	) { Dynas[ pos ] = new Dynamics_xxx; hassys=true; }
   //GS_SYS_DEFINE_END
@@ -96,9 +93,17 @@ int GS::SetSys(string ss){
 
 //////////////////////////////////////////////////
 int GS::Set(string ss){
-  string var;
+  string var,str;
   ss>>var;
-  (*Vars)[var] = ss;
+  if (var=="binary"){
+    ss>>str; 
+    if (str=="on") BinaryMode=true;
+    else BinaryMode=false;
+  }else if (var=="log"){
+    ss>>str;
+    if (str=="off") GV<0>::LogAndError.On=false;
+    else GV<0>::LogAndError.On=true;
+  }else (*Vars)[var] = ss;
   return 0;
 }
 
@@ -111,16 +116,10 @@ int GS::Link(string ss){
 
 int GS::Read(string ss){
   string file,var; ss>>var>>file;
-  ifstream ifs;
-  ifs.open(file.c_str());
-  if (ifs){
-	ifs>>(*Datas)[var];
-	ifs.close();
-  }else{
-	GV<0>::LogAndError<<"Error: File "<<file<<" not found!\n";
-	return -1;
-  }
-  return 0;
+  if (BinaryMode)
+    return (*Datas)[var].BinaryReadFile(file);
+  else
+    return (*Datas)[var].ReadFile(file);
 }
 
 int GS::ReadHere(string name, string &arrays){
@@ -141,7 +140,8 @@ int GS::Write(string sm){
 	  if ( (*Datas)[ss].Position==Data_DEV)
 		(*Datas)[ss].DeviceToHost();
 	  if (file == "") file<<ss<<".data";
-	  (*Datas)[ss].DumpFile(file);
+	  if (BinaryMode) (*Datas)[ss].BinaryDumpFile(file);
+	  else (*Datas)[ss].DumpFile(file);
 	}else GV<0>::LogAndError<<"Error: unknown data \""<<ss<<"\"\n";
   }
   return 0;
@@ -167,19 +167,21 @@ int GS::WriteHere(string sm){
 
 int GS::Run(string ss){
   if (DynaName=="") {
-	GV<0>::LogAndError<<"Error: run before system setting\n";
+	GV<0>::LogAndError<<"Error: system not set\n";
 	return -1;
   }
   ////////////////////////////////////
   int totalsteps=1;
   ss>>totalsteps; TotalSteps=totalsteps;
-  if (totalsteps <= 0 )
-	return -1;
+  if (totalsteps <= 0 ) return -1;
   Dynas[DynaPosition]->Datas = Datas; 
   Dynas[DynaPosition]->Vars = Vars; 
   if ( !DynasInited[DynaName] ){
 	Dynas[DynaPosition]->Initialize();
 	DynasInited[DynaName]=true;
+	//////////////////////////////////////////////////////////////
+	CurrentStep=0;
+	(*Vars)["ahead_steps"]>>=CurrentStep;
   }
   //////////////////////////////////////////////////////////////
   int  infoInterval;
@@ -197,7 +199,7 @@ int GS::Run(string ss){
   GV<0>::LogAndError<<"\n";
   //////////////////////////////////////////////////////////////
   for (int i=1;i<=totalsteps;i++) {
-	CurrentStep = i; // this will be used in dump and info to identity the progress
+	CurrentStep++; // this will be used in dump and info to identity the progress
 	/////////////////////////////
 	Dynas[DynaPosition]->Fix(real(i)/totalsteps);
 	Dynas[DynaPosition]->Calculate();
@@ -217,7 +219,7 @@ int GS::RunFunc(string func ){
   Dynas[DynaPosition]->Datas = Datas; 
   Dynas[DynaPosition]->Vars= Vars; 
   if ( !DynasInited[DynaName] ){
-	GV<0>::LogAndError<<"Warning: Initialization function called\n";
+	GV<0>::LogAndError<<"Warning: Initialization function called before \"run\"\n";
 	Dynas[ DynaPosition]->Initialize();
 	DynasInited[ DynaName ] = true;
   }

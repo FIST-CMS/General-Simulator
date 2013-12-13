@@ -14,6 +14,11 @@
 
 using namespace GS_NS;
 using namespace DATA_NS;
+<<<<<<< HEAD
+
+int Dynamics_stress::Initialize(){
+  //para setting should be finished before or within this function
+=======
 /*
   main calculation:
     the structure tensor B
@@ -24,6 +29,7 @@ int Dynamics_stress::Initialize(){
   //para setting should be finished before or within this function
   string ss;
 
+>>>>>>> origin/master
   ((((((*Vars)["gridsize"]>>=nx)>>=ny)>>=nz)>>=dx)>>=dy)>>=dz;
   Xi=4000.0f;  (*Vars)["xi"]>>=Xi;
   StrainTensor = &((*Datas)["varianttensor"]);
@@ -112,6 +118,16 @@ Dynamics_stress::~Dynamics_stress(){
   if (plan_bvn) cufftDestroy(plan_bvn);
 }
 
+<<<<<<< HEAD
+__global__ void ElasticForceCalculate_Stress_Kernel(Complex *RTerm,Complex*Eta_sq,Real* B,int VariantN,Real Xi){
+  //int BaseVariantN = gridDim.z;
+  int nx= gridDim.x, ny= gridDim.y, nz = blockDim.x;
+  int x = blockIdx.x, y = blockIdx.y, z = threadIdx.x, v = blockIdx.z;
+  //////////////////////
+  RTerm[((v*nx+x)*ny+y)*nz+z]=0.f;
+  for (int i=0;i<VariantN;i++)
+	RTerm[((v*nx+x)*ny+y)*nz+z]+=Xi*B[(((v*VariantN+i)*nx+x)*ny+y)*nz+z]* Eta_sq[((i*nx+x)*ny+y)*nz+z];
+=======
 __global__ void ElasticForceCalculate_Stress_Kernel(Complex *ReTerm,Complex*Eta_sq,Real* B,int VariantN,Real Xi){
   //int BaseVariantN = gridDim.z;
   int nx= gridDim.x, ny= gridDim.y, nz = blockDim.x;
@@ -125,12 +141,17 @@ __global__ void ElasticForceCalculate_Stress_Kernel(Complex *ReTerm,Complex*Eta_
 	if (DEBUG) ReTerm[v*nn+pn]=temp;
   }
   ReTerm[ v*nn + pn ] = temp;
+>>>>>>> origin/master
 }
 
 int Dynamics_stress::ElasticForceCalculate(){
   SetCalPos(Data_DEV);
   //Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
+<<<<<<< HEAD
+  Eta_CT=(*Eta)*(*Eta); //Store it in the buffer area
+=======
   Eta_CT=(*Eta); //Store it in the buffer area
+>>>>>>> origin/master
   cufftExecC2C(plan_vn,(cufftComplex*)Eta_CT.Arr_dev,(cufftComplex*)Eta_CT.Arr_dev,CUFFT_FORWARD);
   divi_device(Eta_CT.Arr_dev,Eta_CT.Arr_dev ,real(nx*ny*nz) ,Eta_CT.N() ); // seperate transformed
   dim3 bn(nx,ny,BaseVariantN/*6*/);
@@ -139,6 +160,19 @@ int Dynamics_stress::ElasticForceCalculate(){
 	(RTermEta_CT.Arr_dev,Eta_CT.Arr_dev,B.Arr_dev,VariantN,Xi);
   cufftExecC2C(plan_bvn,(cufftComplex*)RTermEta_CT.Arr_dev,(cufftComplex*)RTermEta_CT.Arr_dev,CUFFT_INVERSE);
   *Stress = - RTermEta_CT;
+<<<<<<< HEAD
+
+  if (DEBUG) {
+    Eta->DeviceToHost();
+    RTermEta_CT.DeviceToHost();
+    Eta_CT.DeviceToHost();
+    B.DumpFile("data.b");
+    Eta_CT.DumpFile("data.eta_ct");
+    Eta->DumpFile("data.eta");
+    RTermEta_CT.DumpFile("data.rterm");
+  }
+=======
+>>>>>>> origin/master
   return 0;
 }
 

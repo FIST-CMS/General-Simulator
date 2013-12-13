@@ -39,21 +39,57 @@ bool _is_var_char(char ch){
   return false;
 };
 
+int Variable::shell(string ss){ 
+  int err=0; string temp; 
+  err=shell(ss,temp); 
+  GV<0>::LogAndError<<temp<<"\n";
+  return err;
+}
+int Variable::shell(string ss,string &result){
+  string tmpfile=".gs.shell."+ToString(random())+".tmp";
+  string st; st =ss+" 2>&1 >"+tmpfile; 
+  if (system(st.c_str()));
+  ifstream in(tmpfile.c_str(),ios::in);
+  if (in.fail()){
+    GV<0>::LogAndError<<"Error: fail to read shell results\n";
+    return 0;
+  }
+  istreambuf_iterator<char> beg(in), end;
+  result=string(beg,end);
+  in.close();
+  if (result.length()>0) result.erase(result.length()-1,1);
+  st="rm "+tmpfile;
+  if (system(st.c_str()));
+  return 0;
+};
+
 int Variable::ReplaceExpr(string &ss){//ignore the first startP words
   int err=0;
   int p_left=-1,p_right=-1,pl;
+  while( (p_left=ss.find("`"))>=0){
+    p_right=ss.find("`",p_left+1);
+    if ( p_right<0 ){
+	 GV<0>::LogAndError<<"Error: uncomplete expression\n";
+	 return Code_ERR;
+    }
+    ////////////////////////////////////
+    string temp_str,result_str;
+    temp_str=ss.substr(p_left+1,p_right-p_left-1);
+    err=shell(temp_str,result_str); if(err<0)return err;
+    ss.replace(p_left,p_right - p_left+1, result_str);
+  }
+  p_left=-1;
   while( (p_left=ss.find("{"))>=0){
-	p_right=ss.find("}");
-	if (p_right<0) return 0; //no substitution
+    p_right=-1;
 	do {
-	  pl = ss.find("{",p_left+1);
-	  if (pl>p_right||pl<0){
-		break;
-	  }
 	  p_right=ss.find("}",p_right+1);
 	  if ( p_right<0 ){
 		GV<0>::LogAndError<<"Error: uncomplete expression\n";
 		return Code_ERR;
+	  }
+	  pl = ss.find("{",p_left+1);
+	  if (pl>p_right||pl<0){
+		break;
 	  }
 	}while (1);
 	////////////////////////////////////
@@ -67,7 +103,6 @@ int Variable::ReplaceExpr(string &ss){//ignore the first startP words
   return 0;
 }
 
-
 int Variable::Evaluate(string &ss){//calculate an expression
   int pos;
   while ((pos=ss.find('{'))>=0) ss.replace(pos,1,"(");
@@ -75,15 +110,6 @@ int Variable::Evaluate(string &ss){//calculate an expression
   ExprTree tree;
   tree.Init(ss,Vars,Vars_gs);
   ss = tree.Expr;
-  return 0;
-}
-
-int Variable::Set(string ss){
-  string var,val;
-  //////////////////////////////
-  ss>>var>>val;
-  (*Vars)[var]= val;
-  //////////////////////////////
   return 0;
 }
 
@@ -126,20 +152,20 @@ int ExprTree::Init(string expr,Map<string> *vars,Map<string> *vars_gs){
 	string temp_s; expr>>=temp_s;
 	/////////////
 	if ( vars->exist(temp_s) ){
-	  (*vars)[temp_s]>>=Val;
-	  Expr<<Val;
+	  (*vars)[temp_s]>>=Expr;
+	  Expr>>=Val;
 	  return 0;
 	}
 	if (temp_s[0]=='$') temp_s.erase(0,1);
 	if ( vars_gs->exist(temp_s) ){
-	  (*vars_gs)[temp_s]>>=Val;
-	  Expr<<Val;
+	  (*vars_gs)[temp_s]>>=Expr;
+	  Expr>>=Val;
 	  return 0;
 	}
 	////////////////
 	if (_is_number(temp_s)){
+	  Expr=temp_s;
 	  temp_s>>=Val;
-	  Expr<<Val;
 	  return 0;
 	}else{
 	  GV<0>::LogAndError<<"Error: \""<<temp_s<<"\" unknown \n";
@@ -168,7 +194,7 @@ int ExprTree::Init(string expr,Map<string> *vars,Map<string> *vars_gs){
 	else if (Opera=="-") { Val= Left->Val - Right->Val; io(Val,Expr);}
 	else if (Opera=="*") { Val= Left->Val * Right->Val; io(Val,Expr);}
 	else if (Opera=="/") { if (Right->Val==0) {Expr="nan"; Val=_NAN_Var;} else{ Val= Left->Val/Right->Val;io(Val,Expr);} }
-	else if (Opera=="^") { Val= (Real(Left->Val) ^ Right->Val).Re; io(Val,Expr); }
+	else if (Opera=="^") { Val= (Real(Left->Val) ^ ((int)Right->Val)).Re; io(Val,Expr); }
 	else if (Opera=="<="){ if (Left->Val<=Right->Val) Val=1; else Val=0; io(Val,Expr);}
 	else if (Opera==">="){ if (Left->Val>=Right->Val) Val=1; else Val=0; io(Val,Expr);}
 	else if (Opera=="=="){ if (Left->Val==Right->Val) Val=1; else Val=0; io(Val,Expr);}

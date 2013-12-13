@@ -14,9 +14,15 @@ namespace GS_NS{
 	Map< Data<Real> > 	*Datas;
 	Map< string > 		*Vars;
 	////////////////////////////////
+<<<<<<< HEAD
+	const static int 		DynaMax  = 1000;
+	int					DynaTotal;
+	Dynamics	        		*Dynas[DynaMax];
+=======
 	const static int 	DynaMax  = 1000;
 	int					DynaTotal;
 	Dynamics	        *Dynas[DynaMax];
+>>>>>>> origin/master
 	Map< bool >			DynasInited;
 	Map< int  >			DynaPositions;
 	string				DynaName;
@@ -30,6 +36,10 @@ namespace GS_NS{
 	int Set(string); 
 	int Link(string);
 	///////////////////////////////////////////
+<<<<<<< HEAD
+	bool BinaryMode;
+=======
+>>>>>>> origin/master
 	int Read(string); 
 	int ReadHere(string name, string &arrays); // read directly from script
 	int Write(string);
