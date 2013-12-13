@@ -1,0 +1,852 @@
+
+/*
+ */
+
+#ifndef DATA_Eins_H
+#define DATA_Eins_H
+
+#include<stdarg.h>
+#include<iostream>
+#include<fstream>
+#include<sstream>
+#include<typeinfo>
+
+#include<map>
+#include<set>
+
+#include"datanumbers.th"
+#include"datamath.th"
+using namespace std;
+///////////////////////////////////////////////////////////////////////////////////
+namespace DATA_NS{
+  const int 	Data_NONE		= 0;
+  const int 	Data_HOST		= 1;
+  const int 	Data_DEV		= 2;
+  const int 	Data_HOST_DEV	= 3;
+  //some string functions
+  template<int id> class SDataBuffer{ 
+  public: 
+	static stringstream 	TssG; 
+	static char			Seperator;
+  };
+  template<int id> stringstream 	SDataBuffer<id>::TssG;
+  template<int id> char				SDataBuffer<id>::Seperator=' ';
+  template<class typein,class typeout>void io(typein&in,typeout&out){SDataBuffer<0>::TssG.str("");SDataBuffer<0>::TssG.clear();SDataBuffer<0>::TssG<<in;SDataBuffer<0>::TssG>>out;}
+  inline void SetStringSeperator(){ SDataBuffer<0>::Seperator=' '; }
+  inline void SetStringSeperator(char ch){ SDataBuffer<0>::Seperator=ch;}
+  template<class type> string &operator<<(string &ss, type inv){ // inv could not use & will not be able to deal const
+    SDataBuffer<0>::TssG.str("");SDataBuffer<0>::TssG.clear();SDataBuffer<0>::TssG<<inv;
+    ss+=SDataBuffer<0>::TssG.str(); 
+    return ss; 
+  }
+  template<class type> string &operator<<=(string &ss, type inv){ // inv could not use & will not be able to deal const
+    SDataBuffer<0>::TssG.str("");SDataBuffer<0>::TssG.clear();SDataBuffer<0>::TssG<<inv;
+    ss=SDataBuffer<0>::TssG.str(); 
+    return ss; 
+  }
+
+  template<class type> string &operator>>(string &ss,type &inv){
+    SDataBuffer<0>::TssG.str("");SDataBuffer<0>::TssG.clear();
+    while (ss[0]==' ')  ss=ss.erase(0,1);
+    int p = ss.find(" ");
+    if (p>0){ SDataBuffer<0>::TssG<<ss.substr(0,p); SDataBuffer<0>::TssG>>inv; ss=ss.erase(0,p+1);}
+    else{ SDataBuffer<0>::TssG<<ss; SDataBuffer<0>::TssG>>inv; ss=""; }
+    return ss;
+  }
+  template<class type> string operator>>=(string ss,type &inv){
+	string ts=ss;
+	ts>>inv;
+	return ts;
+  }
+  template<class type> string ToString(type anyval){ string ss; return (ss<<anyval); }
+  template<class type> Real ToReal(type anyval){ string ss;Real x; ss<<anyval; ss>> x; return x; }
+}
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+template<class type> __host__ __device__ type&Part(type*a,int*d,int const p){return a[ d[ d[0]+1 ] ];}
+template<class type> __host__ __device__ type&Part(type*a,int*d, int p1,int p2){return a[ p1*d[2]+p2 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d, int p1,int p2,int p3){return a[(p1*d[2]+p2)*d[3]+p3 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d, int p1,int p2,int p3,int p4){return a[ ((p1*d[2]+p2)*d[3]+p3)*d[4]+p4 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d,int p1,int p2,int p3,int p4,int p5){return a[(((p1*d[2]+p2)*d[3]+p3)*d[4]+p4)*d[5]+p5 ];};
+template<class type> __host__ __device__ type&Part(type*a,int*d,int p1,int p2,int p3,int p4,int p5,int p6){
+  return a[((((p1*d[2]+p2)*d[3]+p3)*d[4]+p4)*d[5]+p5)*d[6]+p6];};
+/////////////////////
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim,int const p){
+  int N= dim[ dim[0] +1 ];
+  return arr[ ( p%N + N ) % N ];
+}
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2){
+  int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
+  for (int i=2; i<= d; i++) {if (i==2) p=p2; dt=dim[i]; index=(p%dt+dt)%dt+ index*dt;}
+  return arr[ index ];
+};
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3){
+  int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
+  for (int i=2; i<= d; i++) {if (i==2) p=p2; else if (i==3) p=p3; dt=dim[i]; index=(p%dt+dt)%dt+ index*dt;}
+  return arr[ index ];
+};
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3,int p4){
+  int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
+  for (int i=2; i<= d; i++) {if (i==2) p=p2; else if (i==3) p=p3;else if (i==4) p=p4; dt=dim[i]; index=(p%dt+dt)%dt+ index*dt;}
+  return arr[ index ];
+};
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3,int p4,int p5){
+  int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
+  for (int i=2; i<= d; i++) {if (i==2) p=p2; else if (i==3) p=p3;else if (i==4) p=p4; else if (i==5) p=p5; dt=dim[i];index=(p%dt+dt)%dt+ index*dt;}
+  return arr[ index ];
+};
+template<class type> __host__ __device__ type &PPart(type *arr, int *dim, int p1,int p2,int p3,int p4,int p5,int p6){
+  int d=dim[0],dt=dim[1],index=(p1%dt+dt)%dt,p;
+  for (int i=2; i<= d; i++) {
+	if (i==2) p=p2; else if (i==3) p=p3;else if (i==4) p=p4; else if (i==5) p=p5;else if (i==6) p=p6; dt=dim[i];index=(p%dt+dt)%dt+ index*dt;}
+  return arr[ index ];
+}
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+namespace DATA_NS{
+  //class DataTemp;//defined afterwards
+  inline bool IsSameDimension(int * dime1, int *dim2);
+  template<class type>
+  class Data{
+  public:
+	int		    ID;
+	//string		Name;
+	static int	TotalNumber;
+	int		    SerialCode;
+	int 		Position;
+	int 		*Dimension;//0: dimension 1-[0]:length of each [0]+1: total number 
+	int 		*Dimension_dev;
+	type		*Arr;
+	type	 	*Arr_dev;
+	type		*TotalArr_dev;
+	int 		*CountArr_dev;
+	type 	    Sum;
+	real 		Portion;
+	type 	    Average;
+  public:
+	int VeryInit();	//done in every construct function 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	int Init(int *dimArr,int dataposition); //as a base to uniform the operation and easy to change code
+	int Init(int n,...);	 
+	Data(int *dimArr,int dataposition);
+	Data(int n,...);	 
+	Data();	 
+	Data(int id);	 
+	int Free();
+	~Data();
+	Data(const Data&);
+	//-----------------------------cuda operation
+	int 		HostToDevice();
+	int			DeviceToHost(); 
+	//-----------------------------return arr address
+	type		*arr();
+	type		*arr_dev();
+	// statistic information
+	static const int BlockSize=512;
+	type 	TotalDevice();
+	type	TotalHost();
+
+	real 	CountHost(type cut_value);
+	real 	CountDevice(type cut_value);
+	//-----------------------------
+	int   N();//total element
+	__host__ __device__ type &Part(const int p);
+	__host__ __device__ type &Part(int *pArr); //a base
+	__host__ __device__ type &PPart(int *pArr); //periodic part function
+	__host__ __device__ type &operator[](int p);
+	__host__ __device__ type &operator()(int *pArr);
+	__host__ __device__ type &operator()(int p);
+	__host__ __device__ type &operator()(int p1,int p2);
+	__host__ __device__ type &operator()(int p1,int p2,int p3);
+	__host__ __device__ type &operator()(int p1,int p2,int p3,int p4);
+	__host__ __device__ type &operator()(int p1,int p2,int p3,int p4,int p5);
+	__host__ __device__ type &operator()(int p1,int p2,int p3,int p4,int p5,int p6);
+	// overload = and - (opposite number)
+	template<class etype> Data &operator =(Data<etype> &data);
+	template<class etype> Data &operator =(etype value);
+	Data &operator -();
+	// overload +=
+	template<class etype> Data &operator +=(Data<etype> &data);
+	template<class etype> Data &operator +=(etype value);
+	//overload + - * / at the end of this file
+	//overload ==
+	template<class etype,class eetype> friend bool operator ==(Data<etype> &data1,Data<eetype> &data2);
+	template<class etype> friend bool operator ==(Data<etype> &data,int *dim);
+	template<class etype> friend bool operator ==(int *dim, Data<etype> &data);
+	//overload << >> overload both fstream and stream
+	template<class ostype,class etype> friend ostype &operator<<(ostype &os,Data<etype>&data);
+	template<class istype,class etype> friend istype &operator>>(istype &is,Data<etype>&data);
+	//Read(Dump) in(out) directly with file
+	int  ReadFile(string filename);
+	int  BinaryReadFile(string filename);
+	int  DumpFile(string filename);
+	int  BinaryDumpFile(string filename);
+  };
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+  template <class type> int Data<type>::VeryInit(){
+	TotalNumber++; SerialCode= TotalNumber;
+	ID			=	0;
+	Position	=	0;
+	Dimension	=	NULL;
+	Dimension_dev=	NULL;
+	Arr			=	NULL;
+	Arr_dev		=	NULL;
+	TotalArr_dev=   NULL;
+	CountArr_dev=	NULL;
+	return 0;
+  }
+
+  template<class type> int Data<type>::Init(int *dimArr,int dataposition){//Assign data dype, dimension, and memory
+	Free();
+	int n= dimArr[0];
+	Dimension	= new int[ n+2 ];
+	Dimension[0]	=	n;
+	Dimension[n+1]=	1;
+	for (int i=1;i<=n;i++){
+	  Dimension[i]=dimArr[i]; Dimension[n+1]*=dimArr[i];
+	}
+	Position	=	dataposition;
+	cudaMalloc((void**)&Dimension_dev,sizeof(int)*(n+2));
+	cudaMemcpy(Dimension_dev,Dimension,sizeof(int)*(n+2),cudaMemcpyHostToDevice);
+	if ( dataposition == Data_HOST || dataposition == Data_HOST_DEV)
+	  Arr=new type[ N() ];
+	if ( dataposition == Data_DEV || dataposition == Data_HOST_DEV )
+	  cudaMalloc((void**)&Arr_dev,sizeof(type)*N() );
+	return 0;
+  }
+  template <class type> int Data<type>::Init(int n,...){
+	va_list args;
+	va_start(args,n);
+	int *arr= new int[n+2];
+	arr[0]=n;
+	for (int i=1; i<=n; i++)
+	  arr[i]	=	va_arg(args,int);
+	int dataposition	=	va_arg(args,int);
+	va_end(args);
+	Init(arr,dataposition);
+	delete[]arr;
+	return 0;
+  }
+
+  //construction function
+  template <class type> Data<type>::Data(int *dimArr,int dataposition){
+	VeryInit();
+    Init(dimArr,dataposition);
+  }
+  template <class type> Data<type>::Data(int n,...){
+	VeryInit();
+	va_list args;
+	va_start(args,n);
+	int *arr	=	new int [ n+ 2 ];
+	arr[0]=n;
+	for (int i=1; i<=n; i++)
+	  arr[i]	=	va_arg(args,int);
+	int dataposition	=	va_arg(args,int);
+	va_end(args);
+	Init(arr,dataposition);
+	delete[]arr;
+  }
+  template <class type> Data<type>::Data(){
+	VeryInit();
+  }
+  template <class type> Data<type>::Data(int id){
+	VeryInit();
+	ID=id;
+  }
+  template <class type> Data<type>::Data(const Data<type> &data){
+	cout<<" warning: copy construct is called!!!"<<endl;
+  };
+
+  template <class type> int Data<type>::Free(){
+	if ( Arr != NULL ) 			{ delete []Arr; Arr=NULL;}
+	if ( Arr_dev != NULL ) 		{ cudaFree( Arr_dev );Arr_dev=NULL;}
+	if ( Dimension != NULL ) 	{ delete []Dimension; Dimension=NULL;}
+	if ( Dimension_dev != NULL)	{ cudaFree( Dimension_dev); Dimension_dev=NULL;}
+	if ( TotalArr_dev!= NULL ) 	{ cudaFree(TotalArr_dev); TotalArr_dev=NULL;}
+	if ( CountArr_dev!= NULL ) 	{ cudaFree(CountArr_dev); CountArr_dev=NULL;}
+	return 0;
+  }
+  template <class type> Data<type>::~Data(){//free allocatted main Arr memory
+	Free();
+  }
+
+  //data copy between gpu device and host-------------------
+  template <class type> int Data<type>::HostToDevice(){
+    if (Arr == NULL) { return -1;  }
+    if (Arr_dev == NULL) cudaMalloc((void**)&Arr_dev,sizeof(type)*N() );
+    cudaMemcpy(Arr_dev,Arr,sizeof(type)*N(),cudaMemcpyHostToDevice);
+    return 0;
+  }
+  template <class type> int Data<type>::DeviceToHost(){
+	if (Arr_dev == NULL) { return -1;}
+	if (Arr == NULL) Arr=new type[N()];
+	cudaMemcpy(Arr, Arr_dev, sizeof(type)*N(),cudaMemcpyDeviceToHost);
+	return 0;
+  }
+  // return total number or arr lenghth 
+  template<class type> inline int Data<type>::N(){
+    if (Dimension == NULL) return 0;
+    return Dimension[ Dimension[0]+1 ];
+  }
+  //overload [] and ()   //with periodic condition applied
+
+  template<class type> type &Data<type>::Part(const int p){
+	return Arr[ p ];
+  }
+
+  template<class type>  type &Data<type>::Part(int *pArr){
+	int dim=Dimension[0],dt=Dimension[1],index=pArr[0];
+	for (int i=1; i< dim; i++) {
+	  dt=Dimension[i+1];
+	  index=pArr[i] + index*dt;
+	}
+	return Arr[ index ];
+  };//a base
+  template<class type>  type &Data<type>::PPart(int *pArr){ //periodic part function
+	int dim=Dimension[0],dt=Dimension[1],index=(pArr[0]%dt+dt)%dt;
+	for (int i=1; i< dim; i++) {
+	  dt=Dimension[i+1];
+	  index=(pArr[i]%dt+dt)%dt+ index*dt;
+	}
+	return Arr[ index ];
+  };//a base
+
+  template<class type> type	&Data<type>::operator[](const int p){return Part(p);}
+  template<class type> type &Data<type>::operator()(int *pArr){return Part(pArr);}
+  template<class type> type &Data<type>::operator()(int p){ return Part(p); };
+  //
+  template<class type> type &Data<type>::operator()(int p1,int p2){ int pArr[2]={p1,p2}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3){ int pArr[3]={p1,p2,p3}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3,int p4){ int pArr[4]={p1,p2,p3,p4}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3,int p4,int p5){ int pArr[5]={p1,p2,p3,p4,p5}; return Part(pArr); };
+  template<class type> type &Data<type>::operator()(int p1,int p2,int p3,int p4,int p5,int p6){ int pArr[6]={p1,p2,p3,p4,p5,p6}; return Part(pArr); };
+  //overload ==  to verify that if dimension is the same
+  template<class type,class etype> bool operator ==(Data<type> &data1,Data<etype> &data2){ return IsSameDimension(data1.Dimension,data2.Dimension); }
+  template<class type> bool operator ==(Data<type> &data,int *dim){ return IsSameDimension(data.Dimension,dim); }
+  template<class type> bool operator ==(int *dim,Data<type>&data){ return IsSameDimension(data.Dimension,dim); }
+
+  // Write Data to a File  (read from a file)
+  template<class type> int Data<type>::DumpFile(string filename){
+    if (Dimension==NULL){ 
+	 cerr<<"Error: data not initilized while dumping\n"; 
+	 return -1;
+    }
+    ofstream os(filename.c_str());
+    for (int i=0; i<= Dimension[0]; i++)
+	 os<<Dimension[i]<<" ";
+    os<<endl;
+    for ( int i = 0; i < N() ; i++)
+	 os<<Arr[i]<<endl;
+    os.close();
+    return 0;
+  }
+  template<class type> int Data<type>::BinaryDumpFile(string filename){
+    if (Dimension==NULL){ 
+	 cerr<<"Error: data not initilized while dumping\n"; 
+	 return -1;
+    }
+    ofstream os(filename.c_str(),ios::binary);
+    //for (int i=0; i<= Dimension[0]; i++) os<<Dimension[i]<<" ";
+    //os<<endl;
+    //for ( int i = 0; i < N() ; i++) os<<Arr[i]<<endl;
+    os.write((char*)&Dimension[0],(Dimension[0]+1)*sizeof(int));
+    os.write((char*)&Arr[0],N()*sizeof(type));
+    os.close();
+    return 0;
+  }
+
+  template<class type> int Data<type>::ReadFile(string filename){
+    ifstream ifs;
+    ifs.open(filename.c_str());
+    if (ifs){
+	  ifs>>(*this); // all done by >>
+	  ifs.close();
+    }else{
+	 cerr<<"Error: \""<<filename<<"\" not found!\n";
+	 return -1;
+    }
+    return 0;
+  }
+
+  template<class type> int Data<type>::BinaryReadFile(string filename){
+    ifstream ifs;
+    ifs.open(filename.c_str(),ios::binary);
+    if (!ifs){
+	 cerr<<"Error: \""<<filename<<"\" not found!\n";
+	 return -1;
+    }
+    if ( Arr != NULL ) { delete []Arr; Arr=NULL;}
+    if ( Arr_dev != NULL ) {cudaFree(Arr_dev); Arr_dev=NULL;}
+    if ( Dimension != NULL ) {delete []Dimension;Dimension=NULL;}
+    if ( Dimension_dev != NULL ){ cudaFree(Dimension_dev);Dimension_dev=NULL;}
+    /////////////////////
+    int n; 
+    ifs.read((char*)&n,sizeof(int));
+    Dimension	=	new int[n+2];
+    Dimension[0]	=	n;
+    ifs.read((char*)&Dimension[1],n*sizeof(int));
+    Dimension[n+1]=	1; for (int i = 1; i <= n ; i++) Dimension[n+1]*=Dimension[i];
+    Position		=	Data_HOST;
+
+    cudaMalloc((void**)&Dimension_dev,sizeof(int)*(n+2) 	);
+    cudaMemcpy(Dimension_dev,Dimension,sizeof(int)*(n+2) ,cudaMemcpyHostToDevice);
+    Arr = new type[ Dimension[n+1] ];
+    ifs.read((char*)&Arr[0],Dimension[n+1]*sizeof(type));
+    ifs.close();
+    return 0;
+  }
+
+  //overload <<  >>
+  template<class ostype,class etype> ostype &operator<<(ostype &os, Data<etype> &data){
+     if (data.Dimension==NULL){ // not assigned space
+	  cerr<<"Error: no element for <<\n";
+	  return os;
+	}
+	for (int i=0; i<= data.Dimension[0]; i++)
+	  os<<data.Dimension[i]<<" ";
+	os<<endl;
+	for ( int i = 0; i < data.N() ; i++)
+	  os<<data.Arr[i]<<endl;
+	return os;
+  };
+  template<class istype,class etype> istype &operator>>(istype &is, Data<etype> &data){
+	if ( data.Arr != NULL ) { delete []data.Arr; data.Arr=NULL;}
+	if ( data.Arr_dev != NULL ) {cudaFree(data.Arr_dev); data.Arr_dev=NULL;}
+	if ( data.Dimension != NULL ) {delete []data.Dimension;data.Dimension=NULL;}
+	if ( data.Dimension_dev != NULL ){ cudaFree(data.Dimension_dev);data.Dimension_dev=NULL;}
+	int n; is>>n;
+	data.Dimension	=	new int[n+2];
+	data.Dimension[0]	=	n;
+	data.Position		=	Data_HOST;
+	data.Dimension[n+1]=	1;
+	for (int i = 1; i <= n ; i++){
+	  is>>data.Dimension[i];
+	  data.Dimension[n+1]*=data.Dimension[i];
+	}
+	cudaMalloc((void**)&data.Dimension_dev,sizeof(int)*(n+2) 	);
+	cudaMemcpy(data.Dimension_dev,data.Dimension,sizeof(int)*(n+2) ,cudaMemcpyHostToDevice);
+	data.Arr = new etype[ data.Dimension[n+1] ];
+	for (int i=0; i< data.Dimension[n+1]; i++ )
+	  is>>data.Arr[i];
+	return is;
+  }
+
+  // toarr   toarr_dev
+  template<class type> type *Data<type>::arr(){ return Arr; };
+  template<class type> type *Data<type>::arr_dev(){ return Arr_dev; };
+
+  inline int ArrSet(int *arr,...){//the first argument is the array, second is the length, then each element
+	va_list args;
+	va_start(args,arr);
+	int n=va_arg(args,int);
+	for (int i=0;i<n;i++)
+	  arr[i]=va_arg(args,int);
+	va_end(args);
+	return 0;
+  }
+
+
+  inline bool IsSameDimension(int *dim1, int *dim2){
+    if (dim1==NULL || dim2 ==NULL) return false;
+    if (dim1[0]!=dim2[0]) return false;
+    if (dim1[dim1[0]] != dim2[dim2[0]]) return false;
+    for (int i=1; i<=dim1[0]; i++)
+	  if (dim1[i]!=dim2[i]) 
+		return false;
+    return true;
+  }
+
+};
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------
+#include"datatemp.th"
+
+//--------------------------------------------------------
+// for the buffer area to be only one even compiled for many times with global access
+namespace DATA_NS{
+  template<int id> class DataBuffer{
+  public:
+	static DataTemp DataTempG;
+	//static stringstream TssG;
+  };
+  template<int id> DataTemp DataBuffer<id>::DataTempG;
+  //for some info. about the DataTemp and Data
+  template<class type> int Data<type>::TotalNumber=0;
+  template<class type> int DataNode<type>::TotalNumber=0;
+}
+
+//for arithmetic temp variable operation
+namespace DATA_NS{
+  inline int SetCalPos(int pos){ DataBuffer<0>::DataTempG.DATA_POSITION_FLAG	=	pos; return 0; }
+  inline int GetCalPos()	{ return DataBuffer<0>::DataTempG.DATA_POSITION_FLAG; }
+  inline bool IsOnDevice()	{ return (DataBuffer<0>::DataTempG.DATA_POSITION_FLAG == Data_DEV || DataBuffer<0>::DataTempG.DATA_POSITION_FLAG == Data_HOST_DEV); }
+  inline bool IsOnHost(){ return (DataBuffer<0>::DataTempG.DATA_POSITION_FLAG == Data_HOST|| DataBuffer<0>::DataTempG.DATA_POSITION_FLAG == Data_HOST_DEV); }
+  //overload = and - (opposite number) ------------------------------------------------------
+  //dataout = datain 
+  template<class type> template<class etype> Data<type> &Data<type>::operator =(Data<etype> &data){
+	if (! (data == (*this)) ) 
+	  Init(data.Dimension,DataBuffer<0>::DataTempG.DATA_POSITION_FLAG); 
+	if (IsOnHost()) 	
+	  set_host(Arr, data.Arr, N());
+	if (IsOnDevice()) 	
+	  set_device(Arr_dev,data.Arr_dev,N());
+	Position	=	DataBuffer<0>::DataTempG.DATA_POSITION_FLAG;
+	return *this;
+  };
+  // = num
+  template<class type> template<class etype> Data<type> &Data<type>::operator =(etype value){
+    if (N() <=0 ) return *this;
+    if (IsOnHost()){ 
+	  if (Arr==NULL) Arr= new type[N()];
+	  set_host(Arr, value , N());
+    }
+    if (IsOnDevice()){
+	  if (Arr_dev==NULL) cudaMalloc((void**)&Arr_dev,sizeof(type)*N() );
+	  set_device(Arr_dev,value,N());
+    }
+    Position	=	GetCalPos();
+    return *this;
+  }
+  //overload - opposite number
+  template<class type> Data<type> &Data<type>::operator -(){
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(*this);
+    if (IsOnHost()  ) 	
+	  minus_host(	pdata->Arr,	0,	Arr,	pdata->N());
+    if (IsOnDevice()) 	
+	  minus_device(	pdata->Arr_dev,0,	Arr_dev,	pdata->N());
+    return *pdata;
+  };
+  //overload += ------------------------------------------------------
+  //data1 += data2 
+  template<class type> template< class etype> Data<type> &Data<type>::operator +=(Data<etype> &data){
+    if (!((*this) == data)) return *this;
+    if (IsOnHost()  ) 	
+	  add_host( Arr, 		Arr, 	data.Arr, 	this->N() );
+    if (IsOnDevice()) 	
+	  add_device(Arr_dev,	Arr_dev,	data.Arr_dev,	this->N());
+    return *this;
+  };
+
+  // data + num of different types
+  template<class type> template<class etype> Data<type> &Data<type>::operator +=(etype value){ 
+    if (IsOnHost()  ) 	
+	  add_host( Arr, 		Arr, 	value, 	this->N() );
+    if (IsOnDevice()) 	
+	  add_device(Arr_dev,	Arr_dev,	value,	this->N());
+    return *this;
+  }
+ 
+  //overload + ------------------------------------------------------
+  // data1 + data2 of the same type
+  template<class type> Data<type> &operator +(Data<type> &data1,Data<type> &data2){ 
+    if (!(data1 == data2)) return data1;
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data1);
+    if (IsOnHost()  ) 	
+	  add_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  add_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+  //data1 + data2 of different types
+  template<class type, class etype> Data<Complex> &operator +(Data<type> &data1,Data<etype> &data2){
+    if (!(data1 == data2)) return data1;
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data1);
+    if (IsOnHost()  ) 	
+	  add_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  add_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+
+  // data + num of the sametype
+  template<class type> Data<type> &operator +(type value,Data<type> &data){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  add_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  add_device(pdata->Arr_dev,	data.Arr_dev,	value,	pdata->N());
+    return *pdata;
+  };
+  template<class type> Data<type> &operator +(Data<type> &data,type value){ return value+data; }
+  // data + num of different types
+  template<class type,class etype> Data<Complex> &operator +(etype value,Data<type> &data){ 
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data);
+    if (IsOnHost()  ) 	
+	  add_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  add_device(pdata->Arr_dev,	data.Arr_dev,	value,	pdata->N());
+    return *pdata;
+  }
+  template<class type,class etype> Data<Complex> &operator +(Data<type> &data,etype value){ return value+data; }
+
+  //overload * ------------------------------------------------------
+  // data1 * data2
+  template<class type> Data<type> &operator *(Data<type> &data1,Data<type> &data2){ 
+    if (!(data1 == data2)) return data1;
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data1);
+    if (IsOnHost()  ) 	
+	  multi_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  multi_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+  //data1 * data2 of different types
+  template<class type, class etype> Data<Complex> &operator *(Data<type> &data1,Data<etype> &data2){
+    if (!(data1 == data2)) return data1;
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data1);
+    if (IsOnHost()  ) 	
+	  multi_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  multi_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+
+  // data * num of the same types
+  template<class type> Data<type> &operator *(type value,Data<type> &data){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  multi_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  multi_device(pdata->Arr_dev,	data.Arr_dev,	value,	pdata->N());
+    return *pdata;
+  };
+  template<class type> Data<type> &operator *(Data<type> &data,type value){ return value*data; }
+  // data * num of different types
+  template<class type,class etype> Data<Complex> &operator *(etype value,Data<type> &data){ 
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data);
+    if (IsOnHost()  ) 	
+	  multi_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  multi_device(pdata->Arr_dev,	data.Arr_dev,	value,	pdata->N());
+    return *pdata;
+  }
+  template<class type,class etype> Data<Complex> &operator *(Data<type> &data,etype value){ return value*data; }
+
+  // overload - ------------------------------------------------
+  //
+  // data1 - data2 same types
+  template<class type> Data<type> &operator -(Data<type> &data1,Data<type> &data2){ 
+    if (!(data1 == data2)) return data1;
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data1);
+    if (IsOnHost()  ) 	
+	  minus_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  minus_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+
+  //data1 - data2 of different types
+  template<class type,class etype> Data<Complex> &operator -(Data<type> &data1,Data<etype> &data2){
+    if (!(data1 == data2)) return data1;
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data1);
+    if (IsOnHost()  ) 	
+	  minus_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  minus_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+
+  // num - data and data - num
+  template<class type> Data<type> &operator -(type value,Data<type> &data){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  minus_host(	pdata->Arr,		value, 	data.Arr,		pdata->N());
+    if (IsOnDevice()) 	
+	  minus_device(	pdata->Arr_dev,		value, 	data.Arr_dev,		pdata->N());
+    return *pdata;
+  };
+  template<class type> Data<type> &operator -(Data<type> &data,type value){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  minus_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  minus_device( pdata->Arr_dev,	data.Arr_dev, 	value, 	pdata->N() );
+    return *pdata;
+  }
+  // data - num of different types
+  template<class type,class etype> Data<Complex> &operator -(Data<type> &data,etype value){ 
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data);
+    if (IsOnHost()  ) 	
+	  minus_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  minus_device(pdata->Arr_dev,	data.Arr_dev,	value,	pdata->N());
+    return *pdata;
+  }
+  template<class type,class etype> Data<Complex> &operator -(etype value,Data<type> &data){ 
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data);
+    if (IsOnHost()  ) 	
+	  minus_host( pdata->Arr, 	value , 	data.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  minus_device(pdata->Arr_dev, value,	data.Arr_dev,		pdata->N());
+    return *pdata;
+  }
+
+
+
+  // overload /   -----------------------------------------
+  // data1 / data2 same types
+  template<class type> Data<type> &operator /(Data<type> &data1,Data<type> &data2){ 
+    if (!(data1 == data2)) return data1;
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data1);
+    if (IsOnHost()  ) 	
+	  divi_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  divi_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+
+  //data1 / data2 of different types
+  template<class type,class etype> Data<Complex> &operator /(Data<type> &data1,Data<etype> &data2){
+    if (!(data1 == data2)) return data1;
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data1);
+    if (IsOnHost()  ) 	
+	  divi_host( pdata->Arr, 		data1.Arr, 	data2.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  divi_device(pdata->Arr_dev,	data1.Arr_dev,	data2.Arr_dev,	pdata->N());
+    return *pdata;
+  };
+
+  // num / data and data / num
+  template<class type> Data<type> &operator /(type value,Data<type> &data){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  divi_host(	pdata->Arr,		value, 	data.Arr,		pdata->N());
+    if (IsOnDevice()) 	
+	  divi_device(	pdata->Arr_dev,		value, 	data.Arr_dev,		pdata->N());
+    return *pdata;
+  };
+  template<class type> Data<type> &operator /(Data<type> &data,type value){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  divi_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  divi_device( pdata->Arr_dev,	data.Arr_dev, 	value, 	pdata->N() );
+    return *pdata;
+  }
+  // data / num of different types
+  template<class type,class etype> Data<Complex> &operator /(Data<type> &data,etype value){ 
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data);
+    if (IsOnHost()  ) 	
+	  divi_host( pdata->Arr, 		data.Arr, 	value, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  divi_device(pdata->Arr_dev,	data.Arr_dev,	value,	pdata->N());
+    return *pdata;
+  }
+  template<class type,class etype> Data<Complex> &operator /(etype value,Data<type> &data){ 
+    Data<Complex> *pdata; pdata= DataBuffer<0>::DataTempG.GetComplexTemp(data);
+    if ( IsOnHost()  ) 	
+	  divi_host( pdata->Arr, 	value , 	data.Arr, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  divi_device(pdata->Arr_dev, value,	data.Arr_dev,		pdata->N());
+    return *pdata;
+  }
+  // overload ^   -----------------------------------------
+  // data1 / data2 same types
+  template<class type> Data<type> &operator ^(Data<type> &data,int index){ 
+    Data<type> *pdata; pdata= DataBuffer<0>::DataTempG.GetTemp(data);
+    if (IsOnHost()  ) 	
+	  power_host( pdata->Arr, 		data.Arr, index, 	pdata->N() );
+    if (IsOnDevice()) 	
+	  power_device(pdata->Arr_dev,	data.Arr_dev,	index,	pdata->N());
+    return *pdata;
+  };
+  ///////////////////////////////////////////////////////////////////////////
+#define Data_BlockSize 512
+#define MaxGridDim 65000
+  template<class type> __global__ void DataTotal_Kernel( type *arr,int n_in){
+    int tid= blockIdx.x*blockDim.x+threadIdx.x;
+    int n_cal= gridDim.x*blockDim.x;
+	int n_out= n_in/2;
+	int n_inc; if (n_in%2==0) n_inc=n_out; else n_inc=n_out+1;
+    while (tid<n_out){
+	 arr[tid]+=arr[tid+n_inc];
+	 tid+=n_cal;
+    }
+  }
+  template<class type> type Data<type>::TotalDevice(){
+    int n_in=N();
+    if (TotalArr_dev == NULL) cudaMalloc((void**)&TotalArr_dev,sizeof(type)*n_in) ;
+    cudaMemcpy(TotalArr_dev,Arr_dev,sizeof(type)*n_in,cudaMemcpyDeviceToDevice); // give their one value first to speed up
+    int tn=Data_BlockSize;
+    while (n_in >1){
+	  int bn = (n_in-1)/tn+1; if (bn > MaxGridDim) bn=MaxGridDim; 
+	  if (tn > n_in/2) {tn =n_in/2; bn=1;}
+	  DataTotal_Kernel<<<bn, tn>>>(TotalArr_dev, n_in);
+	  n_in = (n_in+1)/2;
+	  cudaThreadSynchronize();
+    }
+    cudaMemcpy(&Sum,TotalArr_dev,sizeof(type),cudaMemcpyDeviceToHost); // only the final sum is needed
+    return Sum;
+  }
+
+  template<class type> type Data<type>::TotalHost(){
+    type sum=0;
+    for (int i=0;i<N();i++)
+	  sum+=Arr[i];
+	Sum=sum;
+    return Sum;
+  }
+
+  template<class type> __global__ void DataCountSet_Kernel( type *arr,int *count_arr,type cut_value,int n_in){
+    int tid= blockIdx.x*blockDim.x+threadIdx.x;
+    while (tid<n_in){
+	  if ( arr[tid]<=cut_value ) count_arr[tid]=1;
+	  else count_arr[tid] = 0;
+	  tid = tid + n_in;
+	}
+  }
+
+  template<int id>  __global__ void DataCountSum_Kernel(int *arr,int n_in){
+    int tid= blockIdx.x*blockDim.x+threadIdx.x;
+    int n_cal= gridDim.x*blockDim.x;
+	int n_out= n_in/2;
+	int n_inc; if (n_in%2==0) n_inc=n_out; else n_inc=n_out+1;
+    while (tid<n_out){
+	 arr[tid]+=arr[tid+n_inc];
+	 tid+=n_cal;
+    }
+  }
+
+  template<class type> real Data<type>::CountDevice(type cut_value){
+    int n_in=N();
+    if (CountArr_dev == NULL)
+	  cudaMalloc((void**)&CountArr_dev,sizeof(int)*n_in) ;
+	int tn,bn;
+    tn = Data_BlockSize;
+	bn = (n_in-1)/tn+1; if (bn > MaxGridDim) bn=MaxGridDim; 
+	if (tn > n_in) {tn =n_in; bn=1;}
+	DataCountSet_Kernel<<<bn,tn>>>(Arr_dev,CountArr_dev,cut_value,N());
+    while (n_in >1){
+	  bn = (n_in-1)/tn+1; if (bn > MaxGridDim) bn=MaxGridDim; 
+	  if (tn > n_in/2) {tn =n_in/2; bn=1;}
+	  DataCountSum_Kernel<0><<<bn, tn>>>(CountArr_dev, n_in);
+	  n_in = (n_in+1)/2;
+	  cudaThreadSynchronize();
+    }
+	int count;
+    cudaMemcpy(&count,CountArr_dev,sizeof(int),cudaMemcpyDeviceToHost); // only the final sum is needed
+	Portion= real(count)/N();
+    return Portion;
+  }
+
+  template<class type> real Data<type>::CountHost(type cut_value){
+    int num=0;
+    for (int i=0;i<N();i++)
+	  if (Arr[i]<=cut_value)
+		num++;
+    return real(num)/N();
+  }
+
+
+}
+//---------------------------------------------------------
+
+#include"datamap.th"
+
+#endif
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+
+

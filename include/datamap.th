@@ -1,0 +1,165 @@
+
+#ifndef DATA_MAP_H
+#define DATA_MAP_H
+
+namespace DATA_NS{
+  template<class type> class Map{ // solo copy //first is string
+  public:
+	map<string,type* > Vars;
+	map<string,string> Linked;
+	map<string,string> Name;
+	Map();
+	~Map();
+	int 	Initialize();
+	int 	Finalize();
+	type	*&operator()(string id);
+	type 	&operator[](string id);
+	type	*&operator()(map<string,string>::iterator iter);
+	type 	&operator[](map<string,string>::iterator iter);
+	Map	<type> &operator=(Map< type > &vmap);
+	int  	addkey(string id);
+	int 	erase(string id);
+	int 	link(string target, string link);
+	int 	unlink(string id);
+	//map<string, string>::iterator iter;
+	map<string, string>::iterator find(string id);
+	map<string, string>::iterator begin();
+	map<string, string>::iterator end();
+	bool 	exist(string id);
+  };
+  template<class type> Map<type>::Map(){}
+  template<class type> Map<type>::~Map(){
+	Finalize();
+  }
+  template<class type> int Map<type>::Initialize(){
+	return 0;
+  };
+  template<class type> int Map<type>::Finalize(){
+	while ( ! Vars.empty() ){
+	  if (Vars.begin()->second!=NULL){
+		delete Vars.begin()->second;
+		Vars.begin()->second=NULL;
+	  }
+	  Vars.erase(Vars.begin());
+	  Linked.erase(Linked.begin());
+	}
+	return 0;
+  };
+
+  template<class type> bool Map<type>::exist(string id){ 
+	map<string,string >::iterator iter;
+	iter = Name.find(id);
+	if (iter != Name.end() )
+	  return true;
+	else return false;
+	
+  }
+  template<class type> type *&Map<type>::operator()(string id){ 
+	map<string,string >::iterator iter;
+	iter=Linked.find(id);
+	if ( iter!= Linked.end() ){// exist
+	  if (iter->second==""){// not linked
+		return Vars[id];
+	  }else{//linked
+		return (*this)(iter->second);
+	  }
+	}else{
+	  Linked[id]="";
+	  Vars[id]  =NULL;
+	  return Vars[id];
+	}
+  };
+  template<class type> type *&Map<type>::operator()(map<string,string>::iterator iter){
+	return (*this)(iter->first);
+  }
+
+  
+  template<class type> type &Map<type>::operator[](string id){//create new if necc. and return type
+	map<string,string >::iterator iter;
+	iter=Linked.find(id);
+	if ( iter == Linked.end()){ // not found
+	  Linked[id]="";
+	}else{//found
+	  string l_id= iter->second;
+	  if (l_id != ""){//linked
+		if (Vars.find(l_id)==Vars.end()){
+		  cerr<<"Warning: linked data does not exsit, renew field\n";
+		  Linked[id]="";
+		}else return (*this)[l_id];
+	  }//found and not linked
+	}
+	if (Vars[id]==NULL){
+	  Vars[id] = new type;
+	  Name[id] = id;
+	}
+	return *Vars[id];
+  }//note that the return type is distinguished by the operator
+
+  template<class type> type &Map<type>::operator[](map<string,string>::iterator iter){//create new if necc. and return type
+	return (*this)[iter->first];
+  }
+
+  template<class type> Map<type> &Map<type>::operator=(Map< type > &vmap){
+	string id;
+	map< string ,string >::iterator iter;
+	iter=vmap.Linked.begin();
+	while (iter!=vmap.Linked.end()) {
+	  id=iter->first;
+	  Linked[id] = iter->second;
+	  if (iter->second==""){
+		Vars[id] = new type;
+		*Vars[id] = *vmap.Vars[id];
+	  }else
+		Vars[id]=NULL;
+	  iter++;
+	}
+	return *this;
+  }
+
+  template<class type> int Map<type>::addkey(string id){
+    if (Linked.find(id)==Linked.end()) return 0;
+    Linked[id]="";
+    Vars[id]  =NULL;
+    return 0;
+  }
+
+  template<class type> int Map<type>::link(string target, string link){
+	string id_tar,id_lin;
+	map< string ,string >::iterator iter_tar,iter_lin;
+	iter_tar=Linked.find(target);
+	iter_lin=Linked.find(link);
+	if ( iter_tar == Linked.end() )//target not exist, abort operation
+	  return -1;
+	//link exist as not linked
+	if ( iter_lin == Linked.end() && iter_lin->second == "" )
+	  delete Vars[ link ];
+	Vars[link]=NULL;
+	Linked[link]=target;
+	return 0;
+  }
+  template<class type> int Map<type>::erase(string id){
+	Linked.erase(id);
+	Vars.erase(id);
+	return 0;
+  }
+
+  template<class type> int Map<type>::unlink(string id){
+	map< string ,string >::iterator iter;
+	iter=Linked.find(id);
+	if ( iter == Linked.end() )//target not exist, abort operation
+	  return -1;
+	//link exist
+	Linked[id]="";
+	return 0;
+  }
+  template<class type> map<string, string>::iterator Map<type>::begin(){
+	return Name.begin();
+  };
+  template<class type> map<string, string>::iterator Map<type>::end(){
+	return Name.end();
+  };
+  template<class type> map<string, string>::iterator Map<type>::find(string id){
+	return Name.find(id);
+  };
+};
+#endif

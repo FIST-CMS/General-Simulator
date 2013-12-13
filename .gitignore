@@ -1,0 +1,27 @@
+# files by some soft
+*.o
+*.~
+*.swp
+.dy*
+.em*
+.tm*
+*.log
+*.m
+*.err
+log.*
+*.bak
+*.backup
+*.eps
+
+# files of this project
+data.*
+*.data
+src/in.*
+include/emake
+include/makefile
+tags
+Plot.nb
+init.m
+in.gups
+gups
+gsi
